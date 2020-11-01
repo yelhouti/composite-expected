@@ -1,0 +1,11 @@
+id;name;type;end_date;created_at;modified_at;done;description;attachment;attachment_content_type;picture;picture_content_type;user_id
+1;withdrawal Avon rich;TYPE3;2020-11-09;2020-11-09T16:50:36;2020-11-10T04:29:58;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+2;payment Grocery Baby;TYPE2;2020-11-09;2020-11-10T01:27:33;2020-11-10T04:43:35;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+3;back-end;TYPE2;2020-11-09;2020-11-09T21:03:49;2020-11-09T12:24:25;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+4;transmit Designer Pakistan;TYPE1;2020-11-09;2020-11-09T10:28:42;2020-11-10T07:46:10;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+5;hacking;TYPE3;2020-11-10;2020-11-09T15:33:16;2020-11-09T13:05:06;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+6;back-end backing;TYPE3;2020-11-09;2020-11-09T15:00:53;2020-11-10T08:07:05;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+7;Tasty Handmade Orchestrator;TYPE2;2020-11-10;2020-11-10T02:43:16;2020-11-09T14:52:06;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+8;TCP ADP Executive;TYPE2;2020-11-09;2020-11-10T01:56:46;2020-11-09T13:42:46;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+9;Valley Chips methodical;TYPE3;2020-11-09;2020-11-09T11:47:26;2020-11-09T16:58:36;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+10;Expanded;TYPE1;2020-11-09;2020-11-09T16:41:06;2020-11-10T01:57:48;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1

@@ -1,0 +1,99 @@
+<div>
+    <h2 id="page-heading" data-cy="TaskHeading">
+        <span jhiTranslate="compositekeyApp.task.home.title">Tasks</span>
+
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-info mr-2" (click)="handleSyncList()" [disabled]="isLoading">
+                <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+                <span jhiTranslate="compositekeyApp.task.home.refreshListLabel">Refresh List</span>
+            </button>
+
+            <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-primary jh-create-entity create-task" [routerLink]="['/task/new']">
+                <fa-icon icon="plus"></fa-icon>
+                <span  jhiTranslate="compositekeyApp.task.home.createLabel">
+                Create a new Task
+                </span>
+            </button>
+        </div>
+    </h2>
+
+    <jhi-alert-error></jhi-alert-error>
+
+    <jhi-alert></jhi-alert>
+
+    <div class="alert alert-warning" id="no-result" *ngIf="tasks?.length === 0">
+        <span jhiTranslate="compositekeyApp.task.home.notFound">No tasks found</span>
+    </div>
+
+    <div class="table-responsive" id="entities" *ngIf="tasks && tasks.length > 0">
+        <table class="table table-striped" aria-describedby="page-heading">
+            <thead>
+                <tr>
+                    <th scope="col" ><span jhiTranslate="global.field.id">ID</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.name">Name</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.type">Type</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.endDate">End Date</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.createdAt">Created At</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.modifiedAt">Modified At</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.done">Done</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.description">Description</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.attachment">Attachment</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.picture">Picture</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.task.user">User</span></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let task of tasks; trackBy: trackId" data-cy="entityTable">
+                    <td><a [routerLink]="['/task', task.id, 'view']">{{ task.id }}</a></td>
+                    <td>{{ task.name }}</td>
+                    <td jhiTranslate="{{ 'compositekeyApp.TaskType.' + task.type }}">{{ task.type }}</td>
+                    <td>{{ task.endDate | date:'mediumDate' }}</td>
+                    <td>{{ task.createdAt | date:'medium' }}</td>
+                    <td>{{ task.modifiedAt | date:'medium' }}</td>
+                    <td>{{ task.done }}</td>
+                    <td>{{ task.description }}</td>
+                    <td>
+                        <a *ngIf="task.attachment" (click)="openFile(task.attachmentContentType, task.attachment)" jhiTranslate="entity.action.open">open</a>
+                        <span *ngIf="task.attachment">{{ task.attachmentContentType }}, {{ byteSize(task.attachment) }}</span>
+                    </td>
+                    <td>
+                        <a *ngIf="task.picture" (click)="openFile(task.pictureContentType, task.picture)">
+                            <img [src]="'data:' + task.pictureContentType + ';base64,' + task.picture" style="max-height: 30px;" alt="task image"/>
+                        </a>
+                        <span *ngIf="task.picture">{{ task.pictureContentType }}, {{ byteSize(task.picture) }}</span>
+                    </td>
+                    <td>
+                        {{ task.user?.login }}
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group">
+                            <button type="submit"
+                                    [routerLink]="['/task', task.id, 'view']"
+                                    class="btn btn-info btn-sm"
+                                    data-cy="entityDetailsButton">
+                                <fa-icon icon="eye"></fa-icon>
+                                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                            </button>
+
+                            <button type="submit"
+                                    [routerLink]="['/task', task.id, 'edit']"
+                                    class="btn btn-primary btn-sm"
+                                    data-cy="entityEditButton">
+                                <fa-icon icon="pencil-alt"></fa-icon>
+                                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                            </button>
+
+                            <button type="submit" (click)="delete(task)"
+                                    class="btn btn-danger btn-sm"
+                                    data-cy="entityDeleteButton">
+                                <fa-icon icon="times"></fa-icon>
+                                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
