@@ -1,0 +1,49 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="employeeSkillCertificate">
+            <h2 data-cy="employeeSkillCertificateDetailsHeading"><span jhiTranslate="compositekeyApp.employeeSkillCertificate.detail.title">Employee Skill Certificate</span> {{ employeeSkillCertificate.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <jhi-alert></jhi-alert>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.grade">Grade</span></dt>
+                <dd>
+                    <span>{{ employeeSkillCertificate.grade }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.date">Date</span></dt>
+                <dd>
+                    <span>{{ employeeSkillCertificate.date }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.type">Type</span></dt>
+                <dd>
+                    <div *ngIf="employeeSkillCertificate.type">
+                        <a [routerLink]="['/certificate-type', employeeSkillCertificate.type?.id, 'view']">{{ employeeSkillCertificate.type?.name }}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.skill">Skill</span></dt>
+                <dd>
+                    <div *ngIf="employeeSkillCertificate.skill">
+                        <a [routerLink]="['/employee-skill', employeeSkillCertificate.skill?.id, 'view']">{{ employeeSkillCertificate.skill?.id }}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info"
+                    data-cy="entityDetailsBackButton">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

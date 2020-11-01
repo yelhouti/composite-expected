@@ -1,0 +1,14 @@
+package com.mycompany.myapp.repository;
+
+import com.mycompany.myapp.GeneratedByJHipster;
+import com.mycompany.myapp.domain.TaskComment;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Spring Data SQL repository for the TaskComment entity.
+ */
+@SuppressWarnings("unused")
+@Repository
+@GeneratedByJHipster
+public interface TaskCommentRepository extends JpaRepository<TaskComment, Long>, JpaSpecificationExecutor<TaskComment> {}

@@ -1,0 +1,25 @@
+{
+  "compositekeyApp": {
+    "withIdStringDetails": {
+      "home": {
+        "title": "WithIdStringDetails",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau With Id String Details",
+        "createOrEditLabel": "Créer ou éditer un With Id String Details",
+        "notFound": "Aucun With Id String Details trouvé"
+      },
+      "created": "Un nouveau With Id String Details a été créé avec l'identifiant {{ param }}",
+      "updated": "Le With Id String Details avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le With Id String Details avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Etes-vous certain de vouloir supprimer le With Id String Details {{ id }} ?"
+      },
+      "detail": {
+        "title": "With Id String Details"
+      },
+      "id": "ID",
+      "name": "Name",
+      "withIdString": "With Id String"
+    }
+  }
+}

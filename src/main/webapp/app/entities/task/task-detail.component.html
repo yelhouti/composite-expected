@@ -1,0 +1,77 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="task">
+            <h2 data-cy="taskDetailsHeading"><span jhiTranslate="compositekeyApp.task.detail.title">Task</span> {{ task.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <jhi-alert></jhi-alert>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="compositekeyApp.task.name">Name</span></dt>
+                <dd>
+                    <span>{{ task.name }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.type">Type</span></dt>
+                <dd>
+                    <span jhiTranslate="{{ 'compositekeyApp.TaskType.' + task.type }}">{{ task.type }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.endDate">End Date</span></dt>
+                <dd>
+                    <span>{{ task.endDate }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.createdAt">Created At</span></dt>
+                <dd>
+                    <span>{{ task.createdAt }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.modifiedAt">Modified At</span></dt>
+                <dd>
+                    <span>{{ task.modifiedAt }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.done">Done</span></dt>
+                <dd>
+                    <span>{{ task.done }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.description">Description</span></dt>
+                <dd>
+                    <span>{{ task.description }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.attachment">Attachment</span></dt>
+                <dd>
+                    <div *ngIf="task.attachment">
+                        <a (click)="openFile(task.attachmentContentType, task.attachment)" jhiTranslate="entity.action.open">open</a>
+                        {{ task.attachmentContentType }}, {{ byteSize(task.attachment) }}
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.picture">Picture</span></dt>
+                <dd>
+                    <div *ngIf="task.picture">
+                        <a (click)="openFile(task.pictureContentType, task.picture)">
+                            <img [src]="'data:' + task.pictureContentType + ';base64,' + task.picture" style="max-width: 100%;" alt="task image"/>
+                        </a>
+                        {{ task.pictureContentType }}, {{ byteSize(task.picture) }}
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.task.user">User</span></dt>
+                <dd>
+                    {{ task.user?.login }}
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info"
+                    data-cy="entityDetailsBackButton">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/task', task.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

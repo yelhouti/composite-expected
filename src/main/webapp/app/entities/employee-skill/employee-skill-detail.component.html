@@ -1,0 +1,51 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="employeeSkill">
+            <h2 data-cy="employeeSkillDetailsHeading"><span jhiTranslate="compositekeyApp.employeeSkill.detail.title">Employee Skill</span> {{ employeeSkill.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <jhi-alert></jhi-alert>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="compositekeyApp.employeeSkill.level">Level</span></dt>
+                <dd>
+                    <span>{{ employeeSkill.level }}</span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkill.task">Task</span></dt>
+                <dd>
+                    <span *ngFor="let task of employeeSkill.tasks; let last = last">
+                        <a [routerLink]="['/task', task?.id, 'view']">{{ task.name }}</a>{{ last ? '' : ', ' }}
+                    </span>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkill.employee">Employee</span></dt>
+                <dd>
+                    <div *ngIf="employeeSkill.employee">
+                        <a [routerLink]="['/employee', employeeSkill.employee?.id, 'view']">{{ employeeSkill.employee?.fullname }}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="compositekeyApp.employeeSkill.teacher">Teacher</span></dt>
+                <dd>
+                    <div *ngIf="employeeSkill.teacher">
+                        <a [routerLink]="['/employee', employeeSkill.teacher?.id, 'view']">{{ employeeSkill.teacher?.fullname }}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info"
+                    data-cy="entityDetailsBackButton">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/employee-skill', employeeSkill.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

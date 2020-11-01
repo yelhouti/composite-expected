@@ -1,0 +1,33 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="priceFormula">
+            <h2 data-cy="priceFormulaDetailsHeading"><span jhiTranslate="compositekeyApp.priceFormula.detail.title">Price Formula</span> {{ priceFormula.id }}</h2>
+
+            <hr>
+
+            <jhi-alert-error></jhi-alert-error>
+
+            <jhi-alert></jhi-alert>
+
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="compositekeyApp.priceFormula.formula">Formula</span></dt>
+                <dd>
+                    <span>{{ priceFormula.formula }}</span>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info"
+                    data-cy="entityDetailsBackButton">
+                <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/price-formula', priceFormula.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+            </button>
+        </div>
+    </div>
+</div>
