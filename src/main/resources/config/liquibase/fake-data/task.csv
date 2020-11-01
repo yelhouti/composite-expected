@@ -1,0 +1,11 @@
+id;name;type;end_date;created_at;modified_at;done;description;attachment;attachment_content_type;picture;picture_content_type;user_id
+1;withdrawal Avon rich;TYPE3;2021-03-12;2021-03-12T15:46:04;2021-03-13T03:25:26;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+2;Web Chair;TYPE3;2021-03-13;2021-03-12T15:50:52;2021-03-13T06:19:31;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+3;bifurcated virtual;TYPE1;2021-03-12;2021-03-12T19:55:59;2021-03-12T09:39:01;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+4;circuit transmit Designer;TYPE3;2021-03-12;2021-03-12T23:02:14;2021-03-13T05:48:48;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+5;Home Pizza synthesizing;TYPE3;2021-03-12;2021-03-12T11:04:00;2021-03-12T22:55:45;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+6;Bacon Health calculating;TYPE1;2021-03-13;2021-03-12T13:22:29;2021-03-13T05:12:47;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+7;Handmade Orchestrator;TYPE2;2021-03-13;2021-03-13T01:38:44;2021-03-12T13:47:34;false;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+8;programming;TYPE3;2021-03-12;2021-03-12T20:35:20;2021-03-12T17:55:41;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1
+9;multi-tasking;TYPE1;2021-03-12;2021-03-12T13:07:05;2021-03-12T22:06:27;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;2
+10;Dynamic Technician;TYPE2;2021-03-12;2021-03-12T13:06:24;2021-03-12T20:32:17;true;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;../fake-data/blob/hipster.png;image/png;1

@@ -1,0 +1,25 @@
+{
+  "compositekeyApp": {
+    "withUUIDDetails": {
+      "home": {
+        "title": "With UUID Details",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new With UUID Details",
+        "createOrEditLabel": "Create or edit a With UUID Details",
+        "notFound": "No With UUID Details found"
+      },
+      "created": "A new With UUID Details is created with identifier {{ param }}",
+      "updated": "A With UUID Details is updated with identifier {{ param }}",
+      "deleted": "A With UUID Details is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete With UUID Details {{ id }}?"
+      },
+      "detail": {
+        "title": "With UUID Details"
+      },
+      "uuid": "Uuid",
+      "details": "Details",
+      "withUUID": "With UUID"
+    }
+  }
+}
