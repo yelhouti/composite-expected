@@ -13,7 +13,7 @@ class TaskCommentTest {
         TaskComment taskComment1 = new TaskComment();
         taskComment1.setId(1L);
         TaskComment taskComment2 = new TaskComment();
-        taskComment2.setId(taskComment1.getId());
+        taskComment2.setId(1L);
         assertThat(taskComment1).isEqualTo(taskComment2);
         taskComment2.setId(2L);
         assertThat(taskComment1).isNotEqualTo(taskComment2);

@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -18,10 +19,8 @@ public class EmployeeSkillCertificate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
+    @EmbeddedId
+    EmployeeSkillCertificateId id;
 
     @NotNull
     @Column(name = "grade", nullable = false)
@@ -34,23 +33,25 @@ public class EmployeeSkillCertificate implements Serializable {
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "employeeSkillCertificates" }, allowSetters = true)
+    @JoinColumn(insertable = false, updatable = false)
     private CertificateType type;
 
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "employeeSkillCertificates", "tasks", "employee", "teacher" }, allowSetters = true)
+    @JoinColumns({ @JoinColumn(insertable = false, updatable = false), @JoinColumn(insertable = false, updatable = false) })
     private EmployeeSkill skill;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
+    public EmployeeSkillCertificateId getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(EmployeeSkillCertificateId id) {
         this.id = id;
     }
 
-    public EmployeeSkillCertificate id(Long id) {
+    public EmployeeSkillCertificate id(EmployeeSkillCertificateId id) {
         this.id = id;
         return this;
     }
@@ -122,7 +123,7 @@ public class EmployeeSkillCertificate implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore

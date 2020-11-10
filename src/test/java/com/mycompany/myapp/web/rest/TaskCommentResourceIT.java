@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class TaskCommentResourceIT {
+public class TaskCommentResourceIT {
 
-    private static final String DEFAULT_VALUE = "AAAAAAAAAA";
-    private static final String UPDATED_VALUE = "BBBBBBBBBB";
+    public static final String DEFAULT_VALUE = "AAAAAAAAAA";
+    public static final String UPDATED_VALUE = "BBBBBBBBBB";
 
     @Autowired
     private TaskCommentRepository taskCommentRepository;
@@ -62,13 +62,11 @@ class TaskCommentResourceIT {
     public static TaskComment createEntity(EntityManager em) {
         TaskComment taskComment = new TaskComment().value(DEFAULT_VALUE);
         // Add required entity
-        Task task;
-        if (TestUtil.findAll(em, Task.class).isEmpty()) {
+        Task task = TestUtil.findAll(em, Task.class).stream().findFirst().orElse(null);
+        if (task == null) {
             task = TaskResourceIT.createEntity(em);
             em.persist(task);
             em.flush();
-        } else {
-            task = TestUtil.findAll(em, Task.class).get(0);
         }
         taskComment.setTask(task);
         return taskComment;
@@ -83,13 +81,11 @@ class TaskCommentResourceIT {
     public static TaskComment createUpdatedEntity(EntityManager em) {
         TaskComment taskComment = new TaskComment().value(UPDATED_VALUE);
         // Add required entity
-        Task task;
-        if (TestUtil.findAll(em, Task.class).isEmpty()) {
+        Task task = TestUtil.findAll(em, Task.class).stream().skip(1).findFirst().orElse(null);
+        if (task == null) {
             task = TaskResourceIT.createUpdatedEntity(em);
             em.persist(task);
             em.flush();
-        } else {
-            task = TestUtil.findAll(em, Task.class).get(0);
         }
         taskComment.setTask(task);
         return taskComment;
@@ -124,10 +120,11 @@ class TaskCommentResourceIT {
     @Test
     @Transactional
     void createTaskCommentWithExistingId() throws Exception {
+        taskCommentRepository.save(taskComment);
         int databaseSizeBeforeCreate = taskCommentRepository.findAll().size();
 
         // Create the TaskComment with an existing ID
-        taskComment.setId(1L);
+        taskComment.setId(taskComment.getId());
         TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(taskComment);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -174,7 +171,7 @@ class TaskCommentResourceIT {
 
         // Get all the taskCommentList
         restTaskCommentMockMvc
-            .perform(get("/api/task-comments?sort=id,desc"))
+            .perform(get("/api/task-comments"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(taskComment.getId().intValue())))
@@ -295,20 +292,15 @@ class TaskCommentResourceIT {
     @Test
     @Transactional
     void getAllTaskCommentsByTaskIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        Task task = taskComment.getTask();
         taskCommentRepository.saveAndFlush(taskComment);
-        Task task = TaskResourceIT.createEntity(em);
-        em.persist(task);
-        em.flush();
-        taskComment.setTask(task);
-        taskCommentRepository.saveAndFlush(taskComment);
-        Long taskId = task.getId();
 
-        // Get all the taskCommentList where task equals to taskId
-        defaultTaskCommentShouldBeFound("taskId.equals=" + taskId);
+        // Get all the taskCommentList where task.id equals to task.getId()
+        defaultTaskCommentShouldBeFound("task.id.equals=" + task.getId());
 
-        // Get all the taskCommentList where task equals to taskId + 1
-        defaultTaskCommentShouldNotBeFound("taskId.equals=" + (taskId + 1));
+        // Get all the taskCommentList where task.id equals to (task.getId() + 1)
+        defaultTaskCommentShouldNotBeFound("task.id.equals=" + (task.getId() + 1));
     }
 
     /**
@@ -316,7 +308,7 @@ class TaskCommentResourceIT {
      */
     private void defaultTaskCommentShouldBeFound(String filter) throws Exception {
         restTaskCommentMockMvc
-            .perform(get("/api/task-comments?sort=id,desc&" + filter))
+            .perform(get("/api/task-comments?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(taskComment.getId().intValue())))
@@ -324,7 +316,7 @@ class TaskCommentResourceIT {
 
         // Check, that the count call also returns 1
         restTaskCommentMockMvc
-            .perform(get("/api/task-comments/count?sort=id,desc&" + filter))
+            .perform(get("/api/task-comments/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -335,7 +327,7 @@ class TaskCommentResourceIT {
      */
     private void defaultTaskCommentShouldNotBeFound(String filter) throws Exception {
         restTaskCommentMockMvc
-            .perform(get("/api/task-comments?sort=id,desc&" + filter))
+            .perform(get("/api/task-comments?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -343,7 +335,7 @@ class TaskCommentResourceIT {
 
         // Check, that the count call also returns 0
         restTaskCommentMockMvc
-            .perform(get("/api/task-comments/count?sort=id,desc&" + filter))
+            .perform(get("/api/task-comments/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -417,12 +409,12 @@ class TaskCommentResourceIT {
         partialUpdatedTaskComment.setId(taskComment.getId());
 
         partialUpdatedTaskComment.value(UPDATED_VALUE);
-
+        TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(partialUpdatedTaskComment);
         restTaskCommentMockMvc
             .perform(
                 patch("/api/task-comments")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskComment))
+                    .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
             )
             .andExpect(status().isOk());
 
@@ -446,12 +438,12 @@ class TaskCommentResourceIT {
         partialUpdatedTaskComment.setId(taskComment.getId());
 
         partialUpdatedTaskComment.value(UPDATED_VALUE);
-
+        TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(partialUpdatedTaskComment);
         restTaskCommentMockMvc
             .perform(
                 patch("/api/task-comments")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskComment))
+                    .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
             )
             .andExpect(status().isOk());
 

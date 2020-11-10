@@ -43,12 +43,12 @@ public interface WithIdStringService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<WithIdStringDTO> findOne(Long id);
+    Optional<WithIdStringDTO> findOne(String id);
 
     /**
      * Delete the "id" withIdString.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    void delete(String id);
 }

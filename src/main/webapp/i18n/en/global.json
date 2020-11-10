@@ -8,6 +8,7 @@
       "entities": {
         "main": "Entities",
         "employee": "Employee",
+        "priceFormula": "Price Formula",
         "employeeSkill": "Employee Skill",
         "certificateType": "Certificate Type",
         "employeeSkillCertificate": "Employee Skill Certificate",

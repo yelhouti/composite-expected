@@ -23,7 +23,7 @@ export class WithIdStringDetailsService {
     return this.http.put<IWithIdStringDetails>(this.resourceUrl, withIdStringDetails, { observe: 'response' });
   }
 
-  find(id: number): Observable<EntityResponseType> {
+  find(id: string): Observable<EntityResponseType> {
     return this.http.get<IWithIdStringDetails>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
@@ -32,7 +32,7 @@ export class WithIdStringDetailsService {
     return this.http.get<IWithIdStringDetails[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
+  delete(id: string): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 }

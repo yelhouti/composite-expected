@@ -34,6 +34,12 @@
                         </a>
                     </li>
                     <li>
+                        <a class="dropdown-item" routerLink="price-formula" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                            <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                            <span jhiTranslate="global.menu.entities.priceFormula">Price Formula</span>
+                        </a>
+                    </li>
+                    <li>
                         <a class="dropdown-item" routerLink="employee-skill" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                             <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
                             <span jhiTranslate="global.menu.entities.employeeSkill">Employee Skill</span>

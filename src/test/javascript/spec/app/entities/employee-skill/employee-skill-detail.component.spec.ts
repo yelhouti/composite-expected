@@ -16,7 +16,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employeeSkill: new EmployeeSkill('123') }) },
+            useValue: { data: of({ employeeSkill: new EmployeeSkill(123) }) },
           },
         ],
       })
@@ -32,7 +32,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ id: '123' }));
+        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ id: 123 }));
       });
     });
   });

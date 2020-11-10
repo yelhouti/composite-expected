@@ -41,40 +41,40 @@ import org.springframework.util.Base64Utils;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class TaskResourceIT {
+public class TaskResourceIT {
 
-    private static final String DEFAULT_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_NAME = "BBBBBBBBBB";
+    public static final String DEFAULT_NAME = "AAAAAAAAAA";
+    public static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final TaskType DEFAULT_TYPE = TaskType.TYPE1;
-    private static final TaskType UPDATED_TYPE = TaskType.TYPE2;
+    public static final TaskType DEFAULT_TYPE = TaskType.TYPE1;
+    public static final TaskType UPDATED_TYPE = TaskType.TYPE2;
 
-    private static final LocalDate DEFAULT_END_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_END_DATE = LocalDate.now(ZoneId.systemDefault());
-    private static final LocalDate SMALLER_END_DATE = LocalDate.ofEpochDay(-1L);
+    public static final LocalDate DEFAULT_END_DATE = LocalDate.ofEpochDay(0L);
+    public static final LocalDate UPDATED_END_DATE = LocalDate.now(ZoneId.systemDefault());
+    public static final LocalDate SMALLER_END_DATE = LocalDate.ofEpochDay(-1L);
 
-    private static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
-    private static final ZonedDateTime SMALLER_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
+    public static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
+    public static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    public static final ZonedDateTime SMALLER_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
 
-    private static final Instant DEFAULT_MODIFIED_AT = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_MODIFIED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    public static final Instant DEFAULT_MODIFIED_AT = Instant.ofEpochMilli(0L);
+    public static final Instant UPDATED_MODIFIED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Boolean DEFAULT_DONE = false;
-    private static final Boolean UPDATED_DONE = true;
+    public static final Boolean DEFAULT_DONE = false;
+    public static final Boolean UPDATED_DONE = true;
 
-    private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
-    private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+    public static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
+    public static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final byte[] DEFAULT_ATTACHMENT = TestUtil.createByteArray(1, "0");
-    private static final byte[] UPDATED_ATTACHMENT = TestUtil.createByteArray(1, "1");
-    private static final String DEFAULT_ATTACHMENT_CONTENT_TYPE = "image/jpg";
-    private static final String UPDATED_ATTACHMENT_CONTENT_TYPE = "image/png";
+    public static final byte[] DEFAULT_ATTACHMENT = TestUtil.createByteArray(1, "0");
+    public static final byte[] UPDATED_ATTACHMENT = TestUtil.createByteArray(1, "1");
+    public static final String DEFAULT_ATTACHMENT_CONTENT_TYPE = "image/jpg";
+    public static final String UPDATED_ATTACHMENT_CONTENT_TYPE = "image/png";
 
-    private static final byte[] DEFAULT_PICTURE = TestUtil.createByteArray(1, "0");
-    private static final byte[] UPDATED_PICTURE = TestUtil.createByteArray(1, "1");
-    private static final String DEFAULT_PICTURE_CONTENT_TYPE = "image/jpg";
-    private static final String UPDATED_PICTURE_CONTENT_TYPE = "image/png";
+    public static final byte[] DEFAULT_PICTURE = TestUtil.createByteArray(1, "0");
+    public static final byte[] UPDATED_PICTURE = TestUtil.createByteArray(1, "1");
+    public static final String DEFAULT_PICTURE_CONTENT_TYPE = "image/jpg";
+    public static final String UPDATED_PICTURE_CONTENT_TYPE = "image/png";
 
     @Autowired
     private TaskRepository taskRepository;
@@ -182,10 +182,11 @@ class TaskResourceIT {
     @Test
     @Transactional
     void createTaskWithExistingId() throws Exception {
+        taskRepository.save(task);
         int databaseSizeBeforeCreate = taskRepository.findAll().size();
 
         // Create the Task with an existing ID
-        task.setId(1L);
+        task.setId(task.getId());
         TaskDTO taskDTO = taskMapper.toDto(task);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -296,7 +297,7 @@ class TaskResourceIT {
 
         // Get all the taskList
         restTaskMockMvc
-            .perform(get("/api/tasks?sort=id,desc"))
+            .perform(get("/api/tasks"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
@@ -800,25 +801,6 @@ class TaskResourceIT {
 
     @Test
     @Transactional
-    void getAllTasksByUserIsEqualToSomething() throws Exception {
-        // Initialize the database
-        taskRepository.saveAndFlush(task);
-        User user = UserResourceIT.createEntity(em);
-        em.persist(user);
-        em.flush();
-        task.setUser(user);
-        taskRepository.saveAndFlush(task);
-        Long userId = user.getId();
-
-        // Get all the taskList where user equals to userId
-        defaultTaskShouldBeFound("userId.equals=" + userId);
-
-        // Get all the taskList where user equals to userId + 1
-        defaultTaskShouldNotBeFound("userId.equals=" + (userId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllTasksByEmployeeSkillIsEqualToSomething() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
@@ -827,13 +809,12 @@ class TaskResourceIT {
         em.flush();
         task.addEmployeeSkill(employeeSkill);
         taskRepository.saveAndFlush(task);
-        Long employeeSkillId = employeeSkill.getId();
 
-        // Get all the taskList where employeeSkill equals to employeeSkillId
-        defaultTaskShouldBeFound("employeeSkillId.equals=" + employeeSkillId);
+        // Get all the taskList where employeeSkill.name equals to EmployeeSkillResourceIT.DEFAULT_NAME
+        defaultTaskShouldBeFound("employeeSkill.name.equals=" + EmployeeSkillResourceIT.DEFAULT_NAME);
 
-        // Get all the taskList where employeeSkill equals to employeeSkillId + 1
-        defaultTaskShouldNotBeFound("employeeSkillId.equals=" + (employeeSkillId + 1));
+        // Get all the taskList where employeeSkill.name equals to EmployeeSkillResourceIT.UPDATED_NAME
+        defaultTaskShouldNotBeFound("employeeSkill.name.equals=" + EmployeeSkillResourceIT.UPDATED_NAME);
     }
 
     /**
@@ -841,7 +822,7 @@ class TaskResourceIT {
      */
     private void defaultTaskShouldBeFound(String filter) throws Exception {
         restTaskMockMvc
-            .perform(get("/api/tasks?sort=id,desc&" + filter))
+            .perform(get("/api/tasks?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
@@ -859,7 +840,7 @@ class TaskResourceIT {
 
         // Check, that the count call also returns 1
         restTaskMockMvc
-            .perform(get("/api/tasks/count?sort=id,desc&" + filter))
+            .perform(get("/api/tasks/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -870,7 +851,7 @@ class TaskResourceIT {
      */
     private void defaultTaskShouldNotBeFound(String filter) throws Exception {
         restTaskMockMvc
-            .perform(get("/api/tasks?sort=id,desc&" + filter))
+            .perform(get("/api/tasks?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -878,7 +859,7 @@ class TaskResourceIT {
 
         // Check, that the count call also returns 0
         restTaskMockMvc
-            .perform(get("/api/tasks/count?sort=id,desc&" + filter))
+            .perform(get("/api/tasks/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -975,13 +956,9 @@ class TaskResourceIT {
             .modifiedAt(UPDATED_MODIFIED_AT)
             .picture(UPDATED_PICTURE)
             .pictureContentType(UPDATED_PICTURE_CONTENT_TYPE);
-
+        TaskDTO taskDTO = taskMapper.toDto(partialUpdatedTask);
         restTaskMockMvc
-            .perform(
-                patch("/api/tasks")
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTask))
-            )
+            .perform(patch("/api/tasks").contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isOk());
 
         // Validate the Task in the database
@@ -1025,13 +1002,9 @@ class TaskResourceIT {
             .attachmentContentType(UPDATED_ATTACHMENT_CONTENT_TYPE)
             .picture(UPDATED_PICTURE)
             .pictureContentType(UPDATED_PICTURE_CONTENT_TYPE);
-
+        TaskDTO taskDTO = taskMapper.toDto(partialUpdatedTask);
         restTaskMockMvc
-            .perform(
-                patch("/api/tasks")
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTask))
-            )
+            .perform(patch("/api/tasks").contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(taskDTO)))
             .andExpect(status().isOk());
 
         // Validate the Task in the database

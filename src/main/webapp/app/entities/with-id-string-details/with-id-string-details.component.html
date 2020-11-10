@@ -29,7 +29,7 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr>
-                    <th scope="col" ><span jhiTranslate="global.field.id">ID</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.withIdStringDetails.withIdStringId">With Id String Id</span></th>
                     <th scope="col" ><span jhiTranslate="compositekeyApp.withIdStringDetails.name">Name</span></th>
                     <th scope="col" ><span jhiTranslate="compositekeyApp.withIdStringDetails.withIdString">With Id String</span></th>
                     <th scope="col"></th>
@@ -37,7 +37,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let withIdStringDetails of withIdStringDetails; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/with-id-string-details', withIdStringDetails.id, 'view']">{{ withIdStringDetails.id }}</a></td>
+                    <td><a [routerLink]="['/with-id-string-details', withIdStringDetails.withIdStringId, 'view']">{{ withIdStringDetails.withIdStringId }}</a></td>
                     <td>{{ withIdStringDetails.name }}</td>
                     <td>
                         <div *ngIf="withIdStringDetails.withIdString">

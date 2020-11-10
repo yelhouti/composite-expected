@@ -2,6 +2,13 @@
   "name": "TaskComment",
   "fields": [
     {
+      "fieldName": "id",
+      "fieldType": "Long",
+      "options": {
+        "id": true
+      }
+    },
+    {
       "fieldName": "value",
       "fieldType": "String",
       "fieldValidateRules": ["required"]

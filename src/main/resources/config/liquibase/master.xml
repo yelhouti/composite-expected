@@ -18,6 +18,7 @@
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20201110081024_added_entity_Employee.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20201110081024_added_entity_PriceFormula.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20201110081124_added_entity_EmployeeSkill.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20201110081224_added_entity_CertificateType.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20201110081324_added_entity_EmployeeSkillCertificate.xml" relativeToChangelogFile="false"/>

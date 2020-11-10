@@ -31,7 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class WithIdStringResourceIT {
+public class WithIdStringResourceIT {
+
+    public static final String DEFAULT_ID = "AAAAAAAAAA";
+    public static final String UPDATED_ID = "BBBBBBBBBB";
 
     @Autowired
     private WithIdStringRepository withIdStringRepository;
@@ -57,7 +60,7 @@ class WithIdStringResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static WithIdString createEntity(EntityManager em) {
-        WithIdString withIdString = new WithIdString();
+        WithIdString withIdString = new WithIdString().id(DEFAULT_ID);
         return withIdString;
     }
 
@@ -68,7 +71,7 @@ class WithIdStringResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static WithIdString createUpdatedEntity(EntityManager em) {
-        WithIdString withIdString = new WithIdString();
+        WithIdString withIdString = new WithIdString().id(UPDATED_ID);
         return withIdString;
     }
 
@@ -95,15 +98,17 @@ class WithIdStringResourceIT {
         List<WithIdString> withIdStringList = withIdStringRepository.findAll();
         assertThat(withIdStringList).hasSize(databaseSizeBeforeCreate + 1);
         WithIdString testWithIdString = withIdStringList.get(withIdStringList.size() - 1);
+        assertThat(testWithIdString.getId()).isEqualTo(DEFAULT_ID);
     }
 
     @Test
     @Transactional
     void createWithIdStringWithExistingId() throws Exception {
+        withIdStringRepository.save(withIdString);
         int databaseSizeBeforeCreate = withIdStringRepository.findAll().size();
 
         // Create the WithIdString with an existing ID
-        withIdString.setId(1L);
+        withIdString.setId(withIdString.getId());
         WithIdStringDTO withIdStringDTO = withIdStringMapper.toDto(withIdString);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -122,16 +127,38 @@ class WithIdStringResourceIT {
 
     @Test
     @Transactional
+    void checkIdIsRequired() throws Exception {
+        int databaseSizeBeforeTest = withIdStringRepository.findAll().size();
+        // set the field null
+        withIdString.setId(null);
+
+        // Create the WithIdString, which fails.
+        WithIdStringDTO withIdStringDTO = withIdStringMapper.toDto(withIdString);
+
+        restWithIdStringMockMvc
+            .perform(
+                post("/api/with-id-strings")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<WithIdString> withIdStringList = withIdStringRepository.findAll();
+        assertThat(withIdStringList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllWithIdStrings() throws Exception {
         // Initialize the database
         withIdStringRepository.saveAndFlush(withIdString);
 
         // Get all the withIdStringList
         restWithIdStringMockMvc
-            .perform(get("/api/with-id-strings?sort=id,desc"))
+            .perform(get("/api/with-id-strings"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(withIdString.getId().intValue())));
+            .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID)));
     }
 
     @Test
@@ -145,25 +172,85 @@ class WithIdStringResourceIT {
             .perform(get("/api/with-id-strings/{id}", withIdString.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(withIdString.getId().intValue()));
+            .andExpect(jsonPath("$.id").value(DEFAULT_ID));
     }
 
     @Test
     @Transactional
-    void getWithIdStringsByIdFiltering() throws Exception {
+    void getAllWithIdStringsByIdIsEqualToSomething() throws Exception {
         // Initialize the database
         withIdStringRepository.saveAndFlush(withIdString);
 
-        Long id = withIdString.getId();
+        // Get all the withIdStringList where id equals to DEFAULT_ID
+        defaultWithIdStringShouldBeFound("id.equals=" + DEFAULT_ID);
 
-        defaultWithIdStringShouldBeFound("id.equals=" + id);
-        defaultWithIdStringShouldNotBeFound("id.notEquals=" + id);
+        // Get all the withIdStringList where id equals to UPDATED_ID
+        defaultWithIdStringShouldNotBeFound("id.equals=" + UPDATED_ID);
+    }
 
-        defaultWithIdStringShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultWithIdStringShouldNotBeFound("id.greaterThan=" + id);
+    @Test
+    @Transactional
+    void getAllWithIdStringsByIdIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        withIdStringRepository.saveAndFlush(withIdString);
 
-        defaultWithIdStringShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultWithIdStringShouldNotBeFound("id.lessThan=" + id);
+        // Get all the withIdStringList where id not equals to DEFAULT_ID
+        defaultWithIdStringShouldNotBeFound("id.notEquals=" + DEFAULT_ID);
+
+        // Get all the withIdStringList where id not equals to UPDATED_ID
+        defaultWithIdStringShouldBeFound("id.notEquals=" + UPDATED_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllWithIdStringsByIdIsInShouldWork() throws Exception {
+        // Initialize the database
+        withIdStringRepository.saveAndFlush(withIdString);
+
+        // Get all the withIdStringList where id in DEFAULT_ID or UPDATED_ID
+        defaultWithIdStringShouldBeFound("id.in=" + DEFAULT_ID + "," + UPDATED_ID);
+
+        // Get all the withIdStringList where id equals to UPDATED_ID
+        defaultWithIdStringShouldNotBeFound("id.in=" + UPDATED_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllWithIdStringsByIdIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        withIdStringRepository.saveAndFlush(withIdString);
+
+        // Get all the withIdStringList where id is not null
+        defaultWithIdStringShouldBeFound("id.specified=true");
+
+        // Get all the withIdStringList where id is null
+        defaultWithIdStringShouldNotBeFound("id.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllWithIdStringsByIdContainsSomething() throws Exception {
+        // Initialize the database
+        withIdStringRepository.saveAndFlush(withIdString);
+
+        // Get all the withIdStringList where id contains DEFAULT_ID
+        defaultWithIdStringShouldBeFound("id.contains=" + DEFAULT_ID);
+
+        // Get all the withIdStringList where id contains UPDATED_ID
+        defaultWithIdStringShouldNotBeFound("id.contains=" + UPDATED_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllWithIdStringsByIdNotContainsSomething() throws Exception {
+        // Initialize the database
+        withIdStringRepository.saveAndFlush(withIdString);
+
+        // Get all the withIdStringList where id does not contain DEFAULT_ID
+        defaultWithIdStringShouldNotBeFound("id.doesNotContain=" + DEFAULT_ID);
+
+        // Get all the withIdStringList where id does not contain UPDATED_ID
+        defaultWithIdStringShouldBeFound("id.doesNotContain=" + UPDATED_ID);
     }
 
     @Test
@@ -175,15 +262,13 @@ class WithIdStringResourceIT {
         em.persist(withIdStringDetails);
         em.flush();
         withIdString.setWithIdStringDetails(withIdStringDetails);
-        withIdStringDetails.setWithIdString(withIdString);
         withIdStringRepository.saveAndFlush(withIdString);
-        Long withIdStringDetailsId = withIdStringDetails.getId();
 
-        // Get all the withIdStringList where withIdStringDetails equals to withIdStringDetailsId
-        defaultWithIdStringShouldBeFound("withIdStringDetailsId.equals=" + withIdStringDetailsId);
+        // Get all the withIdStringList where withIdStringDetails.withIdStringId equals to withIdStringDetails.getWithIdStringId()
+        defaultWithIdStringShouldBeFound("withIdStringDetails.withIdStringId.equals=" + withIdStringDetails.getWithIdStringId());
 
-        // Get all the withIdStringList where withIdStringDetails equals to withIdStringDetailsId + 1
-        defaultWithIdStringShouldNotBeFound("withIdStringDetailsId.equals=" + (withIdStringDetailsId + 1));
+        // Get all the withIdStringList where withIdStringDetails.withIdStringId equals to (withIdStringDetails.getWithIdStringId() + 1)
+        defaultWithIdStringShouldNotBeFound("withIdStringDetails.withIdStringId.equals=" + (withIdStringDetails.getWithIdStringId() + 1));
     }
 
     /**
@@ -191,14 +276,14 @@ class WithIdStringResourceIT {
      */
     private void defaultWithIdStringShouldBeFound(String filter) throws Exception {
         restWithIdStringMockMvc
-            .perform(get("/api/with-id-strings?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-strings?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(withIdString.getId().intValue())));
+            .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_ID)));
 
         // Check, that the count call also returns 1
         restWithIdStringMockMvc
-            .perform(get("/api/with-id-strings/count?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-strings/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -209,7 +294,7 @@ class WithIdStringResourceIT {
      */
     private void defaultWithIdStringShouldNotBeFound(String filter) throws Exception {
         restWithIdStringMockMvc
-            .perform(get("/api/with-id-strings?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-strings?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -217,7 +302,7 @@ class WithIdStringResourceIT {
 
         // Check, that the count call also returns 0
         restWithIdStringMockMvc
-            .perform(get("/api/with-id-strings/count?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-strings/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -227,7 +312,7 @@ class WithIdStringResourceIT {
     @Transactional
     void getNonExistingWithIdString() throws Exception {
         // Get the withIdString
-        restWithIdStringMockMvc.perform(get("/api/with-id-strings/{id}", Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restWithIdStringMockMvc.perform(get("/api/with-id-strings/{id}", withIdString.getId())).andExpect(status().isNotFound());
     }
 
     @Test
@@ -292,11 +377,12 @@ class WithIdStringResourceIT {
         WithIdString partialUpdatedWithIdString = new WithIdString();
         partialUpdatedWithIdString.setId(withIdString.getId());
 
+        WithIdStringDTO withIdStringDTO = withIdStringMapper.toDto(partialUpdatedWithIdString);
         restWithIdStringMockMvc
             .perform(
                 patch("/api/with-id-strings")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdString))
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDTO))
             )
             .andExpect(status().isOk());
 
@@ -318,11 +404,12 @@ class WithIdStringResourceIT {
         WithIdString partialUpdatedWithIdString = new WithIdString();
         partialUpdatedWithIdString.setId(withIdString.getId());
 
+        WithIdStringDTO withIdStringDTO = withIdStringMapper.toDto(partialUpdatedWithIdString);
         restWithIdStringMockMvc
             .perform(
                 patch("/api/with-id-strings")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdString))
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDTO))
             )
             .andExpect(status().isOk());
 

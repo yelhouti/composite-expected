@@ -28,14 +28,14 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
 
     private StringFilter name;
 
-    private LongFilter employeeSkillCertificateId;
+    private EmployeeSkillCertificateCriteria employeeSkillCertificate;
 
     public CertificateTypeCriteria() {}
 
     public CertificateTypeCriteria(CertificateTypeCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
-        this.employeeSkillCertificateId = other.employeeSkillCertificateId == null ? null : other.employeeSkillCertificateId.copy();
+        this.employeeSkillCertificate = other.employeeSkillCertificate == null ? null : other.employeeSkillCertificate.copy();
     }
 
     @Override
@@ -59,12 +59,12 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public LongFilter getEmployeeSkillCertificateId() {
-        return employeeSkillCertificateId;
+    public EmployeeSkillCertificateCriteria getEmployeeSkillCertificate() {
+        return employeeSkillCertificate;
     }
 
-    public void setEmployeeSkillCertificateId(LongFilter employeeSkillCertificateId) {
-        this.employeeSkillCertificateId = employeeSkillCertificateId;
+    public void setEmployeeSkillCertificate(EmployeeSkillCertificateCriteria employeeSkillCertificate) {
+        this.employeeSkillCertificate = employeeSkillCertificate;
     }
 
     @Override
@@ -79,22 +79,22 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
-            Objects.equals(employeeSkillCertificateId, that.employeeSkillCertificateId)
+            Objects.equals(employeeSkillCertificate, that.employeeSkillCertificate)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, employeeSkillCertificateId);
+        return Objects.hash(id, name, employeeSkillCertificate);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "CertificateTypeCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (name != null ? "name=" + name + ", " : "") +
-                (employeeSkillCertificateId != null ? "employeeSkillCertificateId=" + employeeSkillCertificateId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (name != null ? "name=" + name + ", " : "") +
+            (employeeSkillCertificate != null ? "employeeSkillCertificate=" + employeeSkillCertificate + ", " : "") +
             "}";
     }
 }

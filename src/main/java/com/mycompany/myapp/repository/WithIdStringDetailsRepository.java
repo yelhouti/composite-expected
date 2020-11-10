@@ -10,4 +10,4 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface WithIdStringDetailsRepository
-    extends JpaRepository<WithIdStringDetails, Long>, JpaSpecificationExecutor<WithIdStringDetails> {}
+    extends JpaRepository<WithIdStringDetails, String>, JpaSpecificationExecutor<WithIdStringDetails> {}

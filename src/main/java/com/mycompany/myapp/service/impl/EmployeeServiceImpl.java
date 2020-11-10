@@ -44,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.debug("Request to partially update Employee : {}", employeeDTO);
 
         return employeeRepository
-            .findById(employeeDTO.getId())
+            .findById(employeeDTO.getUsername())
             .map(
                 existingEmployee -> {
                     if (employeeDTO.getFullname() != null) {

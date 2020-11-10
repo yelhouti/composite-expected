@@ -52,6 +52,7 @@ public class CacheConfiguration {
             createCache(cm, com.mycompany.myapp.domain.Employee.class.getName() + ".teamMembers");
             createCache(cm, com.mycompany.myapp.domain.Employee.class.getName() + ".skills");
             createCache(cm, com.mycompany.myapp.domain.Employee.class.getName() + ".taughtSkills");
+            createCache(cm, com.mycompany.myapp.domain.PriceFormula.class.getName());
             createCache(cm, com.mycompany.myapp.domain.EmployeeSkill.class.getName());
             createCache(cm, com.mycompany.myapp.domain.EmployeeSkill.class.getName() + ".employeeSkillCertificates");
             createCache(cm, com.mycompany.myapp.domain.EmployeeSkill.class.getName() + ".tasks");

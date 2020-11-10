@@ -14,11 +14,13 @@ class TaskCommentDTOTest {
         taskCommentDTO1.setId(1L);
         TaskCommentDTO taskCommentDTO2 = new TaskCommentDTO();
         assertThat(taskCommentDTO1).isNotEqualTo(taskCommentDTO2);
-        taskCommentDTO2.setId(taskCommentDTO1.getId());
+        taskCommentDTO2.setId(1L);
         assertThat(taskCommentDTO1).isEqualTo(taskCommentDTO2);
-        taskCommentDTO2.setId(2L);
-        assertThat(taskCommentDTO1).isNotEqualTo(taskCommentDTO2);
-        taskCommentDTO1.setId(null);
-        assertThat(taskCommentDTO1).isNotEqualTo(taskCommentDTO2);
+        TaskCommentDTO taskCommentDTO3 = new TaskCommentDTO();
+        taskCommentDTO3.setId(3L);
+        assertThat(taskCommentDTO1).isNotEqualTo(taskCommentDTO3);
+        TaskCommentDTO taskCommentDTO4 = new TaskCommentDTO();
+        taskCommentDTO4.setId(null);
+        assertThat(taskCommentDTO1).isNotEqualTo(taskCommentDTO4);
     }
 }

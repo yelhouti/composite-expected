@@ -18,7 +18,7 @@ public class EmployeeDTO implements Serializable {
     private EmployeeDTO manager;
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -26,7 +26,7 @@ public class EmployeeDTO implements Serializable {
     }
 
     public String getFullname() {
-        return fullname;
+        return this.fullname;
     }
 
     public void setFullname(String fullname) {
@@ -34,7 +34,7 @@ public class EmployeeDTO implements Serializable {
     }
 
     public EmployeeDTO getManager() {
-        return manager;
+        return this.manager;
     }
 
     public void setManager(EmployeeDTO manager) {

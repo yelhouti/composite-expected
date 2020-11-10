@@ -29,7 +29,7 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-                    <th scope="col"  jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="id"><span jhiTranslate="compositekeyApp.taskComment.id">Id</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="value"><span jhiTranslate="compositekeyApp.taskComment.value">Value</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="task.name"><span jhiTranslate="compositekeyApp.taskComment.task">Task</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>

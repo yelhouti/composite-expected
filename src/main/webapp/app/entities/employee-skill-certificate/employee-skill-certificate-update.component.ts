@@ -24,7 +24,6 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
   employeeskills: IEmployeeSkill[] = [];
 
   editForm = this.fb.group({
-    id: [],
     grade: [null, [Validators.required]],
     date: [null, [Validators.required]],
     type: [null, Validators.required],
@@ -55,7 +54,6 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
 
   updateForm(employeeSkillCertificate: IEmployeeSkillCertificate): void {
     this.editForm.patchValue({
-      id: employeeSkillCertificate.id,
       grade: employeeSkillCertificate.grade,
       date: employeeSkillCertificate.date,
       type: employeeSkillCertificate.type,
@@ -84,7 +82,6 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
   private createFromForm(): IEmployeeSkillCertificate {
     return {
       ...new EmployeeSkillCertificate(),
-      id: this.editForm.get(['id'])!.value,
       grade: this.editForm.get(['grade'])!.value,
       date: this.editForm.get(['date'])!.value,
       type: this.editForm.get(['type'])!.value,

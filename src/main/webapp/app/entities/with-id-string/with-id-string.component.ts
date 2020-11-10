@@ -52,7 +52,7 @@ export class WithIdStringComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackId(index: number, item: IWithIdString): number {
+  trackId(index: number, item: IWithIdString): string {
     return item.id!;
   }
 

@@ -53,7 +53,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new EmployeeSkill('123')],
+            body: [new EmployeeSkill(123)],
             headers,
           })
         )
@@ -64,7 +64,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employeeSkills?.[0]).toEqual(jasmine.objectContaining({ id: '123' }));
+      expect(comp.employeeSkills?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
     });
 
     it('should load a page', () => {
@@ -73,7 +73,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new EmployeeSkill('123')],
+            body: [new EmployeeSkill(123)],
             headers,
           })
         )
@@ -84,7 +84,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employeeSkills?.[0]).toEqual(jasmine.objectContaining({ id: '123' }));
+      expect(comp.employeeSkills?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
     });
 
     it('should calculate the sort attribute for an id', () => {

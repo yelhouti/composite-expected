@@ -58,13 +58,13 @@ public class EmployeeResource {
     @PostMapping("/employees")
     public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to save Employee : {}", employeeDTO);
-        if (employeeDTO.getId() != null) {
-            throw new BadRequestAlertException("A new employee cannot already have an ID", ENTITY_NAME, "idexists");
+        if (employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
+            throw new BadRequestAlertException("This employee already exists", ENTITY_NAME, "idexists");
         }
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
-            .created(new URI("/api/employees/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
+            .created(new URI("/api/employees/" + result.getUsername()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getUsername()))
             .body(result);
     }
 
@@ -80,13 +80,13 @@ public class EmployeeResource {
     @PutMapping("/employees")
     public ResponseEntity<EmployeeDTO> updateEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to update Employee : {}", employeeDTO);
-        if (employeeDTO.getId() == null) {
+        if (employeeDTO.getUsername() == null || !employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getId()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getUsername()))
             .body(result);
     }
 
@@ -103,7 +103,7 @@ public class EmployeeResource {
     @PatchMapping(value = "/employees", consumes = "application/merge-patch+json")
     public ResponseEntity<EmployeeDTO> partialUpdateEmployee(@NotNull @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to update Employee partially : {}", employeeDTO);
-        if (employeeDTO.getId() == null) {
+        if (employeeDTO.getUsername() == null || !employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
@@ -111,7 +111,7 @@ public class EmployeeResource {
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getId())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getUsername())
         );
     }
 

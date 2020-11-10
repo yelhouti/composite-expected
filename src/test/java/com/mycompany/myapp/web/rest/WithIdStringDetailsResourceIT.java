@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class WithIdStringDetailsResourceIT {
+public class WithIdStringDetailsResourceIT {
 
-    private static final String DEFAULT_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_NAME = "BBBBBBBBBB";
+    public static final String DEFAULT_NAME = "AAAAAAAAAA";
+    public static final String UPDATED_NAME = "BBBBBBBBBB";
 
     @Autowired
     private WithIdStringDetailsRepository withIdStringDetailsRepository;
@@ -62,13 +62,17 @@ class WithIdStringDetailsResourceIT {
     public static WithIdStringDetails createEntity(EntityManager em) {
         WithIdStringDetails withIdStringDetails = new WithIdStringDetails().name(DEFAULT_NAME);
         // Add required entity
-        WithIdString withIdString;
-        if (TestUtil.findAll(em, WithIdString.class).isEmpty()) {
-            withIdString = WithIdStringResourceIT.createEntity(em);
+        WithIdString newWithIdString = WithIdStringResourceIT.createEntity(em);
+        WithIdString withIdString = TestUtil
+            .findAll(em, WithIdString.class)
+            .stream()
+            .filter(x -> x.getId().equals(newWithIdString.getId()))
+            .findAny()
+            .orElse(null);
+        if (withIdString == null) {
+            withIdString = newWithIdString;
             em.persist(withIdString);
             em.flush();
-        } else {
-            withIdString = TestUtil.findAll(em, WithIdString.class).get(0);
         }
         withIdStringDetails.setWithIdString(withIdString);
         return withIdStringDetails;
@@ -83,13 +87,17 @@ class WithIdStringDetailsResourceIT {
     public static WithIdStringDetails createUpdatedEntity(EntityManager em) {
         WithIdStringDetails withIdStringDetails = new WithIdStringDetails().name(UPDATED_NAME);
         // Add required entity
-        WithIdString withIdString;
-        if (TestUtil.findAll(em, WithIdString.class).isEmpty()) {
-            withIdString = WithIdStringResourceIT.createUpdatedEntity(em);
+        WithIdString newWithIdString = WithIdStringResourceIT.createUpdatedEntity(em);
+        WithIdString withIdString = TestUtil
+            .findAll(em, WithIdString.class)
+            .stream()
+            .filter(x -> x.getId().equals(newWithIdString.getId()))
+            .findAny()
+            .orElse(null);
+        if (withIdString == null) {
+            withIdString = newWithIdString;
             em.persist(withIdString);
             em.flush();
-        } else {
-            withIdString = TestUtil.findAll(em, WithIdString.class).get(0);
         }
         withIdStringDetails.setWithIdString(withIdString);
         return withIdStringDetails;
@@ -119,18 +127,16 @@ class WithIdStringDetailsResourceIT {
         assertThat(withIdStringDetailsList).hasSize(databaseSizeBeforeCreate + 1);
         WithIdStringDetails testWithIdStringDetails = withIdStringDetailsList.get(withIdStringDetailsList.size() - 1);
         assertThat(testWithIdStringDetails.getName()).isEqualTo(DEFAULT_NAME);
-
-        // Validate the id for MapsId, the ids must be same
-        assertThat(testWithIdStringDetails.getId()).isEqualTo(testWithIdStringDetails.getWithIdString().getId());
     }
 
     @Test
     @Transactional
     void createWithIdStringDetailsWithExistingId() throws Exception {
+        withIdStringDetailsRepository.save(withIdStringDetails);
         int databaseSizeBeforeCreate = withIdStringDetailsRepository.findAll().size();
 
         // Create the WithIdStringDetails with an existing ID
-        withIdStringDetails.setId(1L);
+        withIdStringDetails.setWithIdStringId(withIdStringDetails.getWithIdStringId());
         WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(withIdStringDetails);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -160,7 +166,9 @@ class WithIdStringDetailsResourceIT {
         em.flush();
 
         // Load the withIdStringDetails
-        WithIdStringDetails updatedWithIdStringDetails = withIdStringDetailsRepository.findById(withIdStringDetails.getId()).get();
+        WithIdStringDetails updatedWithIdStringDetails = withIdStringDetailsRepository
+            .findById(withIdStringDetails.getWithIdStringId())
+            .get();
         assertThat(updatedWithIdStringDetails).isNotNull();
         // Disconnect from session so that the updates on updatedWithIdStringDetails are not directly saved in db
         em.detach(updatedWithIdStringDetails);
@@ -186,7 +194,7 @@ class WithIdStringDetailsResourceIT {
         // Validate the id for MapsId, the ids must be same
         // Uncomment the following line for assertion. However, please note that there is a known issue and uncommenting will fail the test.
         // Please look at https://github.com/jhipster/generator-jhipster/issues/9100. You can modify this test as necessary.
-        // assertThat(testWithIdStringDetails.getId()).isEqualTo(testWithIdStringDetails.getWithIdString().getId());
+        // assertThat(testWithIdStringDetails.getId()).isEqualTo(testWithIdStringDetails.get().getId());
     }
 
     @Test
@@ -197,10 +205,10 @@ class WithIdStringDetailsResourceIT {
 
         // Get all the withIdStringDetailsList
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details?sort=id,desc"))
+            .perform(get("/api/with-id-string-details"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(withIdStringDetails.getId().intValue())))
+            .andExpect(jsonPath("$.[*].withIdStringId").value(hasItem(withIdStringDetails.getWithIdStringId())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
     }
 
@@ -212,10 +220,10 @@ class WithIdStringDetailsResourceIT {
 
         // Get the withIdStringDetails
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details/{id}", withIdStringDetails.getId()))
+            .perform(get("/api/with-id-string-details/{withIdStringId}", withIdStringDetails.getWithIdStringId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(withIdStringDetails.getId().intValue()))
+            .andExpect(jsonPath("$.withIdStringId").value(withIdStringDetails.getWithIdStringId()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
     }
 
@@ -225,16 +233,10 @@ class WithIdStringDetailsResourceIT {
         // Initialize the database
         withIdStringDetailsRepository.saveAndFlush(withIdStringDetails);
 
-        Long id = withIdStringDetails.getId();
+        String withIdStringId = withIdStringDetails.getWithIdStringId();
 
-        defaultWithIdStringDetailsShouldBeFound("id.equals=" + id);
-        defaultWithIdStringDetailsShouldNotBeFound("id.notEquals=" + id);
-
-        defaultWithIdStringDetailsShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultWithIdStringDetailsShouldNotBeFound("id.greaterThan=" + id);
-
-        defaultWithIdStringDetailsShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultWithIdStringDetailsShouldNotBeFound("id.lessThan=" + id);
+        defaultWithIdStringDetailsShouldBeFound("withIdStringId.equals=" + withIdStringId);
+        defaultWithIdStringDetailsShouldNotBeFound("withIdStringId.notEquals=" + withIdStringId);
     }
 
     @Test
@@ -321,13 +323,12 @@ class WithIdStringDetailsResourceIT {
         // Get already existing entity
         WithIdString withIdString = withIdStringDetails.getWithIdString();
         withIdStringDetailsRepository.saveAndFlush(withIdStringDetails);
-        Long withIdStringId = withIdString.getId();
 
-        // Get all the withIdStringDetailsList where withIdString equals to withIdStringId
-        defaultWithIdStringDetailsShouldBeFound("withIdStringId.equals=" + withIdStringId);
+        // Get all the withIdStringDetailsList where withIdString.id equals to WithIdStringResourceIT.DEFAULT_ID
+        defaultWithIdStringDetailsShouldBeFound("withIdString.id.equals=" + WithIdStringResourceIT.DEFAULT_ID);
 
-        // Get all the withIdStringDetailsList where withIdString equals to withIdStringId + 1
-        defaultWithIdStringDetailsShouldNotBeFound("withIdStringId.equals=" + (withIdStringId + 1));
+        // Get all the withIdStringDetailsList where withIdString.id equals to WithIdStringResourceIT.UPDATED_ID
+        defaultWithIdStringDetailsShouldNotBeFound("withIdString.id.equals=" + WithIdStringResourceIT.UPDATED_ID);
     }
 
     /**
@@ -335,15 +336,15 @@ class WithIdStringDetailsResourceIT {
      */
     private void defaultWithIdStringDetailsShouldBeFound(String filter) throws Exception {
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-string-details?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(withIdStringDetails.getId().intValue())))
+            .andExpect(jsonPath("$.[*].withIdStringId").value(hasItem(withIdStringDetails.getWithIdStringId())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
 
         // Check, that the count call also returns 1
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details/count?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-string-details/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -354,7 +355,7 @@ class WithIdStringDetailsResourceIT {
      */
     private void defaultWithIdStringDetailsShouldNotBeFound(String filter) throws Exception {
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-string-details?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -362,7 +363,7 @@ class WithIdStringDetailsResourceIT {
 
         // Check, that the count call also returns 0
         restWithIdStringDetailsMockMvc
-            .perform(get("/api/with-id-string-details/count?sort=id,desc&" + filter))
+            .perform(get("/api/with-id-string-details/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -384,7 +385,9 @@ class WithIdStringDetailsResourceIT {
         int databaseSizeBeforeUpdate = withIdStringDetailsRepository.findAll().size();
 
         // Update the withIdStringDetails
-        WithIdStringDetails updatedWithIdStringDetails = withIdStringDetailsRepository.findById(withIdStringDetails.getId()).get();
+        WithIdStringDetails updatedWithIdStringDetails = withIdStringDetailsRepository
+            .findById(withIdStringDetails.getWithIdStringId())
+            .get();
         // Disconnect from session so that the updates on updatedWithIdStringDetails are not directly saved in db
         em.detach(updatedWithIdStringDetails);
         updatedWithIdStringDetails.name(UPDATED_NAME);
@@ -437,13 +440,14 @@ class WithIdStringDetailsResourceIT {
 
         // Update the withIdStringDetails using partial update
         WithIdStringDetails partialUpdatedWithIdStringDetails = new WithIdStringDetails();
-        partialUpdatedWithIdStringDetails.setId(withIdStringDetails.getId());
+        partialUpdatedWithIdStringDetails.setWithIdStringId(withIdStringDetails.getWithIdStringId());
 
+        WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(partialUpdatedWithIdStringDetails);
         restWithIdStringDetailsMockMvc
             .perform(
                 patch("/api/with-id-string-details")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdStringDetails))
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
             )
             .andExpect(status().isOk());
 
@@ -464,15 +468,15 @@ class WithIdStringDetailsResourceIT {
 
         // Update the withIdStringDetails using partial update
         WithIdStringDetails partialUpdatedWithIdStringDetails = new WithIdStringDetails();
-        partialUpdatedWithIdStringDetails.setId(withIdStringDetails.getId());
+        partialUpdatedWithIdStringDetails.setWithIdStringId(withIdStringDetails.getWithIdStringId());
 
         partialUpdatedWithIdStringDetails.name(UPDATED_NAME);
-
+        WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(partialUpdatedWithIdStringDetails);
         restWithIdStringDetailsMockMvc
             .perform(
                 patch("/api/with-id-string-details")
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdStringDetails))
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
             )
             .andExpect(status().isOk());
 
@@ -508,7 +512,10 @@ class WithIdStringDetailsResourceIT {
 
         // Delete the withIdStringDetails
         restWithIdStringDetailsMockMvc
-            .perform(delete("/api/with-id-string-details/{id}", withIdStringDetails.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(
+                delete("/api/with-id-string-details/{withIdStringId}", withIdStringDetails.getWithIdStringId())
+                    .accept(MediaType.APPLICATION_JSON)
+            )
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
