@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -39,12 +40,12 @@ public interface EmployeeSkillCertificateService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<EmployeeSkillCertificateDTO> findOne(Long id);
+    Optional<EmployeeSkillCertificateDTO> findOne(EmployeeSkillCertificateId id);
 
     /**
      * Delete the "id" employeeSkillCertificate.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    void delete(EmployeeSkillCertificateId id);
 }

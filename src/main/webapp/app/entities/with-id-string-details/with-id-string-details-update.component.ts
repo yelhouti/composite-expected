@@ -20,7 +20,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
   withidstrings: IWithIdString[] = [];
 
   editForm = this.fb.group({
-    id: [],
+    withIdStringId: [],
     name: [],
     withIdString: [],
   });
@@ -58,7 +58,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
 
   updateForm(withIdStringDetails: IWithIdStringDetails): void {
     this.editForm.patchValue({
-      id: withIdStringDetails.id,
+      withIdStringId: withIdStringDetails.withIdStringId,
       name: withIdStringDetails.name,
       withIdString: withIdStringDetails.withIdString,
     });
@@ -85,7 +85,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
   private createFromForm(): IWithIdStringDetails {
     return {
       ...new WithIdStringDetails(),
-      id: this.editForm.get(['id'])!.value,
+      withIdStringId: this.editForm.get(['withIdStringId'])!.value,
       name: this.editForm.get(['name'])!.value,
       withIdString: this.editForm.get(['withIdString'])!.value,
     };

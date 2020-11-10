@@ -80,13 +80,13 @@ public class WithIdStringServiceImpl implements WithIdStringService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<WithIdStringDTO> findOne(Long id) {
+    public Optional<WithIdStringDTO> findOne(String id) {
         log.debug("Request to get WithIdString : {}", id);
         return withIdStringRepository.findById(id).map(withIdStringMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         log.debug("Request to delete WithIdString : {}", id);
         withIdStringRepository.deleteById(id);
     }

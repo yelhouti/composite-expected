@@ -6,22 +6,21 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    
     <!--
         Added the entity EmployeeSkill.
     -->
     <changeSet id="20201110081124-1" author="jhipster">
         <createTable tableName="employee_skill">
-            <column name="id" type="varchar(100)">
-                <constraints primaryKey="true" nullable="false"/>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="level" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="employee_id" type="varchar(100)">
-                <constraints nullable="false" />
+            <column name="employee_username" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="teacher_id" type="varchar(100)">
+            <column name="teacher_username" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
@@ -31,15 +30,18 @@
     <changeSet id="20201110081124-1-relations" author="jhipster">
 
         <createTable tableName="rel_employee_skill__task">
-            <column name="task_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="employee_skill_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
+                <column name="task_id" type="bigint">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="employee_skill_name" type="varchar(255)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="employee_skill_employee_username" type="varchar(255)">
+                    <constraints nullable="false"/>
+                </column>
         </createTable>
 
-        <addPrimaryKey columnNames="employee_skill_id, task_id" tableName="rel_employee_skill__task"/>
+        <addPrimaryKey columnNames="task_id, employee_skill_name, employee_skill_employee_username" tableName="rel_employee_skill__task"/>
         
     </changeSet>
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
@@ -57,10 +59,10 @@
                   file="config/liquibase/fake-data/employee_skill.csv"
                   separator=";"
                   tableName="employee_skill">
-            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
             <column name="level" type="numeric"/>
-            <column name="employee_id" type="string"/>
-            <column name="teacher_id" type="string"/>
+            <column name="employee_username" type="string"/>
+            <column name="teacher_username" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

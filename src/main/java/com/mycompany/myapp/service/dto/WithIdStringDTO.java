@@ -2,19 +2,21 @@ package com.mycompany.myapp.service.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link com.mycompany.myapp.domain.WithIdString} entity.
  */
 public class WithIdStringDTO implements Serializable {
 
-    private Long id;
+    @NotNull
+    private String id;
 
-    public Long getId() {
-        return id;
+    public String getId() {
+        return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -43,7 +45,7 @@ public class WithIdStringDTO implements Serializable {
     @Override
     public String toString() {
         return "WithIdStringDTO{" +
-            "id=" + getId() +
+            "id='" + getId() + "'" +
             "}";
     }
 }

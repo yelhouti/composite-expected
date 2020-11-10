@@ -14,11 +14,13 @@ class TaskDTOTest {
         taskDTO1.setId(1L);
         TaskDTO taskDTO2 = new TaskDTO();
         assertThat(taskDTO1).isNotEqualTo(taskDTO2);
-        taskDTO2.setId(taskDTO1.getId());
+        taskDTO2.setId(1L);
         assertThat(taskDTO1).isEqualTo(taskDTO2);
-        taskDTO2.setId(2L);
-        assertThat(taskDTO1).isNotEqualTo(taskDTO2);
-        taskDTO1.setId(null);
-        assertThat(taskDTO1).isNotEqualTo(taskDTO2);
+        TaskDTO taskDTO3 = new TaskDTO();
+        taskDTO3.setId(3L);
+        assertThat(taskDTO1).isNotEqualTo(taskDTO3);
+        TaskDTO taskDTO4 = new TaskDTO();
+        taskDTO4.setId(null);
+        assertThat(taskDTO1).isNotEqualTo(taskDTO4);
     }
 }

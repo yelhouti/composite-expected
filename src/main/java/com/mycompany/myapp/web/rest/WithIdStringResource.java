@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,15 +51,16 @@ public class WithIdStringResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/with-id-strings")
-    public ResponseEntity<WithIdStringDTO> createWithIdString(@RequestBody WithIdStringDTO withIdStringDTO) throws URISyntaxException {
+    public ResponseEntity<WithIdStringDTO> createWithIdString(@Valid @RequestBody WithIdStringDTO withIdStringDTO)
+        throws URISyntaxException {
         log.debug("REST request to save WithIdString : {}", withIdStringDTO);
-        if (withIdStringDTO.getId() != null) {
-            throw new BadRequestAlertException("A new withIdString cannot already have an ID", ENTITY_NAME, "idexists");
+        if (withIdStringService.findOne(withIdStringDTO.getId()).isPresent()) {
+            throw new BadRequestAlertException("This withIdString already exists", ENTITY_NAME, "idexists");
         }
         WithIdStringDTO result = withIdStringService.save(withIdStringDTO);
         return ResponseEntity
             .created(new URI("/api/with-id-strings/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
             .body(result);
     }
 
@@ -71,15 +74,16 @@ public class WithIdStringResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/with-id-strings")
-    public ResponseEntity<WithIdStringDTO> updateWithIdString(@RequestBody WithIdStringDTO withIdStringDTO) throws URISyntaxException {
+    public ResponseEntity<WithIdStringDTO> updateWithIdString(@Valid @RequestBody WithIdStringDTO withIdStringDTO)
+        throws URISyntaxException {
         log.debug("REST request to update WithIdString : {}", withIdStringDTO);
-        if (withIdStringDTO.getId() == null) {
+        if (withIdStringDTO.getId() == null || !withIdStringService.findOne(withIdStringDTO.getId()).isPresent()) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         WithIdStringDTO result = withIdStringService.save(withIdStringDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId()))
             .body(result);
     }
 
@@ -94,10 +98,10 @@ public class WithIdStringResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/with-id-strings", consumes = "application/merge-patch+json")
-    public ResponseEntity<WithIdStringDTO> partialUpdateWithIdString(@RequestBody WithIdStringDTO withIdStringDTO)
+    public ResponseEntity<WithIdStringDTO> partialUpdateWithIdString(@NotNull @RequestBody WithIdStringDTO withIdStringDTO)
         throws URISyntaxException {
         log.debug("REST request to update WithIdString partially : {}", withIdStringDTO);
-        if (withIdStringDTO.getId() == null) {
+        if (withIdStringDTO.getId() == null || !withIdStringService.findOne(withIdStringDTO.getId()).isPresent()) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
@@ -105,7 +109,7 @@ public class WithIdStringResource {
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId())
         );
     }
 
@@ -141,7 +145,7 @@ public class WithIdStringResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the withIdStringDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/with-id-strings/{id}")
-    public ResponseEntity<WithIdStringDTO> getWithIdString(@PathVariable Long id) {
+    public ResponseEntity<WithIdStringDTO> getWithIdString(@PathVariable String id) {
         log.debug("REST request to get WithIdString : {}", id);
         Optional<WithIdStringDTO> withIdStringDTO = withIdStringService.findOne(id);
         return ResponseUtil.wrapOrNotFound(withIdStringDTO);
@@ -154,12 +158,9 @@ public class WithIdStringResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/with-id-strings/{id}")
-    public ResponseEntity<Void> deleteWithIdString(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteWithIdString(@PathVariable String id) {
         log.debug("REST request to delete WithIdString : {}", id);
         withIdStringService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
     }
 }

@@ -21,7 +21,7 @@ export class WithIdStringDetailsDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
+  confirmDelete(id: string): void {
     this.withIdStringDetailsService.delete(id).subscribe(() => {
       this.eventManager.broadcast('withIdStringDetailsListModification');
       this.activeModal.close();

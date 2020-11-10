@@ -6,17 +6,16 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    
     <!--
         Added the entity WithIdStringDetails.
     -->
     <changeSet id="20201110081724-1" author="jhipster">
         <createTable tableName="with_id_string_details">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="true" />
+            </column>
+            <column name="with_id_string_id" type="varchar(255)">
+                <constraints nullable="false" primaryKey="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -40,8 +39,8 @@
                   file="config/liquibase/fake-data/with_id_string_details.csv"
                   separator=";"
                   tableName="with_id_string_details">
-            <column name="id" type="numeric"/>
             <column name="name" type="string"/>
+            <column name="with_id_string_id" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

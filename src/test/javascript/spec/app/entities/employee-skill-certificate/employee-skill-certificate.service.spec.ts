@@ -22,7 +22,7 @@ describe('Service Tests', () => {
       httpMock = TestBed.inject(HttpTestingController);
       currentDate = dayjs();
 
-      elemDefault = new EmployeeSkillCertificate(0, 0, currentDate);
+      elemDefault = new EmployeeSkillCertificate(0, currentDate);
     });
 
     describe('Service methods', () => {
@@ -67,7 +67,6 @@ describe('Service Tests', () => {
       it('should update a EmployeeSkillCertificate', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             grade: 1,
             date: currentDate.format(DATE_FORMAT),
           },
@@ -91,7 +90,6 @@ describe('Service Tests', () => {
       it('should return a list of EmployeeSkillCertificate', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             grade: 1,
             date: currentDate.format(DATE_FORMAT),
           },

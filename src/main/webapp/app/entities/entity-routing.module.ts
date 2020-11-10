@@ -9,6 +9,10 @@ import { RouterModule } from '@angular/router';
         loadChildren: () => import('./employee/employee-routing.module').then(m => m.EmployeeRoutingModule),
       },
       {
+        path: 'price-formula',
+        loadChildren: () => import('./price-formula/price-formula-routing.module').then(m => m.PriceFormulaRoutingModule),
+      },
+      {
         path: 'employee-skill',
         loadChildren: () => import('./employee-skill/employee-skill-routing.module').then(m => m.EmployeeSkillRoutingModule),
       },

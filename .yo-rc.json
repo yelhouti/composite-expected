@@ -40,7 +40,8 @@
       "Task",
       "TaskComment",
       "WithIdString",
-      "WithIdStringDetails"
+      "WithIdStringDetails",
+      "PriceFormula"
     ],
     "skipCheckLengthOfIdentifier": false,
     "skipFakeData": false,

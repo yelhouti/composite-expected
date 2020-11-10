@@ -28,14 +28,14 @@ public class TaskCommentCriteria implements Serializable, Criteria {
 
     private StringFilter value;
 
-    private LongFilter taskId;
+    private TaskCriteria task;
 
     public TaskCommentCriteria() {}
 
     public TaskCommentCriteria(TaskCommentCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.value = other.value == null ? null : other.value.copy();
-        this.taskId = other.taskId == null ? null : other.taskId.copy();
+        this.task = other.task == null ? null : other.task.copy();
     }
 
     @Override
@@ -59,12 +59,12 @@ public class TaskCommentCriteria implements Serializable, Criteria {
         this.value = value;
     }
 
-    public LongFilter getTaskId() {
-        return taskId;
+    public TaskCriteria getTask() {
+        return task;
     }
 
-    public void setTaskId(LongFilter taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskCriteria task) {
+        this.task = task;
     }
 
     @Override
@@ -76,21 +76,21 @@ public class TaskCommentCriteria implements Serializable, Criteria {
             return false;
         }
         final TaskCommentCriteria that = (TaskCommentCriteria) o;
-        return Objects.equals(id, that.id) && Objects.equals(value, that.value) && Objects.equals(taskId, that.taskId);
+        return Objects.equals(id, that.id) && Objects.equals(value, that.value) && Objects.equals(task, that.task);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, value, taskId);
+        return Objects.hash(id, value, task);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "TaskCommentCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (value != null ? "value=" + value + ", " : "") +
-                (taskId != null ? "taskId=" + taskId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (value != null ? "value=" + value + ", " : "") +
+            (task != null ? "task=" + task + ", " : "") +
             "}";
     }
 }

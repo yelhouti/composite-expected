@@ -32,7 +32,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new WithIdStringDetails(123)],
+            body: [new WithIdStringDetails('123')],
             headers,
           })
         )
@@ -43,7 +43,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.withIdStringDetails?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.withIdStringDetails?.[0]).toEqual(jasmine.objectContaining({ id: '123' }));
     });
   });
 });

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -82,17 +83,18 @@ public class Task implements Serializable {
     private Set<EmployeeSkill> employeeSkills = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Task id(Long id) {
         this.id = id;
         return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -291,7 +293,7 @@ public class Task implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore

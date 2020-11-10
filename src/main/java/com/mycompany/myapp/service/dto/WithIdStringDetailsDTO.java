@@ -8,22 +8,22 @@ import java.util.Objects;
  */
 public class WithIdStringDetailsDTO implements Serializable {
 
-    private Long id;
+    private String withIdStringId;
 
     private String name;
 
     private WithIdStringDTO withIdString;
 
-    public Long getId() {
-        return id;
+    public String getWithIdStringId() {
+        return this.withIdStringId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setWithIdStringId(String withIdStringId) {
+        this.withIdStringId = withIdStringId;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -31,7 +31,7 @@ public class WithIdStringDetailsDTO implements Serializable {
     }
 
     public WithIdStringDTO getWithIdString() {
-        return withIdString;
+        return this.withIdString;
     }
 
     public void setWithIdString(WithIdStringDTO withIdString) {
@@ -48,24 +48,24 @@ public class WithIdStringDetailsDTO implements Serializable {
         }
 
         WithIdStringDetailsDTO withIdStringDetailsDTO = (WithIdStringDetailsDTO) o;
-        if (this.id == null) {
+        if (this.withIdStringId == null) {
             return false;
         }
-        return Objects.equals(this.id, withIdStringDetailsDTO.id);
+        return Objects.equals(this.withIdStringId, withIdStringDetailsDTO.withIdStringId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(this.withIdStringId);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "WithIdStringDetailsDTO{" +
-            "id=" + getId() +
+            "withIdStringId='" + getWithIdStringId() + "'" +
             ", name='" + getName() + "'" +
-            ", withIdString=" + getWithIdString() +
+            ", withIdString='" + getWithIdString() + "'" +
             "}";
     }
 }
