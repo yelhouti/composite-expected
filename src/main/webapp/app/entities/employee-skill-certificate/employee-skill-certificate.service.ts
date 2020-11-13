@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as dayjs from 'dayjs';
 
 import { DATE_FORMAT } from 'app/core/config/input.constants';
 import { SERVER_API_URL } from 'app/app.constants';
@@ -32,9 +31,12 @@ export class EmployeeSkillCertificateService {
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
-  find(id: number): Observable<EntityResponseType> {
+  find(typeId: number, skillName: string, employeeUsername: string): Observable<EntityResponseType> {
     return this.http
-      .get<IEmployeeSkillCertificate>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .get<IEmployeeSkillCertificate>(
+        `${this.resourceUrl}/typeId=${typeId};skillName=${skillName};skillEmployeeUsername=${employeeUsername}`,
+        { observe: 'response' }
+      )
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
@@ -45,8 +47,10 @@ export class EmployeeSkillCertificateService {
       .pipe(map((res: EntityArrayResponseType) => this.convertDateArrayFromServer(res)));
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(typeId: number, skillName: string, employeeUsername: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/typeId=${typeId};skillName=${skillName};employeeUsername=${employeeUsername}`, {
+      observe: 'response',
+    });
   }
 
   protected convertDateFromClient(employeeSkillCertificate: IEmployeeSkillCertificate): IEmployeeSkillCertificate {
@@ -58,7 +62,7 @@ export class EmployeeSkillCertificateService {
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.date = res.body.date ? dayjs(res.body.date) : undefined;
+      res.body.date = res.body.date ? res.body.date : undefined;
     }
     return res;
   }
@@ -66,7 +70,7 @@ export class EmployeeSkillCertificateService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((employeeSkillCertificate: IEmployeeSkillCertificate) => {
-        employeeSkillCertificate.date = employeeSkillCertificate.date ? dayjs(employeeSkillCertificate.date) : undefined;
+        employeeSkillCertificate.date = employeeSkillCertificate.date ? employeeSkillCertificate.date : undefined;
       });
     }
     return res;

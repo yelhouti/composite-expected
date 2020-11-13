@@ -86,8 +86,8 @@ export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackId(index: number, item: IEmployeeSkillCertificate): number {
-    return item.id!;
+  trackId(index: number, item: IEmployeeSkillCertificate): string {
+    return `${item.type!.id!},${item.skill!.name!},${item.skill!.employee!.username!}`;
   }
 
   registerChangeInEmployeeSkillCertificates(): void {

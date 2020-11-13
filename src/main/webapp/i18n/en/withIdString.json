@@ -17,8 +17,7 @@
       "detail": {
         "title": "With Id String"
       },
-      "id": "Id",
-      "withIdStringDetails": "With Id String Details"
+      "id": "Id"
     }
   }
 }

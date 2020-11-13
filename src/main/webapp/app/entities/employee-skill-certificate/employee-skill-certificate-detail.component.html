@@ -20,14 +20,14 @@
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.type">Type</span></dt>
                 <dd>
-                    <div *ngIf="employeeSkillCertificate.type">
-                        <a [routerLink]="['/certificate-type', employeeSkillCertificate.type?.id, 'view']">{{ employeeSkillCertificate.type?.name }}</a>
+                    <div *ngIf="employeeSkillCertificate?.type">
+                        <a [routerLink]="['/certificate-type', employeeSkillCertificate.type.id!, 'view']">{{ employeeSkillCertificate?.type!.name }}</a>
                     </div>
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.skill">Skill</span></dt>
                 <dd>
-                    <div *ngIf="employeeSkillCertificate.skill">
-                        <a [routerLink]="['/employee-skill', employeeSkillCertificate.skill?.id, 'view']">{{ employeeSkillCertificate.skill?.id }}</a>
+                    <div *ngIf="employeeSkillCertificate?.skill">
+                        <a [routerLink]="['/employee-skill', { name: employeeSkillCertificate?.skill!.name, employeeUsername: employeeSkillCertificate?.skill!.employee!.username}, 'view']">{{ employeeSkillCertificate?.skill!.name }}</a>
                     </div>
                 </dd>
             </dl>
@@ -40,7 +40,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'edit']"
+                    [routerLink]="['/employee-skill-certificate', { typeId: employeeSkillCertificate?.type!.id, skillName: employeeSkillCertificate?.skill!.name, employeeUsername: employeeSkillCertificate?.skill!.employee!.username}, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

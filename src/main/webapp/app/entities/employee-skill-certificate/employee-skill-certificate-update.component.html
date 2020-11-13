@@ -6,7 +6,6 @@
             <div>
                 <jhi-alert-error></jhi-alert-error>
 
-
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.grade" for="field_grade">Grade</label>
                     <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade"
@@ -46,23 +45,23 @@
                         <option [ngValue]="certificateTypeOption.id === editForm.get('type')!.value?.id ? editForm.get('type')!.value : certificateTypeOption" *ngFor="let certificateTypeOption of certificatetypes; trackBy: trackById">{{ certificateTypeOption.name }}</option>
                     </select>
                 </div>
-                <div *ngIf="editForm.get(['type'])!.invalid && (editForm.get(['type'])!.dirty || editForm.get(['type'])!.touched)">
+                <div *ngIf="editForm.get('typeId')!.invalid && (editForm.get('typeId')!.dirty || editForm.get('typeId')!.touched)">
                     <small class="form-text text-danger"
-                           *ngIf="editForm.get(['type'])?.errors?.required" jhiTranslate="entity.validation.required">
+                           *ngIf="editForm.get('typeId')?.errors?.required" jhiTranslate="entity.validation.required">
                         This field is required.
                     </small>
                 </div>
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.skill" for="field_skill">Skill</label>
-                    <select class="form-control" id="field_skill" data-cy="skill" name="skill" formControlName="skill">
-                        <option *ngIf="!editForm.get('skill')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="employeeSkillOption.id === editForm.get('skill')!.value?.id ? editForm.get('skill')!.value : employeeSkillOption" *ngFor="let employeeSkillOption of employeeskills; trackBy: trackById">{{ employeeSkillOption.id }}</option>
+                    <select class="form-control" id="field_skill" data-cy="skill" name="skill" formControlName="skillName">
+                        <option *ngIf="!editForm.get('skillName')!.value" [ngValue]="null" selected></option>
+<!--                        <option [ngValue]="employeeSkillOption.id" *ngFor="let employeeSkillOption of employeeskills; trackBy: trackById">{{ employeeSkillOption.id }}</option>-->
                     </select>
                 </div>
-                <div *ngIf="editForm.get(['skill'])!.invalid && (editForm.get(['skill'])!.dirty || editForm.get(['skill'])!.touched)">
+                <div *ngIf="editForm.get('skillName')!.invalid && (editForm.get('skillName')!.dirty || editForm.get('skillName')!.touched)">
                     <small class="form-text text-danger"
-                           *ngIf="editForm.get(['skill'])?.errors?.required" jhiTranslate="entity.validation.required">
+                           *ngIf="editForm.get('skillName')?.errors?.required" jhiTranslate="entity.validation.required">
                         This field is required.
                     </small>
                 </div>

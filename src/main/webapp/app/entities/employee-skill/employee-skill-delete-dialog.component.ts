@@ -21,8 +21,8 @@ export class EmployeeSkillDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
-    this.employeeSkillService.delete(id).subscribe(() => {
+  confirmDelete(name: string, employeeUsername: string): void {
+    this.employeeSkillService.delete(name, employeeUsername).subscribe(() => {
       this.eventManager.broadcast('employeeSkillListModification');
       this.activeModal.close();
     });

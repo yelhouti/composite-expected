@@ -59,7 +59,7 @@ export class EmployeeUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const employee = this.createFromForm();
-    if (employee.id !== undefined) {
+    if (employee.username !== undefined) {
       this.subscribeToSaveResponse(this.employeeService.update(employee));
     } else {
       this.subscribeToSaveResponse(this.employeeService.create(employee));
@@ -91,7 +91,7 @@ export class EmployeeUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: IEmployee): number {
-    return item.id!;
+  trackById(index: number, item: IEmployee): any {
+    return item.username!;
   }
 }

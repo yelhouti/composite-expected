@@ -44,14 +44,14 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkill.employee" for="field_employee">Employee</label>
-                    <select class="form-control" id="field_employee" data-cy="employee" name="employee" formControlName="employee">
-                        <option *ngIf="!editForm.get('employee')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="employeeOption.id === editForm.get('employee')!.value?.id ? editForm.get('employee')!.value : employeeOption" *ngFor="let employeeOption of employees; trackBy: trackById">{{ employeeOption.fullname }}</option>
+                    <select class="form-control" id="field_employee" data-cy="employee" name="employee" formControlName="employee" [attr.disabled]="edit ? true : null">
+                        <option *ngIf="edit && editForm.get('employee')!.value" [ngValue]="editForm.get('employee')!.value" selected>{{editForm.get('employee')!.value.fullname}}</option>
+                        <option [ngValue]="employeeOption" *ngFor="let employeeOption of employees; trackBy: trackById">{{ employeeOption.fullname }}</option>
                     </select>
                 </div>
-                <div *ngIf="editForm.get(['employee'])!.invalid && (editForm.get(['employee'])!.dirty || editForm.get(['employee'])!.touched)">
+                <div *ngIf="editForm.get('employee')!.invalid && (editForm.get('employee')!.dirty || editForm.get('employee')!.touched)">
                     <small class="form-text text-danger"
-                           *ngIf="editForm.get(['employee'])?.errors?.required" jhiTranslate="entity.validation.required">
+                           *ngIf="editForm.get('employee')?.errors?.required" jhiTranslate="entity.validation.required">
                         This field is required.
                     </small>
                 </div>
@@ -59,13 +59,13 @@
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkill.teacher" for="field_teacher">Teacher</label>
                     <select class="form-control" id="field_teacher" data-cy="teacher" name="teacher" formControlName="teacher">
-                        <option *ngIf="!editForm.get('teacher')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="employeeOption.id === editForm.get('teacher')!.value?.id ? editForm.get('teacher')!.value : employeeOption" *ngFor="let employeeOption of employees; trackBy: trackById">{{ employeeOption.fullname }}</option>
+                        <option *ngIf="edit && editForm.get('teacher')!.value" [ngValue]="editForm.get('teacher')!.value" selected>{{editForm.get('teacher')!.value.fullname}}</option>
+                        <option [ngValue]="employeeOption" *ngFor="let employeeOption of employees; trackBy: trackById">{{ employeeOption.fullname }}</option>
                     </select>
                 </div>
-                <div *ngIf="editForm.get(['teacher'])!.invalid && (editForm.get(['teacher'])!.dirty || editForm.get(['teacher'])!.touched)">
+                <div *ngIf="editForm.get('teacher')!.invalid && (editForm.get('teacher')!.dirty || editForm.get('teacher')!.touched)">
                     <small class="form-text text-danger"
-                           *ngIf="editForm.get(['teacher'])?.errors?.required" jhiTranslate="entity.validation.required">
+                           *ngIf="editForm.get('teacher')?.errors?.required" jhiTranslate="entity.validation.required">
                         This field is required.
                     </small>
                 </div>

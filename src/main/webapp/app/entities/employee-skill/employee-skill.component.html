@@ -38,22 +38,22 @@
             </thead>
             <tbody>
                 <tr *ngFor="let employeeSkill of employeeSkills; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/employee-skill', employeeSkill.name, 'view']">{{ employeeSkill.name }}</a></td>
+                    <td><a [routerLink]="['/employee-skill', { name: employeeSkill?.name, employeeUsername : employeeSkill?.employee!.username }, 'view']">{{ employeeSkill?.name }}</a></td>
                     <td>{{ employeeSkill.level }}</td>
                     <td>
                         <div *ngIf="employeeSkill.employee">
-                            <a [routerLink]="['/employee', employeeSkill.employee?.id, 'view']" >{{ employeeSkill.employee?.fullname }}</a>
+                            <a [routerLink]="['/employee', employeeSkill.employee!.username , 'view']" >{{ employeeSkill.employee!.fullname }}</a>
                         </div>
                     </td>
                     <td>
                         <div *ngIf="employeeSkill.teacher">
-                            <a [routerLink]="['/employee', employeeSkill.teacher?.id, 'view']" >{{ employeeSkill.teacher?.fullname }}</a>
+                            <a [routerLink]="['/employee', employeeSkill.teacher!.username , 'view']" >{{ employeeSkill.teacher!.fullname }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"
-                                    [routerLink]="['/employee-skill', employeeSkill.id, 'view']"
+                                    [routerLink]="['/employee-skill', { name: employeeSkill?.name, employeeUsername: employeeSkill?.employee!.username },'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -61,7 +61,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/employee-skill', employeeSkill.id, 'edit']"
+                                    [routerLink]="['/employee-skill', { name: employeeSkill?.name, employeeUsername: employeeSkill?.employee!.username }, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

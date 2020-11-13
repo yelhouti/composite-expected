@@ -87,7 +87,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
   }
 
   trackId(index: number, item: IEmployee): string {
-    return item.id!;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    return item.username!;
   }
 
   registerChangeInEmployees(): void {
@@ -101,8 +102,8 @@ export class EmployeeComponent implements OnInit, OnDestroy {
 
   sort(): string[] {
     const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
+    if (this.predicate !== 'username') {
+      result.push('username');
     }
     return result;
   }

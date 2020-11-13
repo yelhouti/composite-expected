@@ -21,7 +21,7 @@ const employeeSkillCertificateRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: 'view',
     component: EmployeeSkillCertificateDetailComponent,
     resolve: {
       employeeSkillCertificate: EmployeeSkillCertificateRoutingResolveService,
@@ -45,7 +45,7 @@ const employeeSkillCertificateRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: 'edit',
     component: EmployeeSkillCertificateUpdateComponent,
     resolve: {
       employeeSkillCertificate: EmployeeSkillCertificateRoutingResolveService,

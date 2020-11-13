@@ -1,4 +1,4 @@
-<form *ngIf="employeeSkill" name="deleteForm" (ngSubmit)="confirmDelete(employeeSkill?.id!)">
+<form *ngIf="employeeSkill" name="deleteForm" (ngSubmit)="confirmDelete(employeeSkill?.name, employeeSkill?.employee.username)">
     <div class="modal-header">
         <h4 class="modal-title" data-cy="employeeSkillDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
 
@@ -9,7 +9,7 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-employeeSkill-heading" jhiTranslate="compositekeyApp.employeeSkill.delete.question" [translateValues]="{ id: employeeSkill.id }">Are you sure you want to delete this Employee Skill?</p>
+        <p id="jhi-delete-employeeSkill-heading" jhiTranslate="compositekeyApp.employeeSkill.delete.question" [translateValues]="{ name: employeeSkill?.name }">Are you sure you want to delete this Employee Skill?</p>
     </div>
 
     <div class="modal-footer">

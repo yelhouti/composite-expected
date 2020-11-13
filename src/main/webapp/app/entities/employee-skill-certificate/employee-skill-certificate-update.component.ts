@@ -7,7 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IEmployeeSkillCertificate, EmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
 import { EmployeeSkillCertificateService } from './employee-skill-certificate.service';
-import { ICertificateType } from 'app/shared/model/certificate-type.model';
+import { CertificateType, ICertificateType } from 'app/shared/model/certificate-type.model';
 import { CertificateTypeService } from 'app/entities/certificate-type/certificate-type.service';
 import { IEmployeeSkill } from 'app/shared/model/employee-skill.model';
 import { EmployeeSkillService } from 'app/entities/employee-skill/employee-skill.service';
@@ -26,8 +26,8 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
   editForm = this.fb.group({
     grade: [null, [Validators.required]],
     date: [null, [Validators.required]],
-    type: [null, Validators.required],
-    skill: [null, Validators.required],
+    typeId: [null, Validators.required],
+    skillName: [null, Validators.required],
   });
 
   constructor(
@@ -56,8 +56,8 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
     this.editForm.patchValue({
       grade: employeeSkillCertificate.grade,
       date: employeeSkillCertificate.date,
-      type: employeeSkillCertificate.type,
-      skill: employeeSkillCertificate.skill,
+      typeId: employeeSkillCertificate.type?.id,
+      skillName: employeeSkillCertificate.skill?.name,
     });
   }
 
@@ -72,11 +72,11 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const employeeSkillCertificate = this.createFromForm();
-    if (employeeSkillCertificate.id !== undefined) {
-      this.subscribeToSaveResponse(this.employeeSkillCertificateService.update(employeeSkillCertificate));
-    } else {
-      this.subscribeToSaveResponse(this.employeeSkillCertificateService.create(employeeSkillCertificate));
-    }
+    // if (employeeSkillCertificate.id !== undefined) {
+    //   this.subscribeToSaveResponse(this.employeeSkillCertificateService.update(employeeSkillCertificate));
+    // } else {
+    this.subscribeToSaveResponse(this.employeeSkillCertificateService.create(employeeSkillCertificate));
+    // }
   }
 
   private createFromForm(): IEmployeeSkillCertificate {
@@ -105,7 +105,10 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: SelectableEntity): number {
-    return item.id!;
+  trackById(index: number, item: SelectableEntity): any {
+    if (item.constructor.name === CertificateType.constructor.name) {
+      return (item as ICertificateType).id;
+    }
+    return `${(item as IEmployeeSkill).name!}, ${(item as IEmployeeSkill).employee!.username!}`;
   }
 }

@@ -53,7 +53,7 @@ export class PriceFormulaComponent implements OnInit, OnDestroy {
   }
 
   trackId(index: number, item: IPriceFormula): number {
-    return item.id!;
+    return item.max!;
   }
 
   registerChangeInPriceFormulas(): void {

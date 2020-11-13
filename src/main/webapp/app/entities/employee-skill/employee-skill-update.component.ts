@@ -7,7 +7,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IEmployeeSkill, EmployeeSkill } from 'app/shared/model/employee-skill.model';
 import { EmployeeSkillService } from './employee-skill.service';
-import { ITask } from 'app/shared/model/task.model';
+import { ITask, Task } from 'app/shared/model/task.model';
 import { TaskService } from 'app/entities/task/task.service';
 import { IEmployee } from 'app/shared/model/employee.model';
 import { EmployeeService } from 'app/entities/employee/employee.service';
@@ -19,6 +19,7 @@ type SelectableEntity = ITask | IEmployee;
   templateUrl: './employee-skill-update.component.html',
 })
 export class EmployeeSkillUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
   tasks: ITask[] = [];
   employees: IEmployee[] = [];
@@ -54,6 +55,7 @@ export class EmployeeSkillUpdateComponent implements OnInit {
   }
 
   updateForm(employeeSkill: IEmployeeSkill): void {
+    this.edit = true;
     this.editForm.patchValue({
       name: employeeSkill.name,
       level: employeeSkill.level,
@@ -74,7 +76,7 @@ export class EmployeeSkillUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const employeeSkill = this.createFromForm();
-    if (employeeSkill.id !== undefined) {
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeSkillService.update(employeeSkill));
     } else {
       this.subscribeToSaveResponse(this.employeeSkillService.create(employeeSkill));
@@ -108,11 +110,15 @@ export class EmployeeSkillUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: SelectableEntity): number {
-    return item.id!;
+  trackById(index: number, item: SelectableEntity): any {
+    if (item.constructor.name === Task.constructor.name) {
+      return (item as ITask).id;
+    }
+    return (item as IEmployee).username;
   }
 
-  getSelected(option: ITask, selectedVals?: ITask[]): ITask {
+  getSelected(option: ITask, selectedVals: ITask[]): ITask {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (selectedVals) {
       for (let i = 0; i < selectedVals.length; i++) {
         if (option.id === selectedVals[i].id) {

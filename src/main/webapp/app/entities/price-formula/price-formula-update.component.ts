@@ -54,7 +54,7 @@ export class PriceFormulaUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const priceFormula = this.createFromForm();
-    if (priceFormula.id !== undefined) {
+    if (priceFormula.max !== undefined) {
       this.subscribeToSaveResponse(this.priceFormulaService.update(priceFormula));
     } else {
       this.subscribeToSaveResponse(this.priceFormulaService.create(priceFormula));

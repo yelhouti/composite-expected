@@ -75,7 +75,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const withIdStringDetails = this.createFromForm();
-    if (withIdStringDetails.id !== undefined) {
+    if (withIdStringDetails.withIdStringId !== undefined) {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.update(withIdStringDetails));
     } else {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.create(withIdStringDetails));
@@ -107,7 +107,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: IWithIdString): number {
+  trackById(index: number, item: IWithIdString): string {
     return item.id!;
   }
 }

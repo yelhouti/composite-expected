@@ -15,7 +15,7 @@ const employeeRoute: Routes = [
     component: EmployeeComponent,
     data: {
       authorities: [Authority.USER],
-      defaultSort: 'id,asc',
+      defaultSort: 'username,asc',
       pageTitle: 'compositekeyApp.employee.home.title',
     },
     canActivate: [UserRouteAccessService],

@@ -41,19 +41,19 @@
                     <td>{{ employeeSkillCertificate.grade }}</td>
                     <td>{{ employeeSkillCertificate.date | date:'mediumDate' }}</td>
                     <td>
-                        <div *ngIf="employeeSkillCertificate.type">
-                            <a [routerLink]="['/certificate-type', employeeSkillCertificate.type?.id, 'view']" >{{ employeeSkillCertificate.type?.name }}</a>
+                        <div *ngIf="employeeSkillCertificate?.type">
+                            <a [routerLink]="['/certificate-type', employeeSkillCertificate.type.id! , 'view']" >{{ employeeSkillCertificate.type.name! }}</a>
                         </div>
                     </td>
                     <td>
-                        <div *ngIf="employeeSkillCertificate.skill">
-                            <a [routerLink]="['/employee-skill', employeeSkillCertificate.skill?.id, 'view']" >{{ employeeSkillCertificate.skill?.id }}</a>
+                        <div *ngIf="employeeSkillCertificate?.skill">
+                            <a [routerLink]="['/employee-skill', { name: employeeSkillCertificate.skill.name!, employeeUsername: employeeSkillCertificate.skill.employee?.username } , 'view']" >{{ employeeSkillCertificate.skill.name! }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"
-                                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'view']"
+                                    [routerLink]="['/employee-skill-certificate', { typeId: employeeSkillCertificate?.type!.id, skillName: employeeSkillCertificate?.skill!.name, employeeUsername: employeeSkillCertificate?.skill!.employee!.username } , 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -61,7 +61,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'edit']"
+                                    [routerLink]="['/employee-skill-certificate', { typeId: employeeSkillCertificate?.type!.id, skillName: employeeSkillCertificate?.skill!.name, employeeUsername: employeeSkillCertificate?.skill!.employee!.username } , 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>
