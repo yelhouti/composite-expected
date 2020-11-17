@@ -12,7 +12,7 @@ export class TaskRoutingResolveService implements Resolve<ITask> {
   constructor(private service: TaskService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ITask> | Observable<never> {
-    const id = route.params['id'];
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
         mergeMap((task: HttpResponse<Task>) => {

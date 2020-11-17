@@ -12,9 +12,10 @@ export class EmployeeSkillRoutingResolveService implements Resolve<IEmployeeSkil
   constructor(private service: EmployeeSkillService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<IEmployeeSkill> | Observable<never> {
-    const id = route.params['id'];
-    if (id) {
-      return this.service.find(id).pipe(
+    const name = route.params['name'] ? route.params['name'] : null;
+    const employeeUsername = route.params['employeeUsername'] ? route.params['employeeUsername'] : null;
+    if (name && employeeUsername) {
+      return this.service.find(name, employeeUsername).pipe(
         mergeMap((employeeSkill: HttpResponse<EmployeeSkill>) => {
           if (employeeSkill.body) {
             return of(employeeSkill.body);

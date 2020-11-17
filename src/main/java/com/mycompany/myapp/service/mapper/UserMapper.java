@@ -5,7 +5,7 @@ import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.service.dto.UserDTO;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.mapstruct.*;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +16,27 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserMapper {
+
+    @Named("id")
+    public UserDTO toDtoId(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        return userDTO;
+    }
+
+    @Named("login")
+    public UserDTO toDtoLogin(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setLogin(user.getLogin());
+        return userDTO;
+    }
 
     public List<UserDTO> usersToUserDTOs(List<User> users) {
         return users.stream().filter(Objects::nonNull).map(this::userToUserDTO).collect(Collectors.toList());
@@ -75,31 +96,5 @@ public class UserMapper {
         User user = new User();
         user.setId(id);
         return user;
-    }
-
-    @Named("id")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    public UserDTO toDtoId(User user) {
-        if (user == null) {
-            return null;
-        }
-        UserDTO userDto = new UserDTO();
-        userDto.setId(user.getId());
-        return userDto;
-    }
-
-    @Named("login")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "login", source = "login")
-    public UserDTO toDtoLogin(User user) {
-        if (user == null) {
-            return null;
-        }
-        UserDTO userDto = new UserDTO();
-        userDto.setId(user.getId());
-        userDto.setLogin(user.getLogin());
-        return userDto;
     }
 }

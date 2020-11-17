@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -20,9 +21,9 @@ public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private String id;
+    @NotNull
+    @Column(name = "username", nullable = false)
+    private String username;
 
     @NotNull
     @Column(name = "fullname", nullable = false)
@@ -48,17 +49,18 @@ public class Employee implements Serializable {
     private Employee manager;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getId() {
-        return id;
+
+    public String getUsername() {
+        return username;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Employee id(String id) {
-        this.id = id;
+    public Employee username(String username) {
+        this.username = username;
         return this;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFullname() {
@@ -172,19 +174,19 @@ public class Employee implements Serializable {
         if (!(o instanceof Employee)) {
             return false;
         }
-        return id != null && id.equals(((Employee) o).id);
+        return username != null && username.equals(((Employee) o).username);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hashCode(username);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "Employee{" +
-            "id=" + getId() +
+            "username='" + getUsername() + "'" +
             ", fullname='" + getFullname() + "'" +
             "}";
     }

@@ -1,4 +1,4 @@
-<form *ngIf="certificateType" name="deleteForm" (ngSubmit)="confirmDelete(certificateType?.id!)">
+<form *ngIf="certificateType" name="deleteForm" (ngSubmit)="confirmDelete(certificateType!.id!)">
     <div class="modal-header">
         <h4 class="modal-title" data-cy="certificateTypeDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
 
@@ -9,7 +9,7 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-certificateType-heading" jhiTranslate="compositekeyApp.certificateType.delete.question" [translateValues]="{ id: certificateType.id }">Are you sure you want to delete this Certificate Type?</p>
+        <p id="jhi-delete-certificateType-heading" jhiTranslate="compositekeyApp.certificateType.delete.question" [translateValues]="certificateType!.id!">Are you sure you want to delete this Certificate Type?</p>
     </div>
 
     <div class="modal-footer">

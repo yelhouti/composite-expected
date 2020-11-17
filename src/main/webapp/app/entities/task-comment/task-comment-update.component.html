@@ -8,7 +8,7 @@
 
 
                 <div class="form-group" [hidden]="editForm.get('id')?.value == null">
-                    <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+                    <label class="form-control-label" jhiTranslate="compositekeyApp.taskComment.id" for="field_id">Id</label>
                     <input type="number" class="form-control" name="id" id="field_id" data-cy="id"
                            formControlName="id" readonly/>
                 </div>
@@ -27,9 +27,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.taskComment.task" for="field_task">Task</label>
-                    <select class="form-control" id="field_task" data-cy="task" name="task" formControlName="task">
+                    <select class="form-control" id="field_task" data-cy="task" name="task" formControlName="task" >
                         <option *ngIf="!editForm.get('task')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="taskOption.id === editForm.get('task')!.value?.id ? editForm.get('task')!.value : taskOption" *ngFor="let taskOption of tasks; trackBy: trackById">{{ taskOption.name }}</option>
+                        <option [ngValue]="taskOption?.id! === editForm.get('task')!.value?.id! ? editForm.get('task')!.value : taskOption" *ngFor="let taskOption of tasks; trackBy: trackById">{{ taskOption!.name }}</option>
                     </select>
                 </div>
                 <div *ngIf="editForm.get(['task'])!.invalid && (editForm.get(['task'])!.dirty || editForm.get(['task'])!.touched)">

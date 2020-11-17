@@ -20,7 +20,7 @@ const withIdStringDetailsRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: ':withIdStringId/view',
     component: WithIdStringDetailsDetailComponent,
     resolve: {
       withIdStringDetails: WithIdStringDetailsRoutingResolveService,
@@ -44,7 +44,7 @@ const withIdStringDetailsRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: ':withIdStringId/edit',
     component: WithIdStringDetailsUpdateComponent,
     resolve: {
       withIdStringDetails: WithIdStringDetailsRoutingResolveService,

@@ -12,9 +12,9 @@ export class WithIdStringDetailsRoutingResolveService implements Resolve<IWithId
   constructor(private service: WithIdStringDetailsService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<IWithIdStringDetails> | Observable<never> {
-    const id = route.params['id'];
-    if (id) {
-      return this.service.find(id).pipe(
+    const withIdStringId = route.params['withIdStringId'] ? route.params['withIdStringId'] : null;
+    if (withIdStringId) {
+      return this.service.find(withIdStringId).pipe(
         mergeMap((withIdStringDetails: HttpResponse<WithIdStringDetails>) => {
           if (withIdStringDetails.body) {
             return of(withIdStringDetails.body);

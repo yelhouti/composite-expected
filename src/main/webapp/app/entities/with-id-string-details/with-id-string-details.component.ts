@@ -52,8 +52,8 @@ export class WithIdStringDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackId(index: number, item: IWithIdStringDetails): number {
-    return item.id!;
+  trackId(index: number, item: IWithIdStringDetails): string {
+    return item.withIdStringId!;
   }
 
   registerChangeInWithIdStringDetails(): void {

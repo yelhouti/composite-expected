@@ -13,7 +13,7 @@ class TaskTest {
         Task task1 = new Task();
         task1.setId(1L);
         Task task2 = new Task();
-        task2.setId(task1.getId());
+        task2.setId(1L);
         assertThat(task1).isEqualTo(task2);
         task2.setId(2L);
         assertThat(task1).isNotEqualTo(task2);

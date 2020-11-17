@@ -10,7 +10,7 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
+                <dt><span jhiTranslate="compositekeyApp.taskComment.id">Id</span></dt>
                 <dd>
                     <span>{{ taskComment.id }}</span>
                 </dd>
@@ -21,7 +21,7 @@
                 <dt><span jhiTranslate="compositekeyApp.taskComment.task">Task</span></dt>
                 <dd>
                     <div *ngIf="taskComment.task">
-                        <a [routerLink]="['/task', taskComment.task?.id, 'view']">{{ taskComment.task?.name }}</a>
+                        <a [routerLink]="['/task', taskComment!.task!.id!, 'view']">{{ taskComment!.task!.name }}</a>
                     </div>
                 </dd>
             </dl>
@@ -34,7 +34,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/task-comment', taskComment.id, 'edit']"
+                    [routerLink]="['/task-comment', taskComment!.id, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

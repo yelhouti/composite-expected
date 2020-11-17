@@ -37,12 +37,12 @@ public interface WithIdStringDetailsService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<WithIdStringDetailsDTO> findOne(Long id);
+    Optional<WithIdStringDetailsDTO> findOne(String id);
 
     /**
      * Delete the "id" withIdStringDetails.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    void delete(String id);
 }

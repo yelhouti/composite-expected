@@ -87,7 +87,7 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
   }
 
   trackId(index: number, item: IEmployeeSkill): string {
-    return item.id!;
+    return `${item.name!},${item.employee!.username!}`;
   }
 
   registerChangeInEmployeeSkills(): void {
@@ -101,9 +101,6 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
 
   sort(): string[] {
     const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
-    }
     return result;
   }
 

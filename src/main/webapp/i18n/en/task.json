@@ -17,7 +17,7 @@
       "detail": {
         "title": "Task"
       },
-      "id": "ID",
+      "id": "Id",
       "name": "Name",
       "type": "Type",
       "endDate": "End Date",

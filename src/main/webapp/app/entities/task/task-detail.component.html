@@ -10,7 +10,7 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
+                <dt><span jhiTranslate="compositekeyApp.task.id">Id</span></dt>
                 <dd>
                     <span>{{ task.id }}</span>
                 </dd>
@@ -60,7 +60,7 @@
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.task.user">User</span></dt>
                 <dd>
-                    {{ task.user?.login }}
+                        {{ task!.user!.login }}
                 </dd>
             </dl>
 
@@ -72,7 +72,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/task', task.id, 'edit']"
+                    [routerLink]="['/task', task!.id, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

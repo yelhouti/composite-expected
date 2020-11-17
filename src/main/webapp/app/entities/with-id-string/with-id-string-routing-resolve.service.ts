@@ -12,7 +12,7 @@ export class WithIdStringRoutingResolveService implements Resolve<IWithIdString>
   constructor(private service: WithIdStringService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<IWithIdString> | Observable<never> {
-    const id = route.params['id'];
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
         mergeMap((withIdString: HttpResponse<WithIdString>) => {

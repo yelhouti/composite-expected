@@ -44,7 +44,7 @@ public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsServic
     public WithIdStringDetailsDTO save(WithIdStringDetailsDTO withIdStringDetailsDTO) {
         log.debug("Request to save WithIdStringDetails : {}", withIdStringDetailsDTO);
         WithIdStringDetails withIdStringDetails = withIdStringDetailsMapper.toEntity(withIdStringDetailsDTO);
-        Long withIdStringId = withIdStringDetailsDTO.getWithIdString().getId();
+        String withIdStringId = withIdStringDetailsDTO.getWithIdString().getId();
         withIdStringRepository.findById(withIdStringId).ifPresent(withIdStringDetails::withIdString);
         withIdStringDetails = withIdStringDetailsRepository.save(withIdStringDetails);
         return withIdStringDetailsMapper.toDto(withIdStringDetails);
@@ -55,7 +55,7 @@ public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsServic
         log.debug("Request to partially update WithIdStringDetails : {}", withIdStringDetailsDTO);
 
         return withIdStringDetailsRepository
-            .findById(withIdStringDetailsDTO.getId())
+            .findById(withIdStringDetailsDTO.getWithIdStringId())
             .map(
                 existingWithIdStringDetails -> {
                     if (withIdStringDetailsDTO.getName() != null) {
@@ -83,13 +83,13 @@ public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsServic
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<WithIdStringDetailsDTO> findOne(Long id) {
+    public Optional<WithIdStringDetailsDTO> findOne(String id) {
         log.debug("Request to get WithIdStringDetails : {}", id);
         return withIdStringDetailsRepository.findById(id).map(withIdStringDetailsMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         log.debug("Request to delete WithIdStringDetails : {}", id);
         withIdStringDetailsRepository.deleteById(id);
     }

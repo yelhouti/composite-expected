@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -19,10 +20,12 @@ public class EmployeeSkill implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private String id;
+    @EmbeddedId
+    EmployeeSkillId id;
+
+    @NotNull
+    @Column(name = "name", nullable = false, insertable = false, updatable = false)
+    private String name;
 
     @NotNull
     @Column(name = "level", nullable = false)
@@ -37,8 +40,11 @@ public class EmployeeSkill implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JoinTable(
         name = "rel_employee_skill__task",
-        joinColumns = @JoinColumn(name = "employee_skill_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id")
+        joinColumns = {
+            @JoinColumn(name = "employee_skill_name", referencedColumnName = "name"),
+            @JoinColumn(name = "employee_skill_employee_username", referencedColumnName = "employee_username"),
+        },
+        inverseJoinColumns = { @JoinColumn(name = "task_id", referencedColumnName = "id") }
     )
     @JsonIgnoreProperties(value = { "user", "employeeSkills" }, allowSetters = true)
     private Set<Task> tasks = new HashSet<>();
@@ -46,6 +52,7 @@ public class EmployeeSkill implements Serializable {
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "teamMembers", "skills", "taughtSkills", "manager" }, allowSetters = true)
+    @JoinColumn(insertable = false, updatable = false)
     private Employee employee;
 
     @ManyToOne(optional = false)
@@ -54,17 +61,30 @@ public class EmployeeSkill implements Serializable {
     private Employee teacher;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getId() {
+    public EmployeeSkillId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(EmployeeSkillId id) {
         this.id = id;
     }
 
-    public EmployeeSkill id(String id) {
+    public EmployeeSkill id(EmployeeSkillId id) {
         this.id = id;
         return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public EmployeeSkill name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getLevel() {
@@ -171,7 +191,7 @@ public class EmployeeSkill implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore
@@ -179,6 +199,7 @@ public class EmployeeSkill implements Serializable {
     public String toString() {
         return "EmployeeSkill{" +
             "id=" + getId() +
+            ", name='" + getName() + "'" +
             ", level=" + getLevel() +
             "}";
     }

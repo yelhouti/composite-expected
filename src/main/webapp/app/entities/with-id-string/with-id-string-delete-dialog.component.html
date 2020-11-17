@@ -1,4 +1,4 @@
-<form *ngIf="withIdString" name="deleteForm" (ngSubmit)="confirmDelete(withIdString?.id!)">
+<form *ngIf="withIdString" name="deleteForm" (ngSubmit)="confirmDelete(withIdString!.id!)">
     <div class="modal-header">
         <h4 class="modal-title" data-cy="withIdStringDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
 
@@ -9,7 +9,7 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-withIdString-heading" jhiTranslate="compositekeyApp.withIdString.delete.question" [translateValues]="{ id: withIdString.id }">Are you sure you want to delete this With Id String?</p>
+        <p id="jhi-delete-withIdString-heading" jhiTranslate="compositekeyApp.withIdString.delete.question" [translateValues]="withIdString!.id!">Are you sure you want to delete this With Id String?</p>
     </div>
 
     <div class="modal-footer">

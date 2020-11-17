@@ -1,4 +1,4 @@
-<form *ngIf="taskComment" name="deleteForm" (ngSubmit)="confirmDelete(taskComment?.id!)">
+<form *ngIf="taskComment" name="deleteForm" (ngSubmit)="confirmDelete(taskComment!.id!)">
     <div class="modal-header">
         <h4 class="modal-title" data-cy="taskCommentDeleteDialogHeading" jhiTranslate="entity.delete.title">Confirm delete operation</h4>
 
@@ -9,7 +9,7 @@
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
 
-        <p id="jhi-delete-taskComment-heading" jhiTranslate="compositekeyApp.taskComment.delete.question" [translateValues]="{ id: taskComment.id }">Are you sure you want to delete this Task Comment?</p>
+        <p id="jhi-delete-taskComment-heading" jhiTranslate="compositekeyApp.taskComment.delete.question" [translateValues]="taskComment!.id!">Are you sure you want to delete this Task Comment?</p>
     </div>
 
     <div class="modal-footer">

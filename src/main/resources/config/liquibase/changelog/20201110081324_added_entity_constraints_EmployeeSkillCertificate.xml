@@ -14,10 +14,10 @@
                                  referencedColumnNames="id"
                                  referencedTableName="certificate_type"/>
 
-        <addForeignKeyConstraint baseColumnNames="skill_id"
+        <addForeignKeyConstraint baseColumnNames="skill_name,skill_employee_username"
                                  baseTableName="employee_skill_certificate"
                                  constraintName="fk_employee_skill_certificate__skill_id"
-                                 referencedColumnNames="id"
+                                 referencedColumnNames="name,employee_username"
                                  referencedTableName="employee_skill"/>
 
     </changeSet>

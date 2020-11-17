@@ -29,7 +29,7 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-                    <th scope="col"  jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="id"><span jhiTranslate="compositekeyApp.taskComment.id">Id</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="value"><span jhiTranslate="compositekeyApp.taskComment.value">Value</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="task.name"><span jhiTranslate="compositekeyApp.taskComment.task">Task</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>
@@ -37,17 +37,18 @@
             </thead>
             <tbody>
                 <tr *ngFor="let taskComment of taskComments; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/task-comment', taskComment.id, 'view']">{{ taskComment.id }}</a></td>
+                    <td><a [routerLink]="['/task-comment', taskComment!.id!, 'view']">{{ taskComment.id }}</a></td>
                     <td>{{ taskComment.value }}</td>
                     <td>
                         <div *ngIf="taskComment.task">
-                            <a [routerLink]="['/task', taskComment.task?.id, 'view']" >{{ taskComment.task?.name }}</a>
+                            <a [routerLink]="['/task', taskComment!.task!.id!, 'view']">{{ taskComment!.task!.name }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
+
                             <button type="submit"
-                                    [routerLink]="['/task-comment', taskComment.id, 'view']"
+                                    [routerLink]="['/task-comment',  taskComment.id!, 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -55,7 +56,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/task-comment', taskComment.id, 'edit']"
+                                    [routerLink]="['/task-comment', taskComment.id!, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

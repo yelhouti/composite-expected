@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.EmployeeSkill;
+import com.mycompany.myapp.domain.EmployeeSkillId;
 import com.mycompany.myapp.repository.EmployeeSkillRepository;
 import com.mycompany.myapp.service.EmployeeSkillService;
 import com.mycompany.myapp.service.dto.EmployeeSkillDTO;
@@ -44,7 +45,7 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
         log.debug("Request to partially update EmployeeSkill : {}", employeeSkillDTO);
 
         return employeeSkillRepository
-            .findById(employeeSkillDTO.getId())
+            .findById(employeeSkillMapper.toEntity(employeeSkillDTO).getId())
             .map(
                 existingEmployeeSkill -> {
                     if (employeeSkillDTO.getLevel() != null) {
@@ -72,13 +73,13 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<EmployeeSkillDTO> findOne(String id) {
+    public Optional<EmployeeSkillDTO> findOne(EmployeeSkillId id) {
         log.debug("Request to get EmployeeSkill : {}", id);
         return employeeSkillRepository.findOneWithEagerRelationships(id).map(employeeSkillMapper::toDto);
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(EmployeeSkillId id) {
         log.debug("Request to delete EmployeeSkill : {}", id);
         employeeSkillRepository.deleteById(id);
     }

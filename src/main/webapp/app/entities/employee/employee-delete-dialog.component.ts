@@ -17,8 +17,8 @@ export class EmployeeDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: string): void {
-    this.employeeService.delete(id).subscribe(() => {
+  confirmDelete(username: string): void {
+    this.employeeService.delete(username).subscribe(() => {
       this.eventManager.broadcast('employeeListModification');
       this.activeModal.close();
     });

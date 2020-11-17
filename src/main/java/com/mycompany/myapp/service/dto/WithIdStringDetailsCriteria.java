@@ -24,18 +24,18 @@ public class WithIdStringDetailsCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
-    private LongFilter id;
+    private StringFilter withIdStringId;
 
     private StringFilter name;
 
-    private LongFilter withIdStringId;
+    private WithIdStringCriteria withIdString;
 
     public WithIdStringDetailsCriteria() {}
 
     public WithIdStringDetailsCriteria(WithIdStringDetailsCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
-        this.name = other.name == null ? null : other.name.copy();
         this.withIdStringId = other.withIdStringId == null ? null : other.withIdStringId.copy();
+        this.name = other.name == null ? null : other.name.copy();
+        this.withIdString = other.withIdString == null ? null : other.withIdString.copy();
     }
 
     @Override
@@ -43,12 +43,12 @@ public class WithIdStringDetailsCriteria implements Serializable, Criteria {
         return new WithIdStringDetailsCriteria(this);
     }
 
-    public LongFilter getId() {
-        return id;
+    public StringFilter getWithIdStringId() {
+        return withIdStringId;
     }
 
-    public void setId(LongFilter id) {
-        this.id = id;
+    public void setWithIdStringId(StringFilter withIdStringId) {
+        this.withIdStringId = withIdStringId;
     }
 
     public StringFilter getName() {
@@ -59,12 +59,12 @@ public class WithIdStringDetailsCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public LongFilter getWithIdStringId() {
-        return withIdStringId;
+    public WithIdStringCriteria getWithIdString() {
+        return withIdString;
     }
 
-    public void setWithIdStringId(LongFilter withIdStringId) {
-        this.withIdStringId = withIdStringId;
+    public void setWithIdString(WithIdStringCriteria withIdString) {
+        this.withIdString = withIdString;
     }
 
     @Override
@@ -76,21 +76,25 @@ public class WithIdStringDetailsCriteria implements Serializable, Criteria {
             return false;
         }
         final WithIdStringDetailsCriteria that = (WithIdStringDetailsCriteria) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(withIdStringId, that.withIdStringId);
+        return (
+            Objects.equals(withIdStringId, that.withIdStringId) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(withIdString, that.withIdString)
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, withIdStringId);
+        return Objects.hash(withIdStringId, name, withIdString);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "WithIdStringDetailsCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (name != null ? "name=" + name + ", " : "") +
-                (withIdStringId != null ? "withIdStringId=" + withIdStringId + ", " : "") +
+            (withIdStringId != null ? "withIdStringId=" + withIdStringId + ", " : "") +
+            (name != null ? "name=" + name + ", " : "") +
+            (withIdString != null ? "withIdString=" + withIdString + ", " : "") +
             "}";
     }
 }

@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.EmployeeSkillCertificate;
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.repository.EmployeeSkillCertificateRepository;
 import com.mycompany.myapp.service.EmployeeSkillCertificateService;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateDTO;
@@ -47,7 +48,7 @@ public class EmployeeSkillCertificateServiceImpl implements EmployeeSkillCertifi
         log.debug("Request to partially update EmployeeSkillCertificate : {}", employeeSkillCertificateDTO);
 
         return employeeSkillCertificateRepository
-            .findById(employeeSkillCertificateDTO.getId())
+            .findById(employeeSkillCertificateMapper.toEntity(employeeSkillCertificateDTO).getId())
             .map(
                 existingEmployeeSkillCertificate -> {
                     if (employeeSkillCertificateDTO.getGrade() != null) {
@@ -75,13 +76,13 @@ public class EmployeeSkillCertificateServiceImpl implements EmployeeSkillCertifi
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<EmployeeSkillCertificateDTO> findOne(Long id) {
+    public Optional<EmployeeSkillCertificateDTO> findOne(EmployeeSkillCertificateId id) {
         log.debug("Request to get EmployeeSkillCertificate : {}", id);
         return employeeSkillCertificateRepository.findById(id).map(employeeSkillCertificateMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(EmployeeSkillCertificateId id) {
         log.debug("Request to delete EmployeeSkillCertificate : {}", id);
         employeeSkillCertificateRepository.deleteById(id);
     }

@@ -33,9 +33,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employee.manager" for="field_manager">Manager</label>
-                    <select class="form-control" id="field_manager" data-cy="manager" name="manager" formControlName="manager">
+                    <select class="form-control" id="field_manager" data-cy="manager" name="manager" formControlName="manager" >
                         <option [ngValue]="null"></option>
-                        <option [ngValue]="employeeOption.id === editForm.get('manager')!.value?.id ? editForm.get('manager')!.value : employeeOption" *ngFor="let employeeOption of employees; trackBy: trackById">{{ employeeOption.fullname }}</option>
+                        <option [ngValue]="employeeOption?.username! === editForm.get('manager')!.value?.username! ? editForm.get('manager')!.value : employeeOption" *ngFor="let employeeOption of employees; trackBy: trackByUsername">{{ employeeOption!.fullname }}</option>
                     </select>
                 </div>
             </div>

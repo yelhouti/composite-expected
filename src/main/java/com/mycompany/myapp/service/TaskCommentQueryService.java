@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.dto.TaskCommentCriteria;
 import com.mycompany.myapp.service.dto.TaskCommentDTO;
 import com.mycompany.myapp.service.mapper.TaskCommentMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,9 +34,16 @@ public class TaskCommentQueryService extends QueryService<TaskComment> {
 
     private final TaskCommentMapper taskCommentMapper;
 
-    public TaskCommentQueryService(TaskCommentRepository taskCommentRepository, TaskCommentMapper taskCommentMapper) {
+    private final TaskQueryService taskQueryService;
+
+    public TaskCommentQueryService(
+        TaskCommentRepository taskCommentRepository,
+        TaskCommentMapper taskCommentMapper,
+        @Lazy TaskQueryService taskQueryService
+    ) {
         this.taskCommentRepository = taskCommentRepository;
         this.taskCommentMapper = taskCommentMapper;
+        this.taskQueryService = taskQueryService;
     }
 
     /**
@@ -80,7 +88,7 @@ public class TaskCommentQueryService extends QueryService<TaskComment> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<TaskComment> createSpecification(TaskCommentCriteria criteria) {
+    public Specification<TaskComment> createSpecification(TaskCommentCriteria criteria) {
         Specification<TaskComment> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
@@ -89,10 +97,18 @@ public class TaskCommentQueryService extends QueryService<TaskComment> {
             if (criteria.getValue() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getValue(), TaskComment_.value));
             }
-            if (criteria.getTaskId() != null) {
+
+            if (criteria.getTask() != null) {
+                Specification<Task> taskSpecification = this.taskQueryService.createSpecification(criteria.getTask());
                 specification =
                     specification.and(
-                        buildSpecification(criteria.getTaskId(), root -> root.join(TaskComment_.task, JoinType.LEFT).get(Task_.id))
+                        (root, query, criteriaBuilder) -> {
+                            Root<Task> taskRoot = query.from(Task.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.equal(taskRoot, root.get(TaskComment_.task)),
+                                taskSpecification.toPredicate(taskRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

@@ -29,7 +29,7 @@ export class WithIdStringDetailsUpdatePage {
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
 
-  idInput = element(by.id('field_id'));
+  withIdStringIdInput = element(by.id('field_withIdStringId'));
   nameInput = element(by.id('field_name'));
 
   withIdStringSelect = element(by.id('field_withIdString'));
@@ -38,12 +38,12 @@ export class WithIdStringDetailsUpdatePage {
     return this.pageTitle.getAttribute('jhiTranslate');
   }
 
-  async setIdInput(id: string): Promise<void> {
-    await this.idInput.sendKeys(id);
+  async setWithIdStringIdInput(withIdStringId: string): Promise<void> {
+    await this.withIdStringIdInput.sendKeys(withIdStringId);
   }
 
-  async getIdInput(): Promise<string> {
-    return await this.idInput.getAttribute('value');
+  async getWithIdStringIdInput(): Promise<string> {
+    return await this.withIdStringIdInput.getAttribute('value');
   }
 
   async setNameInput(name: string): Promise<void> {

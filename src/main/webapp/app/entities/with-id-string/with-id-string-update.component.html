@@ -8,9 +8,15 @@
 
 
                 <div class="form-group" [hidden]="editForm.get('id')?.value == null">
-                    <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-                    <input type="number" class="form-control" name="id" id="field_id" data-cy="id"
+                    <label class="form-control-label" jhiTranslate="compositekeyApp.withIdString.id" for="field_id">Id</label>
+                    <input type="text" class="form-control" name="id" id="field_id" data-cy="id"
                            formControlName="id" readonly/>
+                    <div *ngIf="editForm.get('id')!.invalid && (editForm.get('id')!.dirty || editForm.get('id')!.touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('id')?.errors?.required" jhiTranslate="entity.validation.required">
+                        This field is required.
+                        </small>
+                    </div>
                 </div>
             </div>
 

@@ -12,7 +12,7 @@ export class CertificateTypeRoutingResolveService implements Resolve<ICertificat
   constructor(private service: CertificateTypeService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ICertificateType> | Observable<never> {
-    const id = route.params['id'];
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
         mergeMap((certificateType: HttpResponse<CertificateType>) => {

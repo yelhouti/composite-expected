@@ -12,13 +12,12 @@ import { TaskService } from 'app/entities/task/task.service';
 import { IEmployee } from 'app/shared/model/employee.model';
 import { EmployeeService } from 'app/entities/employee/employee.service';
 
-type SelectableEntity = ITask | IEmployee;
-
 @Component({
   selector: 'jhi-employee-skill-update',
   templateUrl: './employee-skill-update.component.html',
 })
 export class EmployeeSkillUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
   tasks: ITask[] = [];
   employees: IEmployee[] = [];
@@ -54,6 +53,7 @@ export class EmployeeSkillUpdateComponent implements OnInit {
   }
 
   updateForm(employeeSkill: IEmployeeSkill): void {
+    this.edit = true;
     this.editForm.patchValue({
       name: employeeSkill.name,
       level: employeeSkill.level,
@@ -74,7 +74,7 @@ export class EmployeeSkillUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const employeeSkill = this.createFromForm();
-    if (employeeSkill.id !== undefined) {
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeSkillService.update(employeeSkill));
     } else {
       this.subscribeToSaveResponse(this.employeeSkillService.create(employeeSkill));
@@ -108,11 +108,15 @@ export class EmployeeSkillUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: SelectableEntity): number {
+  trackById(index: number, item: ITask): number {
     return item.id!;
   }
 
-  getSelected(option: ITask, selectedVals?: ITask[]): ITask {
+  trackByUsername(index: number, item: IEmployee): string {
+    return item.username!;
+  }
+
+  getSelectedById(option: ITask, selectedVals?: ITask[]): ITask {
     if (selectedVals) {
       for (let i = 0; i < selectedVals.length; i++) {
         if (option.id === selectedVals[i].id) {

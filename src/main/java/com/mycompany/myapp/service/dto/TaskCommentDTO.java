@@ -17,7 +17,7 @@ public class TaskCommentDTO implements Serializable {
     private TaskDTO task;
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -25,7 +25,7 @@ public class TaskCommentDTO implements Serializable {
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(String value) {
@@ -33,7 +33,7 @@ public class TaskCommentDTO implements Serializable {
     }
 
     public TaskDTO getTask() {
-        return task;
+        return this.task;
     }
 
     public void setTask(TaskDTO task) {

@@ -10,9 +10,9 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
+                <dt><span jhiTranslate="compositekeyApp.withIdStringDetails.withIdStringId">With Id String Id</span></dt>
                 <dd>
-                    <span>{{ withIdStringDetails.id }}</span>
+                    <span>{{ withIdStringDetails.withIdStringId }}</span>
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.withIdStringDetails.name">Name</span></dt>
                 <dd>
@@ -21,7 +21,7 @@
                 <dt><span jhiTranslate="compositekeyApp.withIdStringDetails.withIdString">With Id String</span></dt>
                 <dd>
                     <div *ngIf="withIdStringDetails.withIdString">
-                        <a [routerLink]="['/with-id-string', withIdStringDetails.withIdString?.id, 'view']">{{ withIdStringDetails.withIdString?.id }}</a>
+                        <a [routerLink]="['/with-id-string', withIdStringDetails!.withIdString!.id!, 'view']">{{ withIdStringDetails!.withIdString!.id }}</a>
                     </div>
                 </dd>
             </dl>
@@ -34,7 +34,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/with-id-string-details', withIdStringDetails.id, 'edit']"
+                    [routerLink]="['/with-id-string-details', withIdStringDetails!.withIdStringId, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

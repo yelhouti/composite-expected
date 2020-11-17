@@ -12,7 +12,7 @@ export class TaskCommentRoutingResolveService implements Resolve<ITaskComment> {
   constructor(private service: TaskCommentService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ITaskComment> | Observable<never> {
-    const id = route.params['id'];
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
         mergeMap((taskComment: HttpResponse<TaskComment>) => {

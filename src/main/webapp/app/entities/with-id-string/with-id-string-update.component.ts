@@ -1,6 +1,6 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,10 +13,11 @@ import { WithIdStringService } from './with-id-string.service';
   templateUrl: './with-id-string-update.component.html',
 })
 export class WithIdStringUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
 
   editForm = this.fb.group({
-    id: [],
+    id: [null, [Validators.required]],
   });
 
   constructor(
@@ -36,6 +37,7 @@ export class WithIdStringUpdateComponent implements OnInit {
   }
 
   updateForm(withIdString: IWithIdString): void {
+    this.edit = true;
     this.editForm.patchValue({
       id: withIdString.id,
     });
@@ -52,7 +54,7 @@ export class WithIdStringUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const withIdString = this.createFromForm();
-    if (withIdString.id !== undefined) {
+    if (this.edit) {
       this.subscribeToSaveResponse(this.withIdStringService.update(withIdString));
     } else {
       this.subscribeToSaveResponse(this.withIdStringService.create(withIdString));

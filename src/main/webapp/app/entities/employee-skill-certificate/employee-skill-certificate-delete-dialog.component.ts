@@ -21,8 +21,8 @@ export class EmployeeSkillCertificateDeleteDialogComponent {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
-    this.employeeSkillCertificateService.delete(id).subscribe(() => {
+  confirmDelete(typeId: number, skillName: string, skillEmployeeUsername: string): void {
+    this.employeeSkillCertificateService.delete(typeId, skillName, skillEmployeeUsername).subscribe(() => {
       this.eventManager.broadcast('employeeSkillCertificateListModification');
       this.activeModal.close();
     });

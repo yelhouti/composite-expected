@@ -24,27 +24,27 @@ public class EmployeeCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
-    private StringFilter id;
+    private StringFilter username;
 
     private StringFilter fullname;
 
-    private StringFilter teamMemberId;
+    private EmployeeCriteria teamMember;
 
-    private StringFilter skillId;
+    private EmployeeSkillCriteria skill;
 
-    private StringFilter taughtSkillId;
+    private EmployeeSkillCriteria taughtSkill;
 
-    private StringFilter managerId;
+    private EmployeeCriteria manager;
 
     public EmployeeCriteria() {}
 
     public EmployeeCriteria(EmployeeCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
+        this.username = other.username == null ? null : other.username.copy();
         this.fullname = other.fullname == null ? null : other.fullname.copy();
-        this.teamMemberId = other.teamMemberId == null ? null : other.teamMemberId.copy();
-        this.skillId = other.skillId == null ? null : other.skillId.copy();
-        this.taughtSkillId = other.taughtSkillId == null ? null : other.taughtSkillId.copy();
-        this.managerId = other.managerId == null ? null : other.managerId.copy();
+        this.teamMember = other.teamMember == null ? null : other.teamMember.copy();
+        this.skill = other.skill == null ? null : other.skill.copy();
+        this.taughtSkill = other.taughtSkill == null ? null : other.taughtSkill.copy();
+        this.manager = other.manager == null ? null : other.manager.copy();
     }
 
     @Override
@@ -52,12 +52,12 @@ public class EmployeeCriteria implements Serializable, Criteria {
         return new EmployeeCriteria(this);
     }
 
-    public StringFilter getId() {
-        return id;
+    public StringFilter getUsername() {
+        return username;
     }
 
-    public void setId(StringFilter id) {
-        this.id = id;
+    public void setUsername(StringFilter username) {
+        this.username = username;
     }
 
     public StringFilter getFullname() {
@@ -68,36 +68,36 @@ public class EmployeeCriteria implements Serializable, Criteria {
         this.fullname = fullname;
     }
 
-    public StringFilter getTeamMemberId() {
-        return teamMemberId;
+    public EmployeeCriteria getTeamMember() {
+        return teamMember;
     }
 
-    public void setTeamMemberId(StringFilter teamMemberId) {
-        this.teamMemberId = teamMemberId;
+    public void setTeamMember(EmployeeCriteria teamMember) {
+        this.teamMember = teamMember;
     }
 
-    public StringFilter getSkillId() {
-        return skillId;
+    public EmployeeSkillCriteria getSkill() {
+        return skill;
     }
 
-    public void setSkillId(StringFilter skillId) {
-        this.skillId = skillId;
+    public void setSkill(EmployeeSkillCriteria skill) {
+        this.skill = skill;
     }
 
-    public StringFilter getTaughtSkillId() {
-        return taughtSkillId;
+    public EmployeeSkillCriteria getTaughtSkill() {
+        return taughtSkill;
     }
 
-    public void setTaughtSkillId(StringFilter taughtSkillId) {
-        this.taughtSkillId = taughtSkillId;
+    public void setTaughtSkill(EmployeeSkillCriteria taughtSkill) {
+        this.taughtSkill = taughtSkill;
     }
 
-    public StringFilter getManagerId() {
-        return managerId;
+    public EmployeeCriteria getManager() {
+        return manager;
     }
 
-    public void setManagerId(StringFilter managerId) {
-        this.managerId = managerId;
+    public void setManager(EmployeeCriteria manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -110,30 +110,30 @@ public class EmployeeCriteria implements Serializable, Criteria {
         }
         final EmployeeCriteria that = (EmployeeCriteria) o;
         return (
-            Objects.equals(id, that.id) &&
+            Objects.equals(username, that.username) &&
             Objects.equals(fullname, that.fullname) &&
-            Objects.equals(teamMemberId, that.teamMemberId) &&
-            Objects.equals(skillId, that.skillId) &&
-            Objects.equals(taughtSkillId, that.taughtSkillId) &&
-            Objects.equals(managerId, that.managerId)
+            Objects.equals(teamMember, that.teamMember) &&
+            Objects.equals(skill, that.skill) &&
+            Objects.equals(taughtSkill, that.taughtSkill) &&
+            Objects.equals(manager, that.manager)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fullname, teamMemberId, skillId, taughtSkillId, managerId);
+        return Objects.hash(username, fullname, teamMember, skill, taughtSkill, manager);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (fullname != null ? "fullname=" + fullname + ", " : "") +
-                (teamMemberId != null ? "teamMemberId=" + teamMemberId + ", " : "") +
-                (skillId != null ? "skillId=" + skillId + ", " : "") +
-                (taughtSkillId != null ? "taughtSkillId=" + taughtSkillId + ", " : "") +
-                (managerId != null ? "managerId=" + managerId + ", " : "") +
+            (username != null ? "username=" + username + ", " : "") +
+            (fullname != null ? "fullname=" + fullname + ", " : "") +
+            (teamMember != null ? "teamMember=" + teamMember + ", " : "") +
+            (skill != null ? "skill=" + skill + ", " : "") +
+            (taughtSkill != null ? "taughtSkill=" + taughtSkill + ", " : "") +
+            (manager != null ? "manager=" + manager + ", " : "") +
             "}";
     }
 }

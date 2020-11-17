@@ -18,14 +18,14 @@ describe('Service Tests', () => {
       service = TestBed.inject(WithIdStringService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      elemDefault = new WithIdString(0);
+      elemDefault = new WithIdString('AAAAAAA');
     });
 
     describe('Service methods', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign({}, elemDefault);
 
-        service.find(123).subscribe(resp => (expectedResult = resp.body));
+        service.find('123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
@@ -35,7 +35,7 @@ describe('Service Tests', () => {
       it('should create a WithIdString', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0,
+            id: 'ID',
           },
           elemDefault
         );
@@ -52,7 +52,7 @@ describe('Service Tests', () => {
       it('should update a WithIdString', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
+            id: 'BBBBBB',
           },
           elemDefault
         );
@@ -69,7 +69,7 @@ describe('Service Tests', () => {
       it('should return a list of WithIdString', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
+            id: 'BBBBBB',
           },
           elemDefault
         );
@@ -85,7 +85,7 @@ describe('Service Tests', () => {
       });
 
       it('should delete a WithIdString', () => {
-        service.delete(123).subscribe(resp => (expectedResult = resp.ok));
+        service.delete('123').subscribe(resp => (expectedResult = resp.ok));
 
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });

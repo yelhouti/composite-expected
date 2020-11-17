@@ -29,19 +29,20 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr>
-                    <th scope="col" ><span jhiTranslate="global.field.id">ID</span></th>
+                    <th scope="col" ><span jhiTranslate="compositekeyApp.certificateType.id">Id</span></th>
                     <th scope="col" ><span jhiTranslate="compositekeyApp.certificateType.name">Name</span></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let certificateType of certificateTypes; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/certificate-type', certificateType.id, 'view']">{{ certificateType.id }}</a></td>
+                    <td><a [routerLink]="['/certificate-type', certificateType!.id!, 'view']">{{ certificateType.id }}</a></td>
                     <td>{{ certificateType.name }}</td>
                     <td class="text-right">
                         <div class="btn-group">
+
                             <button type="submit"
-                                    [routerLink]="['/certificate-type', certificateType.id, 'view']"
+                                    [routerLink]="['/certificate-type',  certificateType.id!, 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -49,7 +50,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/certificate-type', certificateType.id, 'edit']"
+                                    [routerLink]="['/certificate-type', certificateType.id!, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

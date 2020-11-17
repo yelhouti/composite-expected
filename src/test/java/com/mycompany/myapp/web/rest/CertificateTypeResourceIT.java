@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class CertificateTypeResourceIT {
+public class CertificateTypeResourceIT {
 
-    private static final String DEFAULT_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_NAME = "BBBBBBBBBB";
+    public static final String DEFAULT_NAME = "AAAAAAAAAA";
+    public static final String UPDATED_NAME = "BBBBBBBBBB";
 
     @Autowired
     private CertificateTypeRepository certificateTypeRepository;
@@ -104,10 +104,11 @@ class CertificateTypeResourceIT {
     @Test
     @Transactional
     void createCertificateTypeWithExistingId() throws Exception {
+        certificateTypeRepository.save(certificateType);
         int databaseSizeBeforeCreate = certificateTypeRepository.findAll().size();
 
         // Create the CertificateType with an existing ID
-        certificateType.setId(1L);
+        certificateType.setId(certificateType.getId());
         CertificateTypeDTO certificateTypeDTO = certificateTypeMapper.toDto(certificateType);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -154,7 +155,7 @@ class CertificateTypeResourceIT {
 
         // Get all the certificateTypeList
         restCertificateTypeMockMvc
-            .perform(get("/api/certificate-types?sort=id,desc"))
+            .perform(get("/api/certificate-types"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(certificateType.getId().intValue())))
@@ -282,13 +283,12 @@ class CertificateTypeResourceIT {
         em.flush();
         certificateType.addEmployeeSkillCertificate(employeeSkillCertificate);
         certificateTypeRepository.saveAndFlush(certificateType);
-        Long employeeSkillCertificateId = employeeSkillCertificate.getId();
 
-        // Get all the certificateTypeList where employeeSkillCertificate equals to employeeSkillCertificateId
-        defaultCertificateTypeShouldBeFound("employeeSkillCertificateId.equals=" + employeeSkillCertificateId);
+        // Get all the certificateTypeList where employeeSkillCertificate.grade equals to EmployeeSkillCertificateResourceIT.DEFAULT_GRADE
+        defaultCertificateTypeShouldBeFound("employeeSkillCertificate.grade.equals=" + EmployeeSkillCertificateResourceIT.DEFAULT_GRADE);
 
-        // Get all the certificateTypeList where employeeSkillCertificate equals to employeeSkillCertificateId + 1
-        defaultCertificateTypeShouldNotBeFound("employeeSkillCertificateId.equals=" + (employeeSkillCertificateId + 1));
+        // Get all the certificateTypeList where employeeSkillCertificate.grade equals to EmployeeSkillCertificateResourceIT.UPDATED_GRADE
+        defaultCertificateTypeShouldNotBeFound("employeeSkillCertificate.grade.equals=" + EmployeeSkillCertificateResourceIT.UPDATED_GRADE);
     }
 
     /**
@@ -296,7 +296,7 @@ class CertificateTypeResourceIT {
      */
     private void defaultCertificateTypeShouldBeFound(String filter) throws Exception {
         restCertificateTypeMockMvc
-            .perform(get("/api/certificate-types?sort=id,desc&" + filter))
+            .perform(get("/api/certificate-types?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(certificateType.getId().intValue())))
@@ -304,7 +304,7 @@ class CertificateTypeResourceIT {
 
         // Check, that the count call also returns 1
         restCertificateTypeMockMvc
-            .perform(get("/api/certificate-types/count?sort=id,desc&" + filter))
+            .perform(get("/api/certificate-types/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -315,7 +315,7 @@ class CertificateTypeResourceIT {
      */
     private void defaultCertificateTypeShouldNotBeFound(String filter) throws Exception {
         restCertificateTypeMockMvc
-            .perform(get("/api/certificate-types?sort=id,desc&" + filter))
+            .perform(get("/api/certificate-types?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -323,7 +323,7 @@ class CertificateTypeResourceIT {
 
         // Check, that the count call also returns 0
         restCertificateTypeMockMvc
-            .perform(get("/api/certificate-types/count?sort=id,desc&" + filter))
+            .perform(get("/api/certificate-types/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));

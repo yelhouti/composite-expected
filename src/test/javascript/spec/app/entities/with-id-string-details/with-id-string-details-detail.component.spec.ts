@@ -16,7 +16,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ withIdStringDetails: new WithIdStringDetails(123) }) },
+            useValue: { data: of({ withIdStringDetails: new WithIdStringDetails('123') }) },
           },
         ],
       })
@@ -32,7 +32,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ id: 123 }));
+        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ id: '123' }));
       });
     });
   });
