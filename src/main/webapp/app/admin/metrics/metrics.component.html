@@ -28,14 +28,11 @@
         </jhi-metrics-system>
     </div>
 
-    <div *ngIf="metrics && metricsKeyExists('garbageCollector')">
-        <h3 jhiTranslate="metrics.jvm.gc.title">Garbage collector statistics</h3>
-
-        <jhi-metrics-garbagecollector
-            [updating]="updatingMetrics"
-            [garbageCollectorMetrics]="metrics.garbageCollector">
-        </jhi-metrics-garbagecollector>
-    </div>
+    <jhi-metrics-garbagecollector
+        *ngIf="metrics && metricsKeyExists('garbageCollector')"
+        [updating]="updatingMetrics"
+        [garbageCollectorMetrics]="metrics.garbageCollector">
+    </jhi-metrics-garbagecollector>
 
     <div class="well well-lg" *ngIf="updatingMetrics" jhiTranslate="metrics.updating">Updating...</div>
 

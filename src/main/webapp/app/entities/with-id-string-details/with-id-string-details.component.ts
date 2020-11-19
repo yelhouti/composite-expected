@@ -1,27 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IWithIdStringDetails } from 'app/shared/model/with-id-string-details.model';
 import { WithIdStringDetailsService } from './with-id-string-details.service';
 import { WithIdStringDetailsDeleteDialogComponent } from './with-id-string-details-delete-dialog.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-with-id-string-details',
   templateUrl: './with-id-string-details.component.html',
 })
-export class WithIdStringDetailsComponent implements OnInit, OnDestroy {
+export class WithIdStringDetailsComponent implements OnInit {
   withIdStringDetails?: IWithIdStringDetails[];
-  eventSubscriber?: Subscription;
   isLoading = false;
 
-  constructor(
-    protected withIdStringDetailsService: WithIdStringDetailsService,
-    protected eventManager: EventManager,
-    protected modalService: NgbModal
-  ) {}
+  constructor(protected withIdStringDetailsService: WithIdStringDetailsService, protected modalService: NgbModal) {}
 
   loadAll(): void {
     this.isLoading = true;
@@ -43,25 +36,19 @@ export class WithIdStringDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadAll();
-    this.registerChangeInWithIdStringDetails();
   }
 
-  ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
-  }
-
-  trackId(index: number, item: IWithIdStringDetails): number {
-    return item.id!;
-  }
-
-  registerChangeInWithIdStringDetails(): void {
-    this.eventSubscriber = this.eventManager.subscribe('withIdStringDetailsListModification', () => this.loadAll());
+  trackId(index: number, item: IWithIdStringDetails): string {
+    return item.withIdStringId!;
   }
 
   delete(withIdStringDetails: IWithIdStringDetails): void {
     const modalRef = this.modalService.open(WithIdStringDetailsDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.withIdStringDetails = withIdStringDetails;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadAll();
+      }
+    });
   }
 }

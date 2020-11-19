@@ -3,7 +3,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { User } from 'app/core/user/user.model';
 import { UserService } from 'app/core/user/user.service';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-user-mgmt-delete-dialog',
@@ -12,7 +11,7 @@ import { EventManager } from 'app/core/event-manager/event-manager.service';
 export class UserManagementDeleteDialogComponent {
   user?: User;
 
-  constructor(private userService: UserService, public activeModal: NgbActiveModal, private eventManager: EventManager) {}
+  constructor(private userService: UserService, public activeModal: NgbActiveModal) {}
 
   cancel(): void {
     this.activeModal.dismiss();
@@ -20,8 +19,7 @@ export class UserManagementDeleteDialogComponent {
 
   confirmDelete(login: string): void {
     this.userService.delete(login).subscribe(() => {
-      this.eventManager.broadcast('userListModification');
-      this.activeModal.close();
+      this.activeModal.close('deleted');
     });
   }
 }

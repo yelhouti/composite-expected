@@ -10,10 +10,6 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
-                <dd>
-                    <span>{{ employeeSkill.id }}</span>
-                </dd>
                 <dt><span jhiTranslate="compositekeyApp.employeeSkill.name">Name</span></dt>
                 <dd>
                     <span>{{ employeeSkill.name }}</span>
@@ -25,19 +21,19 @@
                 <dt><span jhiTranslate="compositekeyApp.employeeSkill.task">Task</span></dt>
                 <dd>
                     <span *ngFor="let task of employeeSkill.tasks; let last = last">
-                        <a [routerLink]="['/task', task?.id, 'view']">{{ task.name }}</a>{{ last ? '' : ', ' }}
+                        <a [routerLink]="['/task', task!.id!, 'view']">{{ task!.name }}</a>{{ last ? '' : ', ' }}
                     </span>
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.employeeSkill.employee">Employee</span></dt>
                 <dd>
                     <div *ngIf="employeeSkill.employee">
-                        <a [routerLink]="['/employee', employeeSkill.employee?.id, 'view']">{{ employeeSkill.employee?.fullname }}</a>
+                        <a [routerLink]="['/employee', employeeSkill!.employee!.username!, 'view']">{{ employeeSkill!.employee!.fullname }}</a>
                     </div>
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.employeeSkill.teacher">Teacher</span></dt>
                 <dd>
                     <div *ngIf="employeeSkill.teacher">
-                        <a [routerLink]="['/employee', employeeSkill.teacher?.id, 'view']">{{ employeeSkill.teacher?.fullname }}</a>
+                        <a [routerLink]="['/employee', employeeSkill!.teacher!.username!, 'view']">{{ employeeSkill!.teacher!.fullname }}</a>
                     </div>
                 </dd>
             </dl>
@@ -50,7 +46,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/employee-skill', employeeSkill.id, 'edit']"
+                    [routerLink]="['/employee-skill', { name: employeeSkill!.name!, employeeUsername: employeeSkill!.employee!.username! }, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

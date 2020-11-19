@@ -29,7 +29,6 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-                    <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="name"><span jhiTranslate="compositekeyApp.employeeSkill.name">Name</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="level"><span jhiTranslate="compositekeyApp.employeeSkill.level">Level</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="employee.fullname"><span jhiTranslate="compositekeyApp.employeeSkill.employee">Employee</span> <fa-icon icon="sort"></fa-icon></th>
@@ -39,23 +38,23 @@
             </thead>
             <tbody>
                 <tr *ngFor="let employeeSkill of employeeSkills; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/employee-skill', employeeSkill.id, 'view']">{{ employeeSkill.id }}</a></td>
-                    <td>{{ employeeSkill.name }}</td>
+                    <td><a [routerLink]="['/employee-skill', { name: employeeSkill!.name!, employeeUsername: employeeSkill!.employee!.username! }, 'view']">{{ employeeSkill.name }}</a></td>
                     <td>{{ employeeSkill.level }}</td>
                     <td>
                         <div *ngIf="employeeSkill.employee">
-                            <a [routerLink]="['/employee', employeeSkill.employee?.id, 'view']" >{{ employeeSkill.employee?.fullname }}</a>
+                            <a [routerLink]="['/employee', employeeSkill!.employee!.username!, 'view']">{{ employeeSkill!.employee!.fullname }}</a>
                         </div>
                     </td>
                     <td>
                         <div *ngIf="employeeSkill.teacher">
-                            <a [routerLink]="['/employee', employeeSkill.teacher?.id, 'view']" >{{ employeeSkill.teacher?.fullname }}</a>
+                            <a [routerLink]="['/employee', employeeSkill!.teacher!.username!, 'view']">{{ employeeSkill!.teacher!.fullname }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
+
                             <button type="submit"
-                                    [routerLink]="['/employee-skill', employeeSkill.id, 'view']"
+                                    [routerLink]="['/employee-skill',  { name: employeeSkill!.name!, employeeUsername: employeeSkill!.employee!.username! }, 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -63,7 +62,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/employee-skill', employeeSkill.id, 'edit']"
+                                    [routerLink]="['/employee-skill', { name: employeeSkill!.name!, employeeUsername: employeeSkill!.employee!.username! }, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

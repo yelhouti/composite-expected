@@ -13,7 +13,10 @@
       "otherEntityName": "employeeSkillCertificate",
       "otherEntityRelationshipName": "type",
       "relationshipName": "employeeSkillCertificate",
-      "otherEntityField": "id"
+      "otherEntityField": "id",
+      "options": {
+        "id": true
+      }
     }
   ],
   "entityTableName": "certificate_type",

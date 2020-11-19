@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { TaskDetailComponent } from 'app/entities/task/task-detail.component';
-import { Task } from 'app/shared/model/task.model';
 import { DataUtils } from 'app/core/util/data-util.service';
 
 describe('Component Tests', () => {
@@ -18,7 +17,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ task: new Task(123) }) },
+            useValue: { data: of({ task: { id: 123 } }) },
           },
         ],
       })
@@ -61,10 +60,10 @@ describe('Component Tests', () => {
         const fakeBase64 = 'fake base64';
 
         // WHEN
-        comp.openFile(fakeContentType, fakeBase64);
+        comp.openFile(fakeBase64, fakeContentType);
 
         // THEN
-        expect(dataUtils.openFile).toBeCalledWith(fakeContentType, fakeBase64);
+        expect(dataUtils.openFile).toBeCalledWith(fakeBase64, fakeContentType);
       });
     });
   });

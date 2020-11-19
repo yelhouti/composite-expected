@@ -1,13 +1,17 @@
 package com.mycompany.myapp.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.service.EmployeeSkillCertificateQueryService;
 import com.mycompany.myapp.service.EmployeeSkillCertificateService;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateCriteria;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateDTO;
+import com.mycompany.myapp.service.mapper.EmployeeSkillCertificateMapper;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -43,12 +47,16 @@ public class EmployeeSkillCertificateResource {
 
     private final EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService;
 
+    private final EmployeeSkillCertificateMapper employeeSkillCertificateMapper;
+
     public EmployeeSkillCertificateResource(
         EmployeeSkillCertificateService employeeSkillCertificateService,
-        EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService
+        EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService,
+        EmployeeSkillCertificateMapper employeeSkillCertificateMapper
     ) {
         this.employeeSkillCertificateService = employeeSkillCertificateService;
         this.employeeSkillCertificateQueryService = employeeSkillCertificateQueryService;
+        this.employeeSkillCertificateMapper = employeeSkillCertificateMapper;
     }
 
     /**
@@ -64,13 +72,45 @@ public class EmployeeSkillCertificateResource {
     )
         throws URISyntaxException {
         log.debug("REST request to save EmployeeSkillCertificate : {}", employeeSkillCertificateDTO);
-        if (employeeSkillCertificateDTO.getId() != null) {
-            throw new BadRequestAlertException("A new employeeSkillCertificate cannot already have an ID", ENTITY_NAME, "idexists");
+        EmployeeSkillCertificateId employeeSkillCertificateId = employeeSkillCertificateMapper
+            .toEntity(employeeSkillCertificateDTO)
+            .getId();
+        if (employeeSkillCertificateId == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (employeeSkillCertificateService.findOne(employeeSkillCertificateId).isPresent()) {
+            throw new BadRequestAlertException("This employeeSkillCertificate already exists", ENTITY_NAME, "idexists");
         }
         EmployeeSkillCertificateDTO result = employeeSkillCertificateService.save(employeeSkillCertificateDTO);
         return ResponseEntity
-            .created(new URI("/api/employee-skill-certificates/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .created(
+                new URI(
+                    "/api/employee-skill-certificates/" +
+                    "typeId=" +
+                    result.getType().getId() +
+                    ";" +
+                    "skillName=" +
+                    result.getSkill().getName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    result.getSkill().getEmployee().getUsername()
+                )
+            )
+            .headers(
+                HeaderUtil.createEntityCreationAlert(
+                    applicationName,
+                    true,
+                    ENTITY_NAME,
+                    "typeId=" +
+                    result.getType().getId() +
+                    ";" +
+                    "skillName=" +
+                    result.getSkill().getName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    result.getSkill().getEmployee().getUsername()
+                )
+            )
             .body(result);
     }
 
@@ -89,13 +129,33 @@ public class EmployeeSkillCertificateResource {
     )
         throws URISyntaxException {
         log.debug("REST request to update EmployeeSkillCertificate : {}", employeeSkillCertificateDTO);
-        if (employeeSkillCertificateDTO.getId() == null) {
+        EmployeeSkillCertificateId employeeSkillCertificateId = employeeSkillCertificateMapper
+            .toEntity(employeeSkillCertificateDTO)
+            .getId();
+        if (employeeSkillCertificateId == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!employeeSkillCertificateService.findOne(employeeSkillCertificateId).isPresent()) {
+            throw new BadRequestAlertException("This employeeSkillCertificate doesn't exist", ENTITY_NAME, "idexists");
         }
         EmployeeSkillCertificateDTO result = employeeSkillCertificateService.save(employeeSkillCertificateDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeSkillCertificateDTO.getId().toString()))
+            .headers(
+                HeaderUtil.createEntityUpdateAlert(
+                    applicationName,
+                    true,
+                    ENTITY_NAME,
+                    "typeId=" +
+                    employeeSkillCertificateDTO.getType().getId() +
+                    ";" +
+                    "skillName=" +
+                    employeeSkillCertificateDTO.getSkill().getName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    employeeSkillCertificateDTO.getSkill().getEmployee().getUsername()
+                )
+            )
             .body(result);
     }
 
@@ -115,8 +175,14 @@ public class EmployeeSkillCertificateResource {
     )
         throws URISyntaxException {
         log.debug("REST request to update EmployeeSkillCertificate partially : {}", employeeSkillCertificateDTO);
-        if (employeeSkillCertificateDTO.getId() == null) {
+        EmployeeSkillCertificateId employeeSkillCertificateId = employeeSkillCertificateMapper
+            .toEntity(employeeSkillCertificateDTO)
+            .getId();
+        if (employeeSkillCertificateId == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!employeeSkillCertificateService.findOne(employeeSkillCertificateId).isPresent()) {
+            throw new BadRequestAlertException("This employeeSkillCertificate doesn't exist", ENTITY_NAME, "idexists");
         }
 
         Optional<EmployeeSkillCertificateDTO> result = Optional.ofNullable(
@@ -125,7 +191,19 @@ public class EmployeeSkillCertificateResource {
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeSkillCertificateDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(
+                applicationName,
+                true,
+                ENTITY_NAME,
+                "typeId=" +
+                employeeSkillCertificateDTO.getType().getId() +
+                ";" +
+                "skillName=" +
+                employeeSkillCertificateDTO.getSkill().getName() +
+                ";" +
+                "skillEmployeeUsername=" +
+                employeeSkillCertificateDTO.getSkill().getEmployee().getUsername()
+            )
         );
     }
 
@@ -162,11 +240,15 @@ public class EmployeeSkillCertificateResource {
     /**
      * {@code GET  /employee-skill-certificates/:id} : get the "id" employeeSkillCertificate.
      *
-     * @param id the id of the employeeSkillCertificateDTO to retrieve.
+     * @param idMap a Map representation of the id of the employeeSkillCertificateDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the employeeSkillCertificateDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/employee-skill-certificates/{id}")
-    public ResponseEntity<EmployeeSkillCertificateDTO> getEmployeeSkillCertificate(@PathVariable Long id) {
+    public ResponseEntity<EmployeeSkillCertificateDTO> getEmployeeSkillCertificate(
+        @MatrixVariable(pathVar = "id") Map<String, String> idMap
+    ) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillCertificateId id = mapper.convertValue(idMap, EmployeeSkillCertificateId.class);
         log.debug("REST request to get EmployeeSkillCertificate : {}", id);
         Optional<EmployeeSkillCertificateDTO> employeeSkillCertificateDTO = employeeSkillCertificateService.findOne(id);
         return ResponseUtil.wrapOrNotFound(employeeSkillCertificateDTO);
@@ -175,11 +257,13 @@ public class EmployeeSkillCertificateResource {
     /**
      * {@code DELETE  /employee-skill-certificates/:id} : delete the "id" employeeSkillCertificate.
      *
-     * @param id the id of the employeeSkillCertificateDTO to delete.
+     * @param idMap a Map representation of the id of the employeeSkillCertificateDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/employee-skill-certificates/{id}")
-    public ResponseEntity<Void> deleteEmployeeSkillCertificate(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEmployeeSkillCertificate(@MatrixVariable(pathVar = "id") Map<String, String> idMap) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillCertificateId id = mapper.convertValue(idMap, EmployeeSkillCertificateId.class);
         log.debug("REST request to delete EmployeeSkillCertificate : {}", id);
         employeeSkillCertificateService.delete(id);
         return ResponseEntity

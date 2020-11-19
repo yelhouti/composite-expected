@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.dto.EmployeeSkillCriteria;
 import com.mycompany.myapp.service.dto.EmployeeSkillDTO;
 import com.mycompany.myapp.service.mapper.EmployeeSkillMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,9 +34,24 @@ public class EmployeeSkillQueryService extends QueryService<EmployeeSkill> {
 
     private final EmployeeSkillMapper employeeSkillMapper;
 
-    public EmployeeSkillQueryService(EmployeeSkillRepository employeeSkillRepository, EmployeeSkillMapper employeeSkillMapper) {
+    private final EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService;
+
+    private final TaskQueryService taskQueryService;
+
+    private final EmployeeQueryService employeeQueryService;
+
+    public EmployeeSkillQueryService(
+        EmployeeSkillRepository employeeSkillRepository,
+        EmployeeSkillMapper employeeSkillMapper,
+        @Lazy EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService,
+        @Lazy TaskQueryService taskQueryService,
+        @Lazy EmployeeQueryService employeeQueryService
+    ) {
         this.employeeSkillRepository = employeeSkillRepository;
         this.employeeSkillMapper = employeeSkillMapper;
+        this.employeeSkillCertificateQueryService = employeeSkillCertificateQueryService;
+        this.taskQueryService = taskQueryService;
+        this.employeeQueryService = employeeQueryService;
     }
 
     /**
@@ -80,49 +96,67 @@ public class EmployeeSkillQueryService extends QueryService<EmployeeSkill> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<EmployeeSkill> createSpecification(EmployeeSkillCriteria criteria) {
+    public Specification<EmployeeSkill> createSpecification(EmployeeSkillCriteria criteria) {
         Specification<EmployeeSkill> specification = Specification.where(null);
         if (criteria != null) {
-            if (criteria.getId() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getId(), EmployeeSkill_.id));
-            }
             if (criteria.getName() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getName(), EmployeeSkill_.name));
             }
             if (criteria.getLevel() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getLevel(), EmployeeSkill_.level));
             }
-            if (criteria.getEmployeeSkillCertificateId() != null) {
+
+            if (criteria.getEmployeeSkillCertificate() != null) {
+                Specification<EmployeeSkillCertificate> employeeSkillCertificateSpecification =
+                    this.employeeSkillCertificateQueryService.createSpecification(criteria.getEmployeeSkillCertificate());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getEmployeeSkillCertificateId(),
-                            root -> root.join(EmployeeSkill_.employeeSkillCertificates, JoinType.LEFT).get(EmployeeSkillCertificate_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<EmployeeSkillCertificate> employeeSkillCertificateRoot = query.from(EmployeeSkillCertificate.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.isMember(employeeSkillCertificateRoot, root.get(EmployeeSkill_.employeeSkillCertificates)),
+                                employeeSkillCertificateSpecification.toPredicate(employeeSkillCertificateRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
-            if (criteria.getTaskId() != null) {
+            if (criteria.getTask() != null) {
+                Specification<Task> taskSpecification = this.taskQueryService.createSpecification(criteria.getTask());
                 specification =
                     specification.and(
-                        buildSpecification(criteria.getTaskId(), root -> root.join(EmployeeSkill_.tasks, JoinType.LEFT).get(Task_.id))
+                        (root, query, criteriaBuilder) -> {
+                            Root<Task> taskRoot = query.from(Task.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.isMember(taskRoot, root.get(EmployeeSkill_.tasks)),
+                                taskSpecification.toPredicate(taskRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
-            if (criteria.getEmployeeId() != null) {
+            if (criteria.getEmployee() != null) {
+                Specification<Employee> employeeSpecification = this.employeeQueryService.createSpecification(criteria.getEmployee());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getEmployeeId(),
-                            root -> root.join(EmployeeSkill_.employee, JoinType.LEFT).get(Employee_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<Employee> employeeRoot = query.from(Employee.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.equal(employeeRoot, root.get(EmployeeSkill_.employee)),
+                                employeeSpecification.toPredicate(employeeRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
-            if (criteria.getTeacherId() != null) {
+            if (criteria.getTeacher() != null) {
+                Specification<Employee> employeeSpecification = this.employeeQueryService.createSpecification(criteria.getTeacher());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getTeacherId(),
-                            root -> root.join(EmployeeSkill_.teacher, JoinType.LEFT).get(Employee_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<Employee> employeeRoot = query.from(Employee.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.equal(employeeRoot, root.get(EmployeeSkill_.teacher)),
+                                employeeSpecification.toPredicate(employeeRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

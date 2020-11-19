@@ -10,10 +10,6 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
-                <dd>
-                    <span>{{ employee.id }}</span>
-                </dd>
                 <dt><span jhiTranslate="compositekeyApp.employee.username">Username</span></dt>
                 <dd>
                     <span>{{ employee.username }}</span>
@@ -25,7 +21,7 @@
                 <dt><span jhiTranslate="compositekeyApp.employee.manager">Manager</span></dt>
                 <dd>
                     <div *ngIf="employee.manager">
-                        <a [routerLink]="['/employee', employee.manager?.id, 'view']">{{ employee.manager?.fullname }}</a>
+                        <a [routerLink]="['/employee', employee!.manager!.username!, 'view']">{{ employee!.manager!.fullname }}</a>
                     </div>
                 </dd>
             </dl>
@@ -38,7 +34,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/employee', employee.id, 'edit']"
+                    [routerLink]="['/employee', employee!.username, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

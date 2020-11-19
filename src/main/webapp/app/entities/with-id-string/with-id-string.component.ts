@@ -1,23 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IWithIdString } from 'app/shared/model/with-id-string.model';
 import { WithIdStringService } from './with-id-string.service';
 import { WithIdStringDeleteDialogComponent } from './with-id-string-delete-dialog.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-with-id-string',
   templateUrl: './with-id-string.component.html',
 })
-export class WithIdStringComponent implements OnInit, OnDestroy {
+export class WithIdStringComponent implements OnInit {
   withIdStrings?: IWithIdString[];
-  eventSubscriber?: Subscription;
   isLoading = false;
 
-  constructor(protected withIdStringService: WithIdStringService, protected eventManager: EventManager, protected modalService: NgbModal) {}
+  constructor(protected withIdStringService: WithIdStringService, protected modalService: NgbModal) {}
 
   loadAll(): void {
     this.isLoading = true;
@@ -39,25 +36,19 @@ export class WithIdStringComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadAll();
-    this.registerChangeInWithIdStrings();
   }
 
-  ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
-  }
-
-  trackId(index: number, item: IWithIdString): number {
+  trackId(index: number, item: IWithIdString): string {
     return item.id!;
-  }
-
-  registerChangeInWithIdStrings(): void {
-    this.eventSubscriber = this.eventManager.subscribe('withIdStringListModification', () => this.loadAll());
   }
 
   delete(withIdString: IWithIdString): void {
     const modalRef = this.modalService.open(WithIdStringDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.withIdString = withIdString;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadAll();
+      }
+    });
   }
 }

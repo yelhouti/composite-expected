@@ -58,13 +58,13 @@ public class EmployeeResource {
     @PostMapping("/employees")
     public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to save Employee : {}", employeeDTO);
-        if (employeeDTO.getId() != null) {
-            throw new BadRequestAlertException("A new employee cannot already have an ID", ENTITY_NAME, "idexists");
+        if (employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
+            throw new BadRequestAlertException("This employee already exists", ENTITY_NAME, "idexists");
         }
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
-            .created(new URI("/api/employees/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .created(new URI("/api/employees/" + result.getUsername()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getUsername()))
             .body(result);
     }
 
@@ -80,13 +80,16 @@ public class EmployeeResource {
     @PutMapping("/employees")
     public ResponseEntity<EmployeeDTO> updateEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to update Employee : {}", employeeDTO);
-        if (employeeDTO.getId() == null) {
+        if (employeeDTO.getUsername() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
+            throw new BadRequestAlertException("This employee doesn't exist", ENTITY_NAME, "idexists");
         }
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getUsername()))
             .body(result);
     }
 
@@ -103,15 +106,18 @@ public class EmployeeResource {
     @PatchMapping(value = "/employees", consumes = "application/merge-patch+json")
     public ResponseEntity<EmployeeDTO> partialUpdateEmployee(@NotNull @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to update Employee partially : {}", employeeDTO);
-        if (employeeDTO.getId() == null) {
+        if (employeeDTO.getUsername() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!employeeService.findOne(employeeDTO.getUsername()).isPresent()) {
+            throw new BadRequestAlertException("This employee doesn't exist", ENTITY_NAME, "idexists");
         }
 
         Optional<EmployeeDTO> result = Optional.ofNullable(employeeService.partialUpdate(employeeDTO));
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeDTO.getUsername())
         );
     }
 
@@ -149,7 +155,7 @@ public class EmployeeResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the employeeDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/employees/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable String id) {
         log.debug("REST request to get Employee : {}", id);
         Optional<EmployeeDTO> employeeDTO = employeeService.findOne(id);
         return ResponseUtil.wrapOrNotFound(employeeDTO);
@@ -162,12 +168,9 @@ public class EmployeeResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/employees/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
         log.debug("REST request to delete Employee : {}", id);
         employeeService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
     }
 }

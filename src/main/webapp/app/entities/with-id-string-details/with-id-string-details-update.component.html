@@ -7,12 +7,6 @@
                 <jhi-alert-error></jhi-alert-error>
 
 
-                <div class="form-group" [hidden]="editForm.get('id')?.value == null">
-                    <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-                    <input type="number" class="form-control" name="id" id="field_id" data-cy="id"
-                           formControlName="id" readonly/>
-                </div>
-
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.withIdStringDetails.name" for="field_name">Name</label>
                     <input type="text" class="form-control" name="name" id="field_name" data-cy="name"
@@ -21,9 +15,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.withIdStringDetails.withIdString" for="field_withIdString">With Id String</label>
-                    <select class="form-control" id="field_withIdString" data-cy="withIdString" name="withIdString" formControlName="withIdString">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="withIdStringOption.id === editForm.get('withIdString')!.value?.id ? editForm.get('withIdString')!.value : withIdStringOption" *ngFor="let withIdStringOption of withidstrings; trackBy: trackById">{{ withIdStringOption.id }}</option>
+                    <select class="form-control" id="field_withIdString" data-cy="withIdString" name="withIdString" formControlName="withIdString"  [attr.disabled]="editForm.get('withIdString')!.value ? true : null">
+                        <option *ngIf="!editForm.get('withIdString')!.value" [ngValue]="null" selected></option>
+                        <option [ngValue]="withIdStringOption?.id! === editForm.get('withIdString')!.value?.id! ? editForm.get('withIdString')!.value : withIdStringOption" *ngFor="let withIdStringOption of withidstrings; trackBy: trackById">{{ withIdStringOption!.id }}</option>
                     </select>
                 </div>
             </div>

@@ -11,13 +11,13 @@ class WithIdStringDetailsTest {
     void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(WithIdStringDetails.class);
         WithIdStringDetails withIdStringDetails1 = new WithIdStringDetails();
-        withIdStringDetails1.setId(1L);
+        withIdStringDetails1.setWithIdStringId("ID1");
         WithIdStringDetails withIdStringDetails2 = new WithIdStringDetails();
-        withIdStringDetails2.setId(withIdStringDetails1.getId());
+        withIdStringDetails2.setWithIdStringId("ID1");
         assertThat(withIdStringDetails1).isEqualTo(withIdStringDetails2);
-        withIdStringDetails2.setId(2L);
+        withIdStringDetails2.setWithIdStringId("ID2");
         assertThat(withIdStringDetails1).isNotEqualTo(withIdStringDetails2);
-        withIdStringDetails1.setId(null);
+        withIdStringDetails1.setWithIdStringId(null);
         assertThat(withIdStringDetails1).isNotEqualTo(withIdStringDetails2);
     }
 }

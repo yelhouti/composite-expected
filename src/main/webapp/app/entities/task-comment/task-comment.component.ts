@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ITaskComment } from 'app/shared/model/task-comment.model';
@@ -9,15 +9,13 @@ import { ITaskComment } from 'app/shared/model/task-comment.model';
 import { ITEMS_PER_PAGE } from 'app/core/config/pagination.constants';
 import { TaskCommentService } from './task-comment.service';
 import { TaskCommentDeleteDialogComponent } from './task-comment-delete-dialog.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-task-comment',
   templateUrl: './task-comment.component.html',
 })
-export class TaskCommentComponent implements OnInit, OnDestroy {
+export class TaskCommentComponent implements OnInit {
   taskComments?: ITaskComment[];
-  eventSubscriber?: Subscription;
   isLoading = false;
   totalItems = 0;
   itemsPerPage = ITEMS_PER_PAGE;
@@ -30,7 +28,6 @@ export class TaskCommentComponent implements OnInit, OnDestroy {
     protected taskCommentService: TaskCommentService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected eventManager: EventManager,
     protected modalService: NgbModal
   ) {}
 
@@ -62,7 +59,6 @@ export class TaskCommentComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.handleNavigation();
-    this.registerChangeInTaskComments();
   }
 
   protected handleNavigation(): void {
@@ -70,7 +66,7 @@ export class TaskCommentComponent implements OnInit, OnDestroy {
       const page = params.get('page');
       const pageNumber = page !== null ? +page : 1;
       const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      const predicate = sort[0];
+      const predicate = sort[0] || '';
       const ascending = sort[1] === 'asc';
       if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
         this.predicate = predicate;
@@ -80,23 +76,18 @@ export class TaskCommentComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
-  }
-
   trackId(index: number, item: ITaskComment): number {
     return item.id!;
-  }
-
-  registerChangeInTaskComments(): void {
-    this.eventSubscriber = this.eventManager.subscribe('taskCommentListModification', () => this.loadPage());
   }
 
   delete(taskComment: ITaskComment): void {
     const modalRef = this.modalService.open(TaskCommentDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.taskComment = taskComment;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadPage();
+      }
+    });
   }
 
   sort(): string[] {

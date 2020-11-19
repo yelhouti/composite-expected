@@ -2,7 +2,9 @@ package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -17,26 +19,27 @@ public class WithIdString implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
+    @NotNull
+    @Column(name = "id", nullable = false)
+    private String id;
 
     @JsonIgnoreProperties(value = { "withIdString" }, allowSetters = true)
     @OneToOne(mappedBy = "withIdString")
     private WithIdStringDetails withIdStringDetails;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
-        return id;
+
+    public String getId() {
+        return this.id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public WithIdString id(Long id) {
+    public WithIdString id(String id) {
         this.id = id;
         return this;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public WithIdStringDetails getWithIdStringDetails() {
@@ -73,14 +76,15 @@ public class WithIdString implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "WithIdString{" +
-            "id=" + getId() +
+            "id='" + getId() + "'" +
             "}";
     }
 }

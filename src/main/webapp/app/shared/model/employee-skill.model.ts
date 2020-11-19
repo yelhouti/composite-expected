@@ -3,7 +3,6 @@ import { ITask } from 'app/shared/model/task.model';
 import { IEmployee } from 'app/shared/model/employee.model';
 
 export interface IEmployeeSkill {
-  id?: number;
   name?: string;
   level?: number;
   employeeSkillCertificates?: IEmployeeSkillCertificate[];
@@ -14,7 +13,6 @@ export interface IEmployeeSkill {
 
 export class EmployeeSkill implements IEmployeeSkill {
   constructor(
-    public id?: number,
     public name?: string,
     public level?: number,
     public employeeSkillCertificates?: IEmployeeSkillCertificate[],

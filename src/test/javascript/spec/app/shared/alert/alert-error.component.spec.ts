@@ -3,7 +3,7 @@ import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AlertErrorComponent } from 'app/shared/alert/alert-error.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
+import { EventManager } from 'app/core/util/event-manager.service';
 import { Alert, AlertService } from 'app/core/util/alert.service';
 
 describe('Component Tests', () => {

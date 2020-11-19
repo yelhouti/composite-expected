@@ -8,7 +8,7 @@
 
 
                 <div class="form-group" [hidden]="editForm.get('id')?.value == null">
-                    <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+                    <label class="form-control-label" jhiTranslate="compositekeyApp.task.id" for="field_id">Id</label>
                     <input type="number" class="form-control" name="id" id="field_id" data-cy="id"
                            formControlName="id" readonly/>
                 </div>
@@ -113,7 +113,7 @@
                     <label class="form-control-label" jhiTranslate="compositekeyApp.task.attachment" for="field_attachment">Attachment</label>
                     <div>
                         <div *ngIf="editForm.get('attachment')!.value" class="form-text text-danger clearfix">
-                            <a class="pull-left" (click)="openFile(editForm.get('attachmentContentType')!.value, editForm.get('attachment')!.value)" jhiTranslate="entity.action.open">open</a><br>
+                            <a class="pull-left" (click)="openFile(editForm.get('attachment')!.value, editForm.get('attachmentContentType')!.value)" jhiTranslate="entity.action.open">open</a><br>
                             <span class="pull-left">{{ editForm.get('attachmentContentType')!.value }}, {{ byteSize(editForm.get('attachment')!.value) }}</span>
                             <button type="button" (click)="editForm.patchValue({attachment: null});editForm.patchValue({attachmentContentType: null});"
                                     class="btn btn-secondary btn-xs pull-right">
@@ -160,9 +160,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.task.user" for="field_user">User</label>
-                    <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user">
+                    <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" >
                         <option *ngIf="!editForm.get('user')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="userOption.id === editForm.get('user')!.value?.id ? editForm.get('user')!.value : userOption" *ngFor="let userOption of users; trackBy: trackById">{{ userOption.login }}</option>
+                        <option [ngValue]="userOption?.id! === editForm.get('user')!.value?.id! ? editForm.get('user')!.value : userOption" *ngFor="let userOption of users; trackBy: trackById">{{ userOption!.login }}</option>
                     </select>
                 </div>
                 <div *ngIf="editForm.get(['user'])!.invalid && (editForm.get(['user'])!.dirty || editForm.get(['user'])!.touched)">

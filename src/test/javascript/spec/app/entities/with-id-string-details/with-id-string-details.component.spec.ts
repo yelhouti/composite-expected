@@ -5,7 +5,6 @@ import { of } from 'rxjs';
 
 import { WithIdStringDetailsComponent } from 'app/entities/with-id-string-details/with-id-string-details.component';
 import { WithIdStringDetailsService } from 'app/entities/with-id-string-details/with-id-string-details.service';
-import { WithIdStringDetails } from 'app/shared/model/with-id-string-details.model';
 
 describe('Component Tests', () => {
   describe('WithIdStringDetails Management Component', () => {
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new WithIdStringDetails(123)],
+            body: [{ withIdStringId: "'123'" }],
             headers,
           })
         )
@@ -43,7 +42,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.withIdStringDetails?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.withIdStringDetails?.[0]).toEqual(jasmine.objectContaining({ withIdStringId: "'123'" }));
     });
   });
 });

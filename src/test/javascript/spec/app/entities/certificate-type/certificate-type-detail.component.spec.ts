@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { CertificateTypeDetailComponent } from 'app/entities/certificate-type/certificate-type-detail.component';
-import { CertificateType } from 'app/shared/model/certificate-type.model';
 
 describe('Component Tests', () => {
   describe('CertificateType Management Detail Component', () => {
@@ -16,7 +15,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ certificateType: new CertificateType(123) }) },
+            useValue: { data: of({ certificateType: { id: 123 } }) },
           },
         ],
       })

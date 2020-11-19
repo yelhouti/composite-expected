@@ -3,7 +3,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IEmployeeSkill } from 'app/shared/model/employee-skill.model';
 import { EmployeeSkillService } from './employee-skill.service';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   templateUrl: './employee-skill-delete-dialog.component.html',
@@ -11,20 +10,15 @@ import { EventManager } from 'app/core/event-manager/event-manager.service';
 export class EmployeeSkillDeleteDialogComponent {
   employeeSkill?: IEmployeeSkill;
 
-  constructor(
-    protected employeeSkillService: EmployeeSkillService,
-    public activeModal: NgbActiveModal,
-    protected eventManager: EventManager
-  ) {}
+  constructor(protected employeeSkillService: EmployeeSkillService, public activeModal: NgbActiveModal) {}
 
   cancel(): void {
     this.activeModal.dismiss();
   }
 
-  confirmDelete(id: number): void {
-    this.employeeSkillService.delete(id).subscribe(() => {
-      this.eventManager.broadcast('employeeSkillListModification');
-      this.activeModal.close();
+  confirmDelete(name: string, employeeUsername: string): void {
+    this.employeeSkillService.delete(name, employeeUsername).subscribe(() => {
+      this.activeModal.close('deleted');
     });
   }
 }

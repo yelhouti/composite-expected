@@ -29,7 +29,6 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-                    <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="username"><span jhiTranslate="compositekeyApp.employee.username">Username</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="fullname"><span jhiTranslate="compositekeyApp.employee.fullname">Fullname</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="manager.fullname"><span jhiTranslate="compositekeyApp.employee.manager">Manager</span> <fa-icon icon="sort"></fa-icon></th>
@@ -38,18 +37,18 @@
             </thead>
             <tbody>
                 <tr *ngFor="let employee of employees; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/employee', employee.id, 'view']">{{ employee.id }}</a></td>
-                    <td>{{ employee.username }}</td>
+                    <td><a [routerLink]="['/employee', employee!.username!, 'view']">{{ employee.username }}</a></td>
                     <td>{{ employee.fullname }}</td>
                     <td>
                         <div *ngIf="employee.manager">
-                            <a [routerLink]="['/employee', employee.manager?.id, 'view']" >{{ employee.manager?.fullname }}</a>
+                            <a [routerLink]="['/employee', employee!.manager!.username!, 'view']">{{ employee!.manager!.fullname }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
+
                             <button type="submit"
-                                    [routerLink]="['/employee', employee.id, 'view']"
+                                    [routerLink]="['/employee',  employee.username!, 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -57,7 +56,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/employee', employee.id, 'edit']"
+                                    [routerLink]="['/employee', employee.username!, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

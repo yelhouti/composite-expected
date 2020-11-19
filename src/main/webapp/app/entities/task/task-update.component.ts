@@ -7,11 +7,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as dayjs from 'dayjs';
 import { DATE_TIME_FORMAT } from 'app/core/config/input.constants';
 
-import { ITask, Task } from 'app/shared/model/task.model';
+import { ITask } from 'app/shared/model/task.model';
 import { TaskService } from './task.service';
 import { AlertError } from 'app/shared/alert/alert-error.model';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
-import { EventWithContent } from 'app/core/event-manager/event-with-content.model';
+import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { IUser } from 'app/core/user/user.model';
 import { UserService } from 'app/core/user/user.service';
@@ -56,42 +55,35 @@ export class TaskUpdateComponent implements OnInit {
       return;
     }
     this.activatedRoute.data.subscribe(({ task }) => {
-      if (task.id == null) {
-        const today = dayjs().startOf('day');
-        task.createdAt = today;
-        task.modifiedAt = today;
-      }
-
       this.updateForm(task);
 
       this.userService.query().subscribe((res: HttpResponse<IUser[]>) => (this.users = res.body ?? []));
     });
   }
 
-  updateForm(task: ITask): void {
-    this.editForm.patchValue({
-      id: task.id,
-      name: task.name,
-      type: task.type,
-      endDate: task.endDate,
-      createdAt: task.createdAt ? task.createdAt.format(DATE_TIME_FORMAT) : null,
-      modifiedAt: task.modifiedAt ? task.modifiedAt.format(DATE_TIME_FORMAT) : null,
-      done: task.done,
-      description: task.description,
-      attachment: task.attachment,
-      attachmentContentType: task.attachmentContentType,
-      picture: task.picture,
-      pictureContentType: task.pictureContentType,
-      user: task.user,
-    });
+  updateForm(task: ITask | null): void {
+    if (task) {
+      this.editForm.reset({
+        ...task,
+        createdAt: task.createdAt?.format(DATE_TIME_FORMAT),
+        modifiedAt: task.modifiedAt?.format(DATE_TIME_FORMAT),
+      });
+    } else {
+      const today = dayjs().startOf('day');
+      this.editForm.reset({
+        createdAt: today.format(DATE_TIME_FORMAT),
+        modifiedAt: today.format(DATE_TIME_FORMAT),
+        done: false,
+      });
+    }
   }
 
   byteSize(base64String: string): string {
     return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType: string, base64String: string): void {
-    this.dataUtils.openFile(contentType, base64String);
+  openFile(base64String: string, contentType: string): void {
+    this.dataUtils.openFile(base64String, contentType);
   }
 
   setFileData(event: Event, field: string, isImage: boolean): void {
@@ -123,31 +115,14 @@ export class TaskUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const task = this.createFromForm();
-    if (task.id !== undefined) {
+    const task = this.editForm.value;
+    task.createdAt = task.createdAt ? dayjs(task.createdAt, DATE_TIME_FORMAT) : null;
+    task.modifiedAt = task.modifiedAt ? dayjs(task.modifiedAt, DATE_TIME_FORMAT) : null;
+    if (task.id !== null) {
       this.subscribeToSaveResponse(this.taskService.update(task));
     } else {
       this.subscribeToSaveResponse(this.taskService.create(task));
     }
-  }
-
-  private createFromForm(): ITask {
-    return {
-      ...new Task(),
-      id: this.editForm.get(['id'])!.value,
-      name: this.editForm.get(['name'])!.value,
-      type: this.editForm.get(['type'])!.value,
-      endDate: this.editForm.get(['endDate'])!.value,
-      createdAt: this.editForm.get(['createdAt'])!.value ? dayjs(this.editForm.get(['createdAt'])!.value, DATE_TIME_FORMAT) : undefined,
-      modifiedAt: this.editForm.get(['modifiedAt'])!.value ? dayjs(this.editForm.get(['modifiedAt'])!.value, DATE_TIME_FORMAT) : undefined,
-      done: this.editForm.get(['done'])!.value,
-      description: this.editForm.get(['description'])!.value,
-      attachmentContentType: this.editForm.get(['attachmentContentType'])!.value,
-      attachment: this.editForm.get(['attachment'])!.value,
-      pictureContentType: this.editForm.get(['pictureContentType'])!.value,
-      picture: this.editForm.get(['picture'])!.value,
-      user: this.editForm.get(['user'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {

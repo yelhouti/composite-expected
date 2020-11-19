@@ -9,8 +9,6 @@ import javax.validation.constraints.*;
  */
 public class EmployeeDTO implements Serializable {
 
-    private Long id;
-
     @NotNull
     private String username;
 
@@ -19,16 +17,8 @@ public class EmployeeDTO implements Serializable {
 
     private EmployeeDTO manager;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -36,7 +26,7 @@ public class EmployeeDTO implements Serializable {
     }
 
     public String getFullname() {
-        return fullname;
+        return this.fullname;
     }
 
     public void setFullname(String fullname) {
@@ -44,7 +34,7 @@ public class EmployeeDTO implements Serializable {
     }
 
     public EmployeeDTO getManager() {
-        return manager;
+        return this.manager;
     }
 
     public void setManager(EmployeeDTO manager) {
@@ -61,25 +51,24 @@ public class EmployeeDTO implements Serializable {
         }
 
         EmployeeDTO employeeDTO = (EmployeeDTO) o;
-        if (this.id == null) {
+        if (this.username == null) {
             return false;
         }
-        return Objects.equals(this.id, employeeDTO.id);
+        return Objects.equals(this.username, employeeDTO.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(this.username);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeDTO{" +
-            "id=" + getId() +
-            ", username='" + getUsername() + "'" +
+            "username='" + getUsername() + "'" +
             ", fullname='" + getFullname() + "'" +
-            ", manager=" + getManager() +
+            ", manager='" + getManager() + "'" +
             "}";
     }
 }

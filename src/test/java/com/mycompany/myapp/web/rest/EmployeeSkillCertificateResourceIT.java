@@ -9,6 +9,7 @@ import com.mycompany.myapp.CompositekeyApp;
 import com.mycompany.myapp.domain.CertificateType;
 import com.mycompany.myapp.domain.EmployeeSkill;
 import com.mycompany.myapp.domain.EmployeeSkillCertificate;
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.repository.EmployeeSkillCertificateRepository;
 import com.mycompany.myapp.service.EmployeeSkillCertificateQueryService;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateCriteria;
@@ -34,15 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = CompositekeyApp.class)
 @AutoConfigureMockMvc
 @WithMockUser
-class EmployeeSkillCertificateResourceIT {
+public class EmployeeSkillCertificateResourceIT {
 
-    private static final Integer DEFAULT_GRADE = 1;
-    private static final Integer UPDATED_GRADE = 2;
-    private static final Integer SMALLER_GRADE = 1 - 1;
+    public static final Integer DEFAULT_GRADE = 1;
+    public static final Integer UPDATED_GRADE = 2;
+    public static final Integer SMALLER_GRADE = 1 - 1;
 
-    private static final LocalDate DEFAULT_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_DATE = LocalDate.now(ZoneId.systemDefault());
-    private static final LocalDate SMALLER_DATE = LocalDate.ofEpochDay(-1L);
+    public static final LocalDate DEFAULT_DATE = LocalDate.ofEpochDay(0L);
+    public static final LocalDate UPDATED_DATE = LocalDate.now(ZoneId.systemDefault());
+    public static final LocalDate SMALLER_DATE = LocalDate.ofEpochDay(-1L);
 
     @Autowired
     private EmployeeSkillCertificateRepository employeeSkillCertificateRepository;
@@ -70,25 +71,30 @@ class EmployeeSkillCertificateResourceIT {
     public static EmployeeSkillCertificate createEntity(EntityManager em) {
         EmployeeSkillCertificate employeeSkillCertificate = new EmployeeSkillCertificate().grade(DEFAULT_GRADE).date(DEFAULT_DATE);
         // Add required entity
-        CertificateType certificateType;
-        if (TestUtil.findAll(em, CertificateType.class).isEmpty()) {
+        CertificateType certificateType = TestUtil.findAll(em, CertificateType.class).stream().findFirst().orElse(null);
+        if (certificateType == null) {
             certificateType = CertificateTypeResourceIT.createEntity(em);
             em.persist(certificateType);
             em.flush();
-        } else {
-            certificateType = TestUtil.findAll(em, CertificateType.class).get(0);
         }
         employeeSkillCertificate.setType(certificateType);
         // Add required entity
-        EmployeeSkill employeeSkill;
-        if (TestUtil.findAll(em, EmployeeSkill.class).isEmpty()) {
-            employeeSkill = EmployeeSkillResourceIT.createEntity(em);
+        EmployeeSkill newEmployeeSkill = EmployeeSkillResourceIT.createEntity(em);
+        EmployeeSkill employeeSkill = TestUtil
+            .findAll(em, EmployeeSkill.class)
+            .stream()
+            .filter(x -> x.getId().equals(newEmployeeSkill.getId()))
+            .findAny()
+            .orElse(null);
+        if (employeeSkill == null) {
+            employeeSkill = newEmployeeSkill;
             em.persist(employeeSkill);
             em.flush();
-        } else {
-            employeeSkill = TestUtil.findAll(em, EmployeeSkill.class).get(0);
         }
         employeeSkillCertificate.setSkill(employeeSkill);
+        employeeSkillCertificate.setId(
+            new EmployeeSkillCertificateId(certificateType.getId(), employeeSkill.getName(), employeeSkill.getEmployee().getUsername())
+        );
         return employeeSkillCertificate;
     }
 
@@ -101,25 +107,30 @@ class EmployeeSkillCertificateResourceIT {
     public static EmployeeSkillCertificate createUpdatedEntity(EntityManager em) {
         EmployeeSkillCertificate employeeSkillCertificate = new EmployeeSkillCertificate().grade(UPDATED_GRADE).date(UPDATED_DATE);
         // Add required entity
-        CertificateType certificateType;
-        if (TestUtil.findAll(em, CertificateType.class).isEmpty()) {
+        CertificateType certificateType = TestUtil.findAll(em, CertificateType.class).stream().skip(1).findFirst().orElse(null);
+        if (certificateType == null) {
             certificateType = CertificateTypeResourceIT.createUpdatedEntity(em);
             em.persist(certificateType);
             em.flush();
-        } else {
-            certificateType = TestUtil.findAll(em, CertificateType.class).get(0);
         }
         employeeSkillCertificate.setType(certificateType);
         // Add required entity
-        EmployeeSkill employeeSkill;
-        if (TestUtil.findAll(em, EmployeeSkill.class).isEmpty()) {
-            employeeSkill = EmployeeSkillResourceIT.createUpdatedEntity(em);
+        EmployeeSkill newEmployeeSkill = EmployeeSkillResourceIT.createUpdatedEntity(em);
+        EmployeeSkill employeeSkill = TestUtil
+            .findAll(em, EmployeeSkill.class)
+            .stream()
+            .filter(x -> x.getId().equals(newEmployeeSkill.getId()))
+            .findAny()
+            .orElse(null);
+        if (employeeSkill == null) {
+            employeeSkill = newEmployeeSkill;
             em.persist(employeeSkill);
             em.flush();
-        } else {
-            employeeSkill = TestUtil.findAll(em, EmployeeSkill.class).get(0);
         }
         employeeSkillCertificate.setSkill(employeeSkill);
+        employeeSkillCertificate.setId(
+            new EmployeeSkillCertificateId(certificateType.getId(), employeeSkill.getName(), employeeSkill.getEmployee().getUsername())
+        );
         return employeeSkillCertificate;
     }
 
@@ -153,10 +164,10 @@ class EmployeeSkillCertificateResourceIT {
     @Test
     @Transactional
     void createEmployeeSkillCertificateWithExistingId() throws Exception {
+        employeeSkillCertificateRepository.save(employeeSkillCertificate);
         int databaseSizeBeforeCreate = employeeSkillCertificateRepository.findAll().size();
 
         // Create the EmployeeSkillCertificate with an existing ID
-        employeeSkillCertificate.setId(1L);
         EmployeeSkillCertificateDTO employeeSkillCertificateDTO = employeeSkillCertificateMapper.toDto(employeeSkillCertificate);
 
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -225,10 +236,9 @@ class EmployeeSkillCertificateResourceIT {
 
         // Get all the employeeSkillCertificateList
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates?sort=id,desc"))
+            .perform(get("/api/employee-skill-certificates"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(employeeSkillCertificate.getId().intValue())))
             .andExpect(jsonPath("$.[*].grade").value(hasItem(DEFAULT_GRADE)))
             .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
     }
@@ -241,30 +251,23 @@ class EmployeeSkillCertificateResourceIT {
 
         // Get the employeeSkillCertificate
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates/{id}", employeeSkillCertificate.getId()))
+            .perform(
+                get(
+                    "/api/employee-skill-certificates/{id}",
+                    "typeId=" +
+                    employeeSkillCertificate.getId().getTypeId() +
+                    ";" +
+                    "skillName=" +
+                    employeeSkillCertificate.getId().getSkillName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    employeeSkillCertificate.getId().getSkillEmployeeUsername()
+                )
+            )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(employeeSkillCertificate.getId().intValue()))
             .andExpect(jsonPath("$.grade").value(DEFAULT_GRADE))
             .andExpect(jsonPath("$.date").value(DEFAULT_DATE.toString()));
-    }
-
-    @Test
-    @Transactional
-    void getEmployeeSkillCertificatesByIdFiltering() throws Exception {
-        // Initialize the database
-        employeeSkillCertificateRepository.saveAndFlush(employeeSkillCertificate);
-
-        Long id = employeeSkillCertificate.getId();
-
-        defaultEmployeeSkillCertificateShouldBeFound("id.equals=" + id);
-        defaultEmployeeSkillCertificateShouldNotBeFound("id.notEquals=" + id);
-
-        defaultEmployeeSkillCertificateShouldBeFound("id.greaterThanOrEqual=" + id);
-        defaultEmployeeSkillCertificateShouldNotBeFound("id.greaterThan=" + id);
-
-        defaultEmployeeSkillCertificateShouldBeFound("id.lessThanOrEqual=" + id);
-        defaultEmployeeSkillCertificateShouldNotBeFound("id.lessThan=" + id);
     }
 
     @Test
@@ -478,39 +481,29 @@ class EmployeeSkillCertificateResourceIT {
     @Test
     @Transactional
     void getAllEmployeeSkillCertificatesByTypeIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        CertificateType type = employeeSkillCertificate.getType();
         employeeSkillCertificateRepository.saveAndFlush(employeeSkillCertificate);
-        CertificateType type = CertificateTypeResourceIT.createEntity(em);
-        em.persist(type);
-        em.flush();
-        employeeSkillCertificate.setType(type);
-        employeeSkillCertificateRepository.saveAndFlush(employeeSkillCertificate);
-        Long typeId = type.getId();
 
-        // Get all the employeeSkillCertificateList where type equals to typeId
-        defaultEmployeeSkillCertificateShouldBeFound("typeId.equals=" + typeId);
+        // Get all the employeeSkillCertificateList where type.id equals to type.getId()
+        defaultEmployeeSkillCertificateShouldBeFound("type.id.equals=" + type.getId());
 
-        // Get all the employeeSkillCertificateList where type equals to typeId + 1
-        defaultEmployeeSkillCertificateShouldNotBeFound("typeId.equals=" + (typeId + 1));
+        // Get all the employeeSkillCertificateList where type.id equals to (type.getId() + 1)
+        defaultEmployeeSkillCertificateShouldNotBeFound("type.id.equals=" + (type.getId() + 1));
     }
 
     @Test
     @Transactional
     void getAllEmployeeSkillCertificatesBySkillIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        EmployeeSkill skill = employeeSkillCertificate.getSkill();
         employeeSkillCertificateRepository.saveAndFlush(employeeSkillCertificate);
-        EmployeeSkill skill = EmployeeSkillResourceIT.createEntity(em);
-        em.persist(skill);
-        em.flush();
-        employeeSkillCertificate.setSkill(skill);
-        employeeSkillCertificateRepository.saveAndFlush(employeeSkillCertificate);
-        Long skillId = skill.getId();
 
-        // Get all the employeeSkillCertificateList where skill equals to skillId
-        defaultEmployeeSkillCertificateShouldBeFound("skillId.equals=" + skillId);
+        // Get all the employeeSkillCertificateList where skill.name equals to EmployeeSkillResourceIT.DEFAULT_NAME
+        defaultEmployeeSkillCertificateShouldBeFound("skill.name.equals=" + EmployeeSkillResourceIT.DEFAULT_NAME);
 
-        // Get all the employeeSkillCertificateList where skill equals to skillId + 1
-        defaultEmployeeSkillCertificateShouldNotBeFound("skillId.equals=" + (skillId + 1));
+        // Get all the employeeSkillCertificateList where skill.name equals to EmployeeSkillResourceIT.UPDATED_NAME
+        defaultEmployeeSkillCertificateShouldNotBeFound("skill.name.equals=" + EmployeeSkillResourceIT.UPDATED_NAME);
     }
 
     /**
@@ -518,16 +511,15 @@ class EmployeeSkillCertificateResourceIT {
      */
     private void defaultEmployeeSkillCertificateShouldBeFound(String filter) throws Exception {
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates?sort=id,desc&" + filter))
+            .perform(get("/api/employee-skill-certificates?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(employeeSkillCertificate.getId().intValue())))
             .andExpect(jsonPath("$.[*].grade").value(hasItem(DEFAULT_GRADE)))
             .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString())));
 
         // Check, that the count call also returns 1
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates/count?sort=id,desc&" + filter))
+            .perform(get("/api/employee-skill-certificates/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -538,7 +530,7 @@ class EmployeeSkillCertificateResourceIT {
      */
     private void defaultEmployeeSkillCertificateShouldNotBeFound(String filter) throws Exception {
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates?sort=id,desc&" + filter))
+            .perform(get("/api/employee-skill-certificates?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -546,7 +538,7 @@ class EmployeeSkillCertificateResourceIT {
 
         // Check, that the count call also returns 0
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates/count?sort=id,desc&" + filter))
+            .perform(get("/api/employee-skill-certificates/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -557,7 +549,19 @@ class EmployeeSkillCertificateResourceIT {
     void getNonExistingEmployeeSkillCertificate() throws Exception {
         // Get the employeeSkillCertificate
         restEmployeeSkillCertificateMockMvc
-            .perform(get("/api/employee-skill-certificates/{id}", Long.MAX_VALUE))
+            .perform(
+                get(
+                    "/api/employee-skill-certificates/{id}",
+                    "typeId=" +
+                    employeeSkillCertificate.getId().getTypeId() +
+                    ";" +
+                    "skillName=" +
+                    employeeSkillCertificate.getId().getSkillName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    employeeSkillCertificate.getId().getSkillEmployeeUsername()
+                )
+            )
             .andExpect(status().isNotFound());
     }
 
@@ -626,7 +630,8 @@ class EmployeeSkillCertificateResourceIT {
 
         // Update the employeeSkillCertificate using partial update
         EmployeeSkillCertificate partialUpdatedEmployeeSkillCertificate = new EmployeeSkillCertificate();
-        partialUpdatedEmployeeSkillCertificate.setId(employeeSkillCertificate.getId());
+        partialUpdatedEmployeeSkillCertificate.setType(employeeSkillCertificate.getType());
+        partialUpdatedEmployeeSkillCertificate.setSkill(employeeSkillCertificate.getSkill());
 
         partialUpdatedEmployeeSkillCertificate.grade(UPDATED_GRADE);
 
@@ -656,7 +661,8 @@ class EmployeeSkillCertificateResourceIT {
 
         // Update the employeeSkillCertificate using partial update
         EmployeeSkillCertificate partialUpdatedEmployeeSkillCertificate = new EmployeeSkillCertificate();
-        partialUpdatedEmployeeSkillCertificate.setId(employeeSkillCertificate.getId());
+        partialUpdatedEmployeeSkillCertificate.setType(employeeSkillCertificate.getType());
+        partialUpdatedEmployeeSkillCertificate.setSkill(employeeSkillCertificate.getSkill());
 
         partialUpdatedEmployeeSkillCertificate.grade(UPDATED_GRADE).date(UPDATED_DATE);
 
@@ -701,7 +707,20 @@ class EmployeeSkillCertificateResourceIT {
 
         // Delete the employeeSkillCertificate
         restEmployeeSkillCertificateMockMvc
-            .perform(delete("/api/employee-skill-certificates/{id}", employeeSkillCertificate.getId()).accept(MediaType.APPLICATION_JSON))
+            .perform(
+                delete(
+                    "/api/employee-skill-certificates/{id}",
+                    "typeId=" +
+                    employeeSkillCertificate.getId().getTypeId() +
+                    ";" +
+                    "skillName=" +
+                    employeeSkillCertificate.getId().getSkillName() +
+                    ";" +
+                    "skillEmployeeUsername=" +
+                    employeeSkillCertificate.getId().getSkillEmployeeUsername()
+                )
+                    .accept(MediaType.APPLICATION_JSON)
+            )
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

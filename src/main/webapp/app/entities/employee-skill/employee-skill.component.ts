@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IEmployeeSkill } from 'app/shared/model/employee-skill.model';
@@ -9,15 +9,13 @@ import { IEmployeeSkill } from 'app/shared/model/employee-skill.model';
 import { ITEMS_PER_PAGE } from 'app/core/config/pagination.constants';
 import { EmployeeSkillService } from './employee-skill.service';
 import { EmployeeSkillDeleteDialogComponent } from './employee-skill-delete-dialog.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-employee-skill',
   templateUrl: './employee-skill.component.html',
 })
-export class EmployeeSkillComponent implements OnInit, OnDestroy {
+export class EmployeeSkillComponent implements OnInit {
   employeeSkills?: IEmployeeSkill[];
-  eventSubscriber?: Subscription;
   isLoading = false;
   totalItems = 0;
   itemsPerPage = ITEMS_PER_PAGE;
@@ -30,7 +28,6 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
     protected employeeSkillService: EmployeeSkillService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected eventManager: EventManager,
     protected modalService: NgbModal
   ) {}
 
@@ -62,7 +59,6 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.handleNavigation();
-    this.registerChangeInEmployeeSkills();
   }
 
   protected handleNavigation(): void {
@@ -70,7 +66,7 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
       const page = params.get('page');
       const pageNumber = page !== null ? +page : 1;
       const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      const predicate = sort[0];
+      const predicate = sort[0] || '';
       const ascending = sort[1] === 'asc';
       if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
         this.predicate = predicate;
@@ -80,29 +76,24 @@ export class EmployeeSkillComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
-  }
-
-  trackId(index: number, item: IEmployeeSkill): number {
-    return item.id!;
-  }
-
-  registerChangeInEmployeeSkills(): void {
-    this.eventSubscriber = this.eventManager.subscribe('employeeSkillListModification', () => this.loadPage());
+  trackId(index: number, item: IEmployeeSkill): string {
+    return `${item.name!},${item.employee!.username!}`;
   }
 
   delete(employeeSkill: IEmployeeSkill): void {
     const modalRef = this.modalService.open(EmployeeSkillDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.employeeSkill = employeeSkill;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadPage();
+      }
+    });
   }
 
   sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
+    const result = [];
+    if (this.predicate.length) {
+      result.push(this.predicate + ',' + (this.ascending ? 'asc' : 'desc'));
     }
     return result;
   }

@@ -10,8 +10,6 @@ import javax.validation.constraints.*;
  */
 public class EmployeeSkillCertificateDTO implements Serializable {
 
-    private Long id;
-
     @NotNull
     private Integer grade;
 
@@ -22,16 +20,8 @@ public class EmployeeSkillCertificateDTO implements Serializable {
 
     private EmployeeSkillDTO skill;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Integer getGrade() {
-        return grade;
+        return this.grade;
     }
 
     public void setGrade(Integer grade) {
@@ -39,7 +29,7 @@ public class EmployeeSkillCertificateDTO implements Serializable {
     }
 
     public LocalDate getDate() {
-        return date;
+        return this.date;
     }
 
     public void setDate(LocalDate date) {
@@ -47,7 +37,7 @@ public class EmployeeSkillCertificateDTO implements Serializable {
     }
 
     public CertificateTypeDTO getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(CertificateTypeDTO type) {
@@ -55,7 +45,7 @@ public class EmployeeSkillCertificateDTO implements Serializable {
     }
 
     public EmployeeSkillDTO getSkill() {
-        return skill;
+        return this.skill;
     }
 
     public void setSkill(EmployeeSkillDTO skill) {
@@ -72,26 +62,25 @@ public class EmployeeSkillCertificateDTO implements Serializable {
         }
 
         EmployeeSkillCertificateDTO employeeSkillCertificateDTO = (EmployeeSkillCertificateDTO) o;
-        if (this.id == null) {
+        if (this.type == null && this.skill == null) {
             return false;
         }
-        return Objects.equals(this.id, employeeSkillCertificateDTO.id);
+        return Objects.equals(this.type, employeeSkillCertificateDTO.type) && Objects.equals(this.skill, employeeSkillCertificateDTO.skill);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(this.type, this.skill);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeSkillCertificateDTO{" +
-            "id=" + getId() +
-            ", grade=" + getGrade() +
+            "grade=" + getGrade() +
             ", date='" + getDate() + "'" +
             ", type=" + getType() +
-            ", skill=" + getSkill() +
+            ", skill='" + getSkill() + "'" +
             "}";
     }
 }

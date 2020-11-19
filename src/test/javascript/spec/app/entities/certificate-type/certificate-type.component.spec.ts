@@ -5,7 +5,6 @@ import { of } from 'rxjs';
 
 import { CertificateTypeComponent } from 'app/entities/certificate-type/certificate-type.component';
 import { CertificateTypeService } from 'app/entities/certificate-type/certificate-type.service';
-import { CertificateType } from 'app/shared/model/certificate-type.model';
 
 describe('Component Tests', () => {
   describe('CertificateType Management Component', () => {
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new CertificateType(123)],
+            body: [{ id: 123 }],
             headers,
           })
         )

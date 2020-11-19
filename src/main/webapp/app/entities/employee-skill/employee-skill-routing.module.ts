@@ -15,13 +15,13 @@ const employeeSkillRoute: Routes = [
     component: EmployeeSkillComponent,
     data: {
       authorities: [Authority.USER],
-      defaultSort: 'id,asc',
+      defaultSort: '',
       pageTitle: 'compositekeyApp.employeeSkill.home.title',
     },
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/view',
+    path: 'view',
     component: EmployeeSkillDetailComponent,
     resolve: {
       employeeSkill: EmployeeSkillRoutingResolveService,
@@ -45,7 +45,7 @@ const employeeSkillRoute: Routes = [
     canActivate: [UserRouteAccessService],
   },
   {
-    path: ':id/edit',
+    path: 'edit',
     component: EmployeeSkillUpdateComponent,
     resolve: {
       employeeSkill: EmployeeSkillRoutingResolveService,

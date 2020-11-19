@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { TaskCommentDetailComponent } from 'app/entities/task-comment/task-comment-detail.component';
-import { TaskComment } from 'app/shared/model/task-comment.model';
 
 describe('Component Tests', () => {
   describe('TaskComment Management Detail Component', () => {
@@ -16,7 +15,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ taskComment: new TaskComment(123) }) },
+            useValue: { data: of({ taskComment: { id: 123 } }) },
           },
         ],
       })

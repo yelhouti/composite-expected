@@ -10,7 +10,7 @@ application {
 }
 
 entity Employee{
-	username String required
+	@id username String required
 	fullname String required
 }
 
@@ -20,12 +20,12 @@ relationship OneToMany{
 
 entity EmployeeSkill{
 	// compositeId employeeSkill.name, employee.id
-	name String required
+	@id name String required
 	level Integer required
 }
 
 relationship OneToMany{
-	Employee{skill(name)} to EmployeeSkill{employee(fullname) required}
+	@id Employee{skill(name)} to EmployeeSkill{employee(fullname) required}
 }
 
 entity CertificateType{
@@ -39,11 +39,11 @@ entity EmployeeSkillCertificate{
 }
 
 relationship OneToMany{
-	CertificateType to EmployeeSkillCertificate{type(name) required}
+	@id CertificateType to EmployeeSkillCertificate{type(name) required}
 }
 
 relationship OneToMany{
-	EmployeeSkill to EmployeeSkillCertificate{skill(name) required}
+	@id EmployeeSkill to EmployeeSkillCertificate{skill(name) required}
 }
 
 entity Task {
@@ -64,7 +64,7 @@ enum TaskType {
 
 entity TaskComment {
     // detect autoIncrement
-    id Long
+    @id id Long
     value String required
 }
 
@@ -88,7 +88,7 @@ relationship ManyToOne {
 }
 
 entity WithIdString {
-    id String required
+    @id id String required
 }
 
 entity WithIdStringDetails {

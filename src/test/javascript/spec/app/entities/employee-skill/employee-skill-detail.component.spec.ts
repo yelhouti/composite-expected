@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { EmployeeSkillDetailComponent } from 'app/entities/employee-skill/employee-skill-detail.component';
-import { EmployeeSkill } from 'app/shared/model/employee-skill.model';
 
 describe('Component Tests', () => {
   describe('EmployeeSkill Management Detail Component', () => {
@@ -16,7 +15,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employeeSkill: new EmployeeSkill(123) }) },
+            useValue: { data: of({ employeeSkill: { name: "'123'", employee: { username: "'123'" } } }) },
           },
         ],
       })
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ id: 123 }));
+        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ name: "'123'", employee: { username: "'123'" } }));
       });
     });
   });

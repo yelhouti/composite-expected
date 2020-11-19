@@ -4,7 +4,10 @@
     {
       "fieldName": "username",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
     },
     {
       "fieldName": "fullname",
@@ -25,7 +28,10 @@
       "otherEntityName": "employeeSkill",
       "otherEntityRelationshipName": "employee",
       "relationshipName": "skill",
-      "otherEntityField": "name"
+      "otherEntityField": "name",
+      "options": {
+        "id": true
+      }
     },
     {
       "relationshipType": "one-to-many",

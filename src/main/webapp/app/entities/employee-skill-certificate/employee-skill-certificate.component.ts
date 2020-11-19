@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { IEmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
@@ -9,15 +9,13 @@ import { IEmployeeSkillCertificate } from 'app/shared/model/employee-skill-certi
 import { ITEMS_PER_PAGE } from 'app/core/config/pagination.constants';
 import { EmployeeSkillCertificateService } from './employee-skill-certificate.service';
 import { EmployeeSkillCertificateDeleteDialogComponent } from './employee-skill-certificate-delete-dialog.component';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 @Component({
   selector: 'jhi-employee-skill-certificate',
   templateUrl: './employee-skill-certificate.component.html',
 })
-export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
+export class EmployeeSkillCertificateComponent implements OnInit {
   employeeSkillCertificates?: IEmployeeSkillCertificate[];
-  eventSubscriber?: Subscription;
   isLoading = false;
   totalItems = 0;
   itemsPerPage = ITEMS_PER_PAGE;
@@ -30,7 +28,6 @@ export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
     protected employeeSkillCertificateService: EmployeeSkillCertificateService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected eventManager: EventManager,
     protected modalService: NgbModal
   ) {}
 
@@ -62,7 +59,6 @@ export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.handleNavigation();
-    this.registerChangeInEmployeeSkillCertificates();
   }
 
   protected handleNavigation(): void {
@@ -70,7 +66,7 @@ export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
       const page = params.get('page');
       const pageNumber = page !== null ? +page : 1;
       const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      const predicate = sort[0];
+      const predicate = sort[0] || '';
       const ascending = sort[1] === 'asc';
       if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
         this.predicate = predicate;
@@ -80,29 +76,24 @@ export class EmployeeSkillCertificateComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.eventSubscriber) {
-      this.eventManager.destroy(this.eventSubscriber);
-    }
-  }
-
-  trackId(index: number, item: IEmployeeSkillCertificate): number {
-    return item.id!;
-  }
-
-  registerChangeInEmployeeSkillCertificates(): void {
-    this.eventSubscriber = this.eventManager.subscribe('employeeSkillCertificateListModification', () => this.loadPage());
+  trackId(index: number, item: IEmployeeSkillCertificate): string {
+    return `${item.type!.id!},${item.skill!.name!},${item.skill!.employee!.username!}`;
   }
 
   delete(employeeSkillCertificate: IEmployeeSkillCertificate): void {
     const modalRef = this.modalService.open(EmployeeSkillCertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.employeeSkillCertificate = employeeSkillCertificate;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadPage();
+      }
+    });
   }
 
   sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
+    const result = [];
+    if (this.predicate.length) {
+      result.push(this.predicate + ',' + (this.ascending ? 'asc' : 'desc'));
     }
     return result;
   }

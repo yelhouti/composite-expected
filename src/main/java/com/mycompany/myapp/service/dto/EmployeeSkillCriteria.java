@@ -24,43 +24,32 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
-    private LongFilter id;
-
     private StringFilter name;
 
     private IntegerFilter level;
 
-    private LongFilter employeeSkillCertificateId;
+    private EmployeeSkillCertificateCriteria employeeSkillCertificate;
 
-    private LongFilter taskId;
+    private TaskCriteria task;
 
-    private LongFilter employeeId;
+    private EmployeeCriteria employee;
 
-    private LongFilter teacherId;
+    private EmployeeCriteria teacher;
 
     public EmployeeSkillCriteria() {}
 
     public EmployeeSkillCriteria(EmployeeSkillCriteria other) {
-        this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.level = other.level == null ? null : other.level.copy();
-        this.employeeSkillCertificateId = other.employeeSkillCertificateId == null ? null : other.employeeSkillCertificateId.copy();
-        this.taskId = other.taskId == null ? null : other.taskId.copy();
-        this.employeeId = other.employeeId == null ? null : other.employeeId.copy();
-        this.teacherId = other.teacherId == null ? null : other.teacherId.copy();
+        this.employeeSkillCertificate = other.employeeSkillCertificate == null ? null : other.employeeSkillCertificate.copy();
+        this.task = other.task == null ? null : other.task.copy();
+        this.employee = other.employee == null ? null : other.employee.copy();
+        this.teacher = other.teacher == null ? null : other.teacher.copy();
     }
 
     @Override
     public EmployeeSkillCriteria copy() {
         return new EmployeeSkillCriteria(this);
-    }
-
-    public LongFilter getId() {
-        return id;
-    }
-
-    public void setId(LongFilter id) {
-        this.id = id;
     }
 
     public StringFilter getName() {
@@ -79,36 +68,36 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
         this.level = level;
     }
 
-    public LongFilter getEmployeeSkillCertificateId() {
-        return employeeSkillCertificateId;
+    public EmployeeSkillCertificateCriteria getEmployeeSkillCertificate() {
+        return employeeSkillCertificate;
     }
 
-    public void setEmployeeSkillCertificateId(LongFilter employeeSkillCertificateId) {
-        this.employeeSkillCertificateId = employeeSkillCertificateId;
+    public void setEmployeeSkillCertificate(EmployeeSkillCertificateCriteria employeeSkillCertificate) {
+        this.employeeSkillCertificate = employeeSkillCertificate;
     }
 
-    public LongFilter getTaskId() {
-        return taskId;
+    public TaskCriteria getTask() {
+        return task;
     }
 
-    public void setTaskId(LongFilter taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskCriteria task) {
+        this.task = task;
     }
 
-    public LongFilter getEmployeeId() {
-        return employeeId;
+    public EmployeeCriteria getEmployee() {
+        return employee;
     }
 
-    public void setEmployeeId(LongFilter employeeId) {
-        this.employeeId = employeeId;
+    public void setEmployee(EmployeeCriteria employee) {
+        this.employee = employee;
     }
 
-    public LongFilter getTeacherId() {
-        return teacherId;
+    public EmployeeCriteria getTeacher() {
+        return teacher;
     }
 
-    public void setTeacherId(LongFilter teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher(EmployeeCriteria teacher) {
+        this.teacher = teacher;
     }
 
     @Override
@@ -121,32 +110,30 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
         }
         final EmployeeSkillCriteria that = (EmployeeSkillCriteria) o;
         return (
-            Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(level, that.level) &&
-            Objects.equals(employeeSkillCertificateId, that.employeeSkillCertificateId) &&
-            Objects.equals(taskId, that.taskId) &&
-            Objects.equals(employeeId, that.employeeId) &&
-            Objects.equals(teacherId, that.teacherId)
+            Objects.equals(employeeSkillCertificate, that.employeeSkillCertificate) &&
+            Objects.equals(task, that.task) &&
+            Objects.equals(employee, that.employee) &&
+            Objects.equals(teacher, that.teacher)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, level, employeeSkillCertificateId, taskId, employeeId, teacherId);
+        return Objects.hash(name, level, employeeSkillCertificate, task, employee, teacher);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeSkillCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (name != null ? "name=" + name + ", " : "") +
-                (level != null ? "level=" + level + ", " : "") +
-                (employeeSkillCertificateId != null ? "employeeSkillCertificateId=" + employeeSkillCertificateId + ", " : "") +
-                (taskId != null ? "taskId=" + taskId + ", " : "") +
-                (employeeId != null ? "employeeId=" + employeeId + ", " : "") +
-                (teacherId != null ? "teacherId=" + teacherId + ", " : "") +
+            (name != null ? "name=" + name + ", " : "") +
+            (level != null ? "level=" + level + ", " : "") +
+            (employeeSkillCertificate != null ? "employeeSkillCertificate=" + employeeSkillCertificate + ", " : "") +
+            (task != null ? "task=" + task + ", " : "") +
+            (employee != null ? "employee=" + employee + ", " : "") +
+            (teacher != null ? "teacher=" + teacher + ", " : "") +
             "}";
     }
 }

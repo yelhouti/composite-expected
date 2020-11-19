@@ -7,12 +7,6 @@
                 <jhi-alert-error></jhi-alert-error>
 
 
-                <div class="form-group" [hidden]="editForm.get('id')?.value == null">
-                    <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-                    <input type="number" class="form-control" name="id" id="field_id" data-cy="id"
-                           formControlName="id" readonly/>
-                </div>
-
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.grade" for="field_grade">Grade</label>
                     <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade"
@@ -47,9 +41,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.type" for="field_type">Type</label>
-                    <select class="form-control" id="field_type" data-cy="type" name="type" formControlName="type">
+                    <select class="form-control" id="field_type" data-cy="type" name="type" formControlName="type"  [attr.disabled]="edit ? true : null">
                         <option *ngIf="!editForm.get('type')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="certificateTypeOption.id === editForm.get('type')!.value?.id ? editForm.get('type')!.value : certificateTypeOption" *ngFor="let certificateTypeOption of certificatetypes; trackBy: trackById">{{ certificateTypeOption.name }}</option>
+                        <option [ngValue]="certificateTypeOption?.id! === editForm.get('type')!.value?.id! ? editForm.get('type')!.value : certificateTypeOption" *ngFor="let certificateTypeOption of certificatetypes; trackBy: trackById">{{ certificateTypeOption!.name }}</option>
                     </select>
                 </div>
                 <div *ngIf="editForm.get(['type'])!.invalid && (editForm.get(['type'])!.dirty || editForm.get(['type'])!.touched)">
@@ -61,9 +55,9 @@
 
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.skill" for="field_skill">Skill</label>
-                    <select class="form-control" id="field_skill" data-cy="skill" name="skill" formControlName="skill">
+                    <select class="form-control" id="field_skill" data-cy="skill" name="skill" formControlName="skill"  [attr.disabled]="edit ? true : null">
                         <option *ngIf="!editForm.get('skill')!.value" [ngValue]="null" selected></option>
-                        <option [ngValue]="employeeSkillOption.id === editForm.get('skill')!.value?.id ? editForm.get('skill')!.value : employeeSkillOption" *ngFor="let employeeSkillOption of employeeskills; trackBy: trackById">{{ employeeSkillOption.name }}</option>
+                        <option [ngValue]="employeeSkillOption?.name! === editForm.get('skill')!.value?.name! && employeeSkillOption?.employee!.username! === editForm.get('skill')!.value?.employee!.username! ? editForm.get('skill')!.value : employeeSkillOption" *ngFor="let employeeSkillOption of employeeskills; trackBy: trackByEmployeeSkillId">{{ employeeSkillOption!.name }} | {{ employeeSkillOption!.employee!.fullname }}</option>
                     </select>
                 </div>
                 <div *ngIf="editForm.get(['skill'])!.invalid && (editForm.get(['skill'])!.dirty || editForm.get(['skill'])!.touched)">

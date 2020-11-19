@@ -4,18 +4,20 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IEmployeeSkillCertificate, EmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
+import { IEmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
 import { EmployeeSkillCertificateService } from './employee-skill-certificate.service';
 
 @Injectable({ providedIn: 'root' })
-export class EmployeeSkillCertificateRoutingResolveService implements Resolve<IEmployeeSkillCertificate> {
+export class EmployeeSkillCertificateRoutingResolveService implements Resolve<IEmployeeSkillCertificate | null> {
   constructor(private service: EmployeeSkillCertificateService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IEmployeeSkillCertificate> | Observable<never> {
-    const id = route.params['id'];
-    if (id) {
-      return this.service.find(id).pipe(
-        mergeMap((employeeSkillCertificate: HttpResponse<EmployeeSkillCertificate>) => {
+  resolve(route: ActivatedRouteSnapshot): Observable<IEmployeeSkillCertificate | null> | Observable<never> {
+    const typeId = route.params['typeId'] ? route.params['typeId'] : null;
+    const skillName = route.params['skillName'] ? route.params['skillName'] : null;
+    const skillEmployeeUsername = route.params['skillEmployeeUsername'] ? route.params['skillEmployeeUsername'] : null;
+    if (typeId && skillName && skillEmployeeUsername) {
+      return this.service.find(typeId, skillName, skillEmployeeUsername).pipe(
+        mergeMap((employeeSkillCertificate: HttpResponse<IEmployeeSkillCertificate>) => {
           if (employeeSkillCertificate.body) {
             return of(employeeSkillCertificate.body);
           } else {
@@ -25,6 +27,6 @@ export class EmployeeSkillCertificateRoutingResolveService implements Resolve<IE
         })
       );
     }
-    return of(new EmployeeSkillCertificate());
+    return of(null);
   }
 }

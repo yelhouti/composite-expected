@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { IWithIdStringDetails, WithIdStringDetails } from 'app/shared/model/with-id-string-details.model';
+import { IWithIdStringDetails } from 'app/shared/model/with-id-string-details.model';
 import { WithIdStringDetailsService } from './with-id-string-details.service';
 import { IWithIdString } from 'app/shared/model/with-id-string.model';
 import { WithIdStringService } from 'app/entities/with-id-string/with-id-string.service';
@@ -20,7 +20,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
   withidstrings: IWithIdString[] = [];
 
   editForm = this.fb.group({
-    id: [],
+    withIdStringId: [],
     name: [],
     withIdString: [],
   });
@@ -56,12 +56,14 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(withIdStringDetails: IWithIdStringDetails): void {
-    this.editForm.patchValue({
-      id: withIdStringDetails.id,
-      name: withIdStringDetails.name,
-      withIdString: withIdStringDetails.withIdString,
-    });
+  updateForm(withIdStringDetails: IWithIdStringDetails | null): void {
+    if (withIdStringDetails) {
+      this.editForm.reset({
+        ...withIdStringDetails,
+      });
+    } else {
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -74,21 +76,12 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const withIdStringDetails = this.createFromForm();
-    if (withIdStringDetails.id !== undefined) {
+    const withIdStringDetails = this.editForm.value;
+    if (withIdStringDetails.withIdStringId !== null) {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.update(withIdStringDetails));
     } else {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.create(withIdStringDetails));
     }
-  }
-
-  private createFromForm(): IWithIdStringDetails {
-    return {
-      ...new WithIdStringDetails(),
-      id: this.editForm.get(['id'])!.value,
-      name: this.editForm.get(['name'])!.value,
-      withIdString: this.editForm.get(['withIdString'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IWithIdStringDetails>>): void {
@@ -107,7 +100,7 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: IWithIdString): number {
+  trackById(index: number, item: IWithIdString): string {
     return item.id!;
   }
 }

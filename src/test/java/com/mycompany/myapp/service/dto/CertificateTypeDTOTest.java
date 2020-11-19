@@ -14,11 +14,13 @@ class CertificateTypeDTOTest {
         certificateTypeDTO1.setId(1L);
         CertificateTypeDTO certificateTypeDTO2 = new CertificateTypeDTO();
         assertThat(certificateTypeDTO1).isNotEqualTo(certificateTypeDTO2);
-        certificateTypeDTO2.setId(certificateTypeDTO1.getId());
+        certificateTypeDTO2.setId(1L);
         assertThat(certificateTypeDTO1).isEqualTo(certificateTypeDTO2);
-        certificateTypeDTO2.setId(2L);
-        assertThat(certificateTypeDTO1).isNotEqualTo(certificateTypeDTO2);
-        certificateTypeDTO1.setId(null);
-        assertThat(certificateTypeDTO1).isNotEqualTo(certificateTypeDTO2);
+        CertificateTypeDTO certificateTypeDTO3 = new CertificateTypeDTO();
+        certificateTypeDTO3.setId(3L);
+        assertThat(certificateTypeDTO1).isNotEqualTo(certificateTypeDTO3);
+        CertificateTypeDTO certificateTypeDTO4 = new CertificateTypeDTO();
+        certificateTypeDTO4.setId(null);
+        assertThat(certificateTypeDTO1).isNotEqualTo(certificateTypeDTO4);
     }
 }

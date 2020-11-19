@@ -5,7 +5,6 @@ import { of } from 'rxjs';
 
 import { TaskComponent } from 'app/entities/task/task.component';
 import { TaskService } from 'app/entities/task/task.service';
-import { Task } from 'app/shared/model/task.model';
 
 describe('Component Tests', () => {
   describe('Task Management Component', () => {
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new Task(123)],
+            body: [{ id: 123 }],
             headers,
           })
         )

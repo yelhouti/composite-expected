@@ -59,9 +59,7 @@ public class TaskCriteria implements Serializable, Criteria {
 
     private BooleanFilter done;
 
-    private LongFilter userId;
-
-    private LongFilter employeeSkillId;
+    private EmployeeSkillCriteria employeeSkill;
 
     public TaskCriteria() {}
 
@@ -73,8 +71,7 @@ public class TaskCriteria implements Serializable, Criteria {
         this.createdAt = other.createdAt == null ? null : other.createdAt.copy();
         this.modifiedAt = other.modifiedAt == null ? null : other.modifiedAt.copy();
         this.done = other.done == null ? null : other.done.copy();
-        this.userId = other.userId == null ? null : other.userId.copy();
-        this.employeeSkillId = other.employeeSkillId == null ? null : other.employeeSkillId.copy();
+        this.employeeSkill = other.employeeSkill == null ? null : other.employeeSkill.copy();
     }
 
     @Override
@@ -138,20 +135,12 @@ public class TaskCriteria implements Serializable, Criteria {
         this.done = done;
     }
 
-    public LongFilter getUserId() {
-        return userId;
+    public EmployeeSkillCriteria getEmployeeSkill() {
+        return employeeSkill;
     }
 
-    public void setUserId(LongFilter userId) {
-        this.userId = userId;
-    }
-
-    public LongFilter getEmployeeSkillId() {
-        return employeeSkillId;
-    }
-
-    public void setEmployeeSkillId(LongFilter employeeSkillId) {
-        this.employeeSkillId = employeeSkillId;
+    public void setEmployeeSkill(EmployeeSkillCriteria employeeSkill) {
+        this.employeeSkill = employeeSkill;
     }
 
     @Override
@@ -171,29 +160,27 @@ public class TaskCriteria implements Serializable, Criteria {
             Objects.equals(createdAt, that.createdAt) &&
             Objects.equals(modifiedAt, that.modifiedAt) &&
             Objects.equals(done, that.done) &&
-            Objects.equals(userId, that.userId) &&
-            Objects.equals(employeeSkillId, that.employeeSkillId)
+            Objects.equals(employeeSkill, that.employeeSkill)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, endDate, createdAt, modifiedAt, done, userId, employeeSkillId);
+        return Objects.hash(id, name, type, endDate, createdAt, modifiedAt, done, employeeSkill);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "TaskCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (name != null ? "name=" + name + ", " : "") +
-                (type != null ? "type=" + type + ", " : "") +
-                (endDate != null ? "endDate=" + endDate + ", " : "") +
-                (createdAt != null ? "createdAt=" + createdAt + ", " : "") +
-                (modifiedAt != null ? "modifiedAt=" + modifiedAt + ", " : "") +
-                (done != null ? "done=" + done + ", " : "") +
-                (userId != null ? "userId=" + userId + ", " : "") +
-                (employeeSkillId != null ? "employeeSkillId=" + employeeSkillId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (name != null ? "name=" + name + ", " : "") +
+            (type != null ? "type=" + type + ", " : "") +
+            (endDate != null ? "endDate=" + endDate + ", " : "") +
+            (createdAt != null ? "createdAt=" + createdAt + ", " : "") +
+            (modifiedAt != null ? "modifiedAt=" + modifiedAt + ", " : "") +
+            (done != null ? "done=" + done + ", " : "") +
+            (employeeSkill != null ? "employeeSkill=" + employeeSkill + ", " : "") +
             "}";
     }
 }

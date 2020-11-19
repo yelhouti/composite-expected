@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ICertificateType, CertificateType } from 'app/shared/model/certificate-type.model';
+import { ICertificateType } from 'app/shared/model/certificate-type.model';
 import { CertificateTypeService } from './certificate-type.service';
 
 @Component({
@@ -36,11 +36,14 @@ export class CertificateTypeUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(certificateType: ICertificateType): void {
-    this.editForm.patchValue({
-      id: certificateType.id,
-      name: certificateType.name,
-    });
+  updateForm(certificateType: ICertificateType | null): void {
+    if (certificateType) {
+      this.editForm.reset({
+        ...certificateType,
+      });
+    } else {
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -53,20 +56,12 @@ export class CertificateTypeUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const certificateType = this.createFromForm();
-    if (certificateType.id !== undefined) {
+    const certificateType = this.editForm.value;
+    if (certificateType.id !== null) {
       this.subscribeToSaveResponse(this.certificateTypeService.update(certificateType));
     } else {
       this.subscribeToSaveResponse(this.certificateTypeService.create(certificateType));
     }
-  }
-
-  private createFromForm(): ICertificateType {
-    return {
-      ...new CertificateType(),
-      id: this.editForm.get(['id'])!.value,
-      name: this.editForm.get(['name'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ICertificateType>>): void {

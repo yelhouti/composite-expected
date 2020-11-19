@@ -40,13 +40,8 @@ describe('Employee e2e test', () => {
 
     await employeeComponentsPage.clickOnCreateButton();
 
-    await promise.all([
-      employeeUpdatePage.setUsernameInput('username'),
-      employeeUpdatePage.setFullnameInput('fullname'),
-      employeeUpdatePage.managerSelectLastOption(),
-    ]);
+    await promise.all([employeeUpdatePage.setFullnameInput('fullname'), employeeUpdatePage.managerSelectLastOption()]);
 
-    expect(await employeeUpdatePage.getUsernameInput()).to.eq('username', 'Expected Username value to be equals to username');
     expect(await employeeUpdatePage.getFullnameInput()).to.eq('fullname', 'Expected Fullname value to be equals to fullname');
 
     await employeeUpdatePage.save();

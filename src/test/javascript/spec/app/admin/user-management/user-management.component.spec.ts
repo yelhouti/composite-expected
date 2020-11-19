@@ -1,5 +1,4 @@
 jest.mock('@angular/router');
-jest.mock('app/core/event-manager/event-manager.service');
 jest.mock('app/core/auth/account.service');
 
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
@@ -12,7 +11,6 @@ import { UserManagementComponent } from 'app/admin/user-management/user-manageme
 import { UserService } from 'app/core/user/user.service';
 import { User } from 'app/core/user/user.model';
 import { AccountService } from 'app/core/auth/account.service';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 describe('Component Tests', () => {
   describe('User Management Component', () => {
@@ -36,7 +34,7 @@ describe('Component Tests', () => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
           declarations: [UserManagementComponent],
-          providers: [EventManager, Router, { provide: ActivatedRoute, useValue: { data, queryParamMap } }, AccountService],
+          providers: [Router, { provide: ActivatedRoute, useValue: { data, queryParamMap } }, AccountService],
         })
           .overrideTemplate(UserManagementComponent, '')
           .compileComponents();

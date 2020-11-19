@@ -48,7 +48,7 @@ public class TaskDTO implements Serializable {
     private UserDTO user;
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -56,7 +56,7 @@ public class TaskDTO implements Serializable {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -64,7 +64,7 @@ public class TaskDTO implements Serializable {
     }
 
     public TaskType getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(TaskType type) {
@@ -72,7 +72,7 @@ public class TaskDTO implements Serializable {
     }
 
     public LocalDate getEndDate() {
-        return endDate;
+        return this.endDate;
     }
 
     public void setEndDate(LocalDate endDate) {
@@ -80,7 +80,7 @@ public class TaskDTO implements Serializable {
     }
 
     public ZonedDateTime getCreatedAt() {
-        return createdAt;
+        return this.createdAt;
     }
 
     public void setCreatedAt(ZonedDateTime createdAt) {
@@ -88,7 +88,7 @@ public class TaskDTO implements Serializable {
     }
 
     public Instant getModifiedAt() {
-        return modifiedAt;
+        return this.modifiedAt;
     }
 
     public void setModifiedAt(Instant modifiedAt) {
@@ -96,7 +96,7 @@ public class TaskDTO implements Serializable {
     }
 
     public Boolean getDone() {
-        return done;
+        return this.done;
     }
 
     public void setDone(Boolean done) {
@@ -104,7 +104,7 @@ public class TaskDTO implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -112,7 +112,7 @@ public class TaskDTO implements Serializable {
     }
 
     public byte[] getAttachment() {
-        return attachment;
+        return this.attachment;
     }
 
     public void setAttachment(byte[] attachment) {
@@ -128,7 +128,7 @@ public class TaskDTO implements Serializable {
     }
 
     public byte[] getPicture() {
-        return picture;
+        return this.picture;
     }
 
     public void setPicture(byte[] picture) {
@@ -144,7 +144,7 @@ public class TaskDTO implements Serializable {
     }
 
     public UserDTO getUser() {
-        return user;
+        return this.user;
     }
 
     public void setUser(UserDTO user) {

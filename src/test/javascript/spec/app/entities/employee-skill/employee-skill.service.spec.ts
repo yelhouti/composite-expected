@@ -18,14 +18,14 @@ describe('Service Tests', () => {
       service = TestBed.inject(EmployeeSkillService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      elemDefault = new EmployeeSkill(0, 'AAAAAAA', 0);
+      elemDefault = new EmployeeSkill('AAAAAAA', 0);
     });
 
     describe('Service methods', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign({}, elemDefault);
 
-        service.find(123).subscribe(resp => (expectedResult = resp.body));
+        service.find('123', '123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
@@ -35,7 +35,7 @@ describe('Service Tests', () => {
       it('should create a EmployeeSkill', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0,
+            id: 'ID',
           },
           elemDefault
         );
@@ -52,7 +52,6 @@ describe('Service Tests', () => {
       it('should update a EmployeeSkill', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             name: 'BBBBBB',
             level: 1,
           },
@@ -71,7 +70,6 @@ describe('Service Tests', () => {
       it('should return a list of EmployeeSkill', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             name: 'BBBBBB',
             level: 1,
           },
@@ -89,7 +87,7 @@ describe('Service Tests', () => {
       });
 
       it('should delete a EmployeeSkill', () => {
-        service.delete(123).subscribe(resp => (expectedResult = resp.ok));
+        service.delete('123', '123').subscribe(resp => (expectedResult = resp.ok));
 
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });

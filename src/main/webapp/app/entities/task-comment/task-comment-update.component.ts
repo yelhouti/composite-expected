@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ITaskComment, TaskComment } from 'app/shared/model/task-comment.model';
+import { ITaskComment } from 'app/shared/model/task-comment.model';
 import { TaskCommentService } from './task-comment.service';
 import { ITask } from 'app/shared/model/task.model';
 import { TaskService } from 'app/entities/task/task.service';
@@ -43,12 +43,14 @@ export class TaskCommentUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(taskComment: ITaskComment): void {
-    this.editForm.patchValue({
-      id: taskComment.id,
-      value: taskComment.value,
-      task: taskComment.task,
-    });
+  updateForm(taskComment: ITaskComment | null): void {
+    if (taskComment) {
+      this.editForm.reset({
+        ...taskComment,
+      });
+    } else {
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -61,21 +63,12 @@ export class TaskCommentUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const taskComment = this.createFromForm();
-    if (taskComment.id !== undefined) {
+    const taskComment = this.editForm.value;
+    if (taskComment.id !== null) {
       this.subscribeToSaveResponse(this.taskCommentService.update(taskComment));
     } else {
       this.subscribeToSaveResponse(this.taskCommentService.create(taskComment));
     }
-  }
-
-  private createFromForm(): ITaskComment {
-    return {
-      ...new TaskComment(),
-      id: this.editForm.get(['id'])!.value,
-      value: this.editForm.get(['value'])!.value,
-      task: this.editForm.get(['task'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITaskComment>>): void {

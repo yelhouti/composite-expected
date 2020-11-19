@@ -1,11 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ITEMS_PER_PAGE } from 'app/core/config/pagination.constants';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/user/account.model';
 import { UserService } from 'app/core/user/user.service';
@@ -16,10 +15,9 @@ import { UserManagementDeleteDialogComponent } from './user-management-delete-di
   selector: 'jhi-user-mgmt',
   templateUrl: './user-management.component.html',
 })
-export class UserManagementComponent implements OnInit, OnDestroy {
+export class UserManagementComponent implements OnInit {
   currentAccount: Account | null = null;
   users: User[] | null = null;
-  userListSubscription?: Subscription;
   isLoading = false;
   totalItems = 0;
   itemsPerPage = ITEMS_PER_PAGE;
@@ -32,20 +30,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private accountService: AccountService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private eventManager: EventManager,
     private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => (this.currentAccount = account));
-    this.userListSubscription = this.eventManager.subscribe('userListModification', () => this.loadAll());
     this.handleNavigation();
-  }
-
-  ngOnDestroy(): void {
-    if (this.userListSubscription) {
-      this.eventManager.destroy(this.userListSubscription);
-    }
   }
 
   setActive(user: User, isActivated: boolean): void {
@@ -59,6 +49,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   deleteUser(user: User): void {
     const modalRef = this.modalService.open(UserManagementDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.user = user;
+    modalRef.result.then(reason => {
+      if (reason === 'deleted') {
+        this.loadAll();
+      }
+    });
   }
 
   handleSyncList(): void {

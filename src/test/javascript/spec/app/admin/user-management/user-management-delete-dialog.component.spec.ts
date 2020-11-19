@@ -1,5 +1,4 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
-jest.mock('app/core/event-manager/event-manager.service');
 
 import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -8,14 +7,12 @@ import { of } from 'rxjs';
 
 import { UserManagementDeleteDialogComponent } from 'app/admin/user-management/user-management-delete-dialog.component';
 import { UserService } from 'app/core/user/user.service';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 describe('Component Tests', () => {
   describe('User Management Delete Component', () => {
     let comp: UserManagementDeleteDialogComponent;
     let fixture: ComponentFixture<UserManagementDeleteDialogComponent>;
     let service: UserService;
-    let mockEventManager: EventManager;
     let mockActiveModal: NgbActiveModal;
 
     beforeEach(
@@ -23,7 +20,7 @@ describe('Component Tests', () => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
           declarations: [UserManagementDeleteDialogComponent],
-          providers: [NgbActiveModal, EventManager],
+          providers: [NgbActiveModal],
         })
           .overrideTemplate(UserManagementDeleteDialogComponent, '')
           .compileComponents();
@@ -34,7 +31,6 @@ describe('Component Tests', () => {
       fixture = TestBed.createComponent(UserManagementDeleteDialogComponent);
       comp = fixture.componentInstance;
       service = TestBed.inject(UserService);
-      mockEventManager = TestBed.inject(EventManager);
       mockActiveModal = TestBed.inject(NgbActiveModal);
     });
 
@@ -51,8 +47,7 @@ describe('Component Tests', () => {
 
           // THEN
           expect(service.delete).toHaveBeenCalledWith('user');
-          expect(mockActiveModal.close).toHaveBeenCalled();
-          expect(mockEventManager.broadcast).toHaveBeenCalled();
+          expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
         })
       ));
     });

@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.dto.WithIdStringCriteria;
 import com.mycompany.myapp.service.dto.WithIdStringDTO;
 import com.mycompany.myapp.service.mapper.WithIdStringMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,9 +34,16 @@ public class WithIdStringQueryService extends QueryService<WithIdString> {
 
     private final WithIdStringMapper withIdStringMapper;
 
-    public WithIdStringQueryService(WithIdStringRepository withIdStringRepository, WithIdStringMapper withIdStringMapper) {
+    private final WithIdStringDetailsQueryService withIdStringDetailsQueryService;
+
+    public WithIdStringQueryService(
+        WithIdStringRepository withIdStringRepository,
+        WithIdStringMapper withIdStringMapper,
+        @Lazy WithIdStringDetailsQueryService withIdStringDetailsQueryService
+    ) {
         this.withIdStringRepository = withIdStringRepository;
         this.withIdStringMapper = withIdStringMapper;
+        this.withIdStringDetailsQueryService = withIdStringDetailsQueryService;
     }
 
     /**
@@ -80,19 +88,28 @@ public class WithIdStringQueryService extends QueryService<WithIdString> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<WithIdString> createSpecification(WithIdStringCriteria criteria) {
+    public Specification<WithIdString> createSpecification(WithIdStringCriteria criteria) {
         Specification<WithIdString> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
-                specification = specification.and(buildRangeSpecification(criteria.getId(), WithIdString_.id));
+                specification = specification.and(buildStringSpecification(criteria.getId(), WithIdString_.id));
             }
-            if (criteria.getWithIdStringDetailsId() != null) {
+
+            if (criteria.getWithIdStringDetails() != null) {
+                Specification<WithIdStringDetails> withIdStringDetailsSpecification =
+                    this.withIdStringDetailsQueryService.createSpecification(criteria.getWithIdStringDetails());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getWithIdStringDetailsId(),
-                            root -> root.join(WithIdString_.withIdStringDetails, JoinType.LEFT).get(WithIdStringDetails_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<WithIdStringDetails> withIdStringDetailsRoot = query.from(WithIdStringDetails.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.equal(
+                                    withIdStringDetailsRoot.get(WithIdStringDetails_.withIdStringId),
+                                    root.get(WithIdString_.withIdStringDetails).get(WithIdStringDetails_.withIdStringId)
+                                ),
+                                withIdStringDetailsSpecification.toPredicate(withIdStringDetailsRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

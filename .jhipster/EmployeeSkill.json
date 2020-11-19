@@ -4,7 +4,10 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
     },
     {
       "fieldName": "level",
@@ -18,7 +21,10 @@
       "otherEntityName": "employeeSkillCertificate",
       "otherEntityRelationshipName": "skill",
       "relationshipName": "employeeSkillCertificate",
-      "otherEntityField": "id"
+      "otherEntityField": "id",
+      "options": {
+        "id": true
+      }
     },
     {
       "relationshipType": "many-to-many",
@@ -34,7 +40,10 @@
       "otherEntityRelationshipName": "skill",
       "relationshipValidateRules": "required",
       "relationshipName": "employee",
-      "otherEntityField": "fullname"
+      "otherEntityField": "fullname",
+      "options": {
+        "id": true
+      }
     },
     {
       "relationshipType": "many-to-one",

@@ -8,7 +8,6 @@ import { of } from 'rxjs';
 
 import { TaskCommentComponent } from 'app/entities/task-comment/task-comment.component';
 import { TaskCommentService } from 'app/entities/task-comment/task-comment.service';
-import { TaskComment } from 'app/shared/model/task-comment.model';
 
 describe('Component Tests', () => {
   describe('TaskComment Management Component', () => {
@@ -53,7 +52,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new TaskComment(123)],
+            body: [{ id: 123 }],
             headers,
           })
         )
@@ -73,13 +72,14 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new TaskComment(123)],
+            body: [{ id: 123 }],
             headers,
           })
         )
       );
 
       // WHEN
+      comp.ngOnInit();
       comp.loadPage(1);
 
       // THEN

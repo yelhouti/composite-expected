@@ -19,7 +19,10 @@
       "otherEntityRelationshipName": "employeeSkillCertificate",
       "relationshipValidateRules": "required",
       "relationshipName": "type",
-      "otherEntityField": "name"
+      "otherEntityField": "name",
+      "options": {
+        "id": true
+      }
     },
     {
       "relationshipType": "many-to-one",
@@ -27,7 +30,10 @@
       "otherEntityRelationshipName": "employeeSkillCertificate",
       "relationshipValidateRules": "required",
       "relationshipName": "skill",
-      "otherEntityField": "name"
+      "otherEntityField": "name",
+      "options": {
+        "id": true
+      }
     }
   ],
   "entityTableName": "employee_skill_certificate",

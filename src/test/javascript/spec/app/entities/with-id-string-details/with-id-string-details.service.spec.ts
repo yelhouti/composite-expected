@@ -18,14 +18,14 @@ describe('Service Tests', () => {
       service = TestBed.inject(WithIdStringDetailsService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      elemDefault = new WithIdStringDetails(0, 'AAAAAAA');
+      elemDefault = new WithIdStringDetails('AAAAAAA', 'AAAAAAA');
     });
 
     describe('Service methods', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign({}, elemDefault);
 
-        service.find(123).subscribe(resp => (expectedResult = resp.body));
+        service.find('123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
@@ -35,7 +35,7 @@ describe('Service Tests', () => {
       it('should create a WithIdStringDetails', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0,
+            id: 'ID',
           },
           elemDefault
         );
@@ -52,7 +52,7 @@ describe('Service Tests', () => {
       it('should update a WithIdStringDetails', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
+            withIdStringId: 'BBBBBB',
             name: 'BBBBBB',
           },
           elemDefault
@@ -70,7 +70,7 @@ describe('Service Tests', () => {
       it('should return a list of WithIdStringDetails', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
+            withIdStringId: 'BBBBBB',
             name: 'BBBBBB',
           },
           elemDefault
@@ -87,7 +87,7 @@ describe('Service Tests', () => {
       });
 
       it('should delete a WithIdStringDetails', () => {
-        service.delete(123).subscribe(resp => (expectedResult = resp.ok));
+        service.delete('123').subscribe(resp => (expectedResult = resp.ok));
 
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });

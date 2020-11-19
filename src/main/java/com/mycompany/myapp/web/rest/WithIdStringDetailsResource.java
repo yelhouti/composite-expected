@@ -55,7 +55,7 @@ public class WithIdStringDetailsResource {
     public ResponseEntity<WithIdStringDetailsDTO> createWithIdStringDetails(@RequestBody WithIdStringDetailsDTO withIdStringDetailsDTO)
         throws URISyntaxException {
         log.debug("REST request to save WithIdStringDetails : {}", withIdStringDetailsDTO);
-        if (withIdStringDetailsDTO.getId() != null) {
+        if (withIdStringDetailsDTO.getWithIdStringId() != null) {
             throw new BadRequestAlertException("A new withIdStringDetails cannot already have an ID", ENTITY_NAME, "idexists");
         }
         if (Objects.isNull(withIdStringDetailsDTO.getWithIdString())) {
@@ -63,8 +63,8 @@ public class WithIdStringDetailsResource {
         }
         WithIdStringDetailsDTO result = withIdStringDetailsService.save(withIdStringDetailsDTO);
         return ResponseEntity
-            .created(new URI("/api/with-id-string-details/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .created(new URI("/api/with-id-string-details/" + result.getWithIdStringId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getWithIdStringId()))
             .body(result);
     }
 
@@ -81,13 +81,13 @@ public class WithIdStringDetailsResource {
     public ResponseEntity<WithIdStringDetailsDTO> updateWithIdStringDetails(@RequestBody WithIdStringDetailsDTO withIdStringDetailsDTO)
         throws URISyntaxException {
         log.debug("REST request to update WithIdStringDetails : {}", withIdStringDetailsDTO);
-        if (withIdStringDetailsDTO.getId() == null) {
+        if (withIdStringDetailsDTO.getWithIdStringId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         WithIdStringDetailsDTO result = withIdStringDetailsService.save(withIdStringDetailsDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDetailsDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDetailsDTO.getWithIdStringId()))
             .body(result);
     }
 
@@ -107,7 +107,7 @@ public class WithIdStringDetailsResource {
     )
         throws URISyntaxException {
         log.debug("REST request to update WithIdStringDetails partially : {}", withIdStringDetailsDTO);
-        if (withIdStringDetailsDTO.getId() == null) {
+        if (withIdStringDetailsDTO.getWithIdStringId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
@@ -115,7 +115,7 @@ public class WithIdStringDetailsResource {
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDetailsDTO.getId().toString())
+            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDetailsDTO.getWithIdStringId())
         );
     }
 
@@ -151,7 +151,7 @@ public class WithIdStringDetailsResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the withIdStringDetailsDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/with-id-string-details/{id}")
-    public ResponseEntity<WithIdStringDetailsDTO> getWithIdStringDetails(@PathVariable Long id) {
+    public ResponseEntity<WithIdStringDetailsDTO> getWithIdStringDetails(@PathVariable String id) {
         log.debug("REST request to get WithIdStringDetails : {}", id);
         Optional<WithIdStringDetailsDTO> withIdStringDetailsDTO = withIdStringDetailsService.findOne(id);
         return ResponseUtil.wrapOrNotFound(withIdStringDetailsDTO);
@@ -164,12 +164,9 @@ public class WithIdStringDetailsResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/with-id-string-details/{id}")
-    public ResponseEntity<Void> deleteWithIdStringDetails(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteWithIdStringDetails(@PathVariable String id) {
         log.debug("REST request to delete WithIdStringDetails : {}", id);
         withIdStringDetailsService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
     }
 }

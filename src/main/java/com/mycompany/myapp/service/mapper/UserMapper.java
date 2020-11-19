@@ -99,7 +99,7 @@ public class UserMapper {
             return null;
         }
 
-        Set<UserDTO> userSet = new HashSet<UserDTO>();
+        Set<UserDTO> userSet = new HashSet<>();
         for (User userEntity : users) {
             userSet.add(this.toDtoId(userEntity));
         }
@@ -130,7 +130,7 @@ public class UserMapper {
             return null;
         }
 
-        Set<UserDTO> userSet = new HashSet<UserDTO>();
+        Set<UserDTO> userSet = new HashSet<>();
         for (User userEntity : users) {
             userSet.add(this.toDtoLogin(userEntity));
         }

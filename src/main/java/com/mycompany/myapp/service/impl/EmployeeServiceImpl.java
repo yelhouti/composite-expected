@@ -44,13 +44,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.debug("Request to partially update Employee : {}", employeeDTO);
 
         return employeeRepository
-            .findById(employeeDTO.getId())
+            .findById(employeeDTO.getUsername())
             .map(
                 existingEmployee -> {
-                    if (employeeDTO.getUsername() != null) {
-                        existingEmployee.setUsername(employeeDTO.getUsername());
-                    }
-
                     if (employeeDTO.getFullname() != null) {
                         existingEmployee.setFullname(employeeDTO.getFullname());
                     }
@@ -72,13 +68,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<EmployeeDTO> findOne(Long id) {
+    public Optional<EmployeeDTO> findOne(String id) {
         log.debug("Request to get Employee : {}", id);
         return employeeRepository.findById(id).map(employeeMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         log.debug("Request to delete Employee : {}", id);
         employeeRepository.deleteById(id);
     }

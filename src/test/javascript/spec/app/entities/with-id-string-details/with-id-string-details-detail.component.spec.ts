@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { WithIdStringDetailsDetailComponent } from 'app/entities/with-id-string-details/with-id-string-details-detail.component';
-import { WithIdStringDetails } from 'app/shared/model/with-id-string-details.model';
 
 describe('Component Tests', () => {
   describe('WithIdStringDetails Management Detail Component', () => {
@@ -16,7 +15,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ withIdStringDetails: new WithIdStringDetails(123) }) },
+            useValue: { data: of({ withIdStringDetails: { withIdStringId: "'123'" } }) },
           },
         ],
       })
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ id: 123 }));
+        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ withIdStringId: "'123'" }));
       });
     });
   });

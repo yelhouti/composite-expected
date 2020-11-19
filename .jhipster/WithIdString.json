@@ -1,6 +1,15 @@
 {
   "name": "WithIdString",
-  "fields": [],
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    }
+  ],
   "relationships": [
     {
       "relationshipType": "one-to-one",

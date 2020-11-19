@@ -5,26 +5,24 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { IEmployeeSkillCertificate, EmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
+import { IEmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
 import { EmployeeSkillCertificateService } from './employee-skill-certificate.service';
 import { ICertificateType } from 'app/shared/model/certificate-type.model';
 import { CertificateTypeService } from 'app/entities/certificate-type/certificate-type.service';
 import { IEmployeeSkill } from 'app/shared/model/employee-skill.model';
 import { EmployeeSkillService } from 'app/entities/employee-skill/employee-skill.service';
 
-type SelectableEntity = ICertificateType | IEmployeeSkill;
-
 @Component({
   selector: 'jhi-employee-skill-certificate-update',
   templateUrl: './employee-skill-certificate-update.component.html',
 })
 export class EmployeeSkillCertificateUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
   certificatetypes: ICertificateType[] = [];
   employeeskills: IEmployeeSkill[] = [];
 
   editForm = this.fb.group({
-    id: [],
     grade: [null, [Validators.required]],
     date: [null, [Validators.required]],
     type: [null, Validators.required],
@@ -53,14 +51,16 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(employeeSkillCertificate: IEmployeeSkillCertificate): void {
-    this.editForm.patchValue({
-      id: employeeSkillCertificate.id,
-      grade: employeeSkillCertificate.grade,
-      date: employeeSkillCertificate.date,
-      type: employeeSkillCertificate.type,
-      skill: employeeSkillCertificate.skill,
-    });
+  updateForm(employeeSkillCertificate: IEmployeeSkillCertificate | null): void {
+    if (employeeSkillCertificate) {
+      this.edit = true;
+      this.editForm.reset({
+        ...employeeSkillCertificate,
+      });
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -73,23 +73,12 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const employeeSkillCertificate = this.createFromForm();
-    if (employeeSkillCertificate.id !== undefined) {
+    const employeeSkillCertificate = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeSkillCertificateService.update(employeeSkillCertificate));
     } else {
       this.subscribeToSaveResponse(this.employeeSkillCertificateService.create(employeeSkillCertificate));
     }
-  }
-
-  private createFromForm(): IEmployeeSkillCertificate {
-    return {
-      ...new EmployeeSkillCertificate(),
-      id: this.editForm.get(['id'])!.value,
-      grade: this.editForm.get(['grade'])!.value,
-      date: this.editForm.get(['date'])!.value,
-      type: this.editForm.get(['type'])!.value,
-      skill: this.editForm.get(['skill'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IEmployeeSkillCertificate>>): void {
@@ -108,7 +97,11 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: SelectableEntity): number {
+  trackById(index: number, item: ICertificateType): number {
     return item.id!;
+  }
+
+  trackByEmployeeSkillId(index: number, item: IEmployeeSkill): string {
+    return `${item.name!},${item.employee!.username!}`;
   }
 }

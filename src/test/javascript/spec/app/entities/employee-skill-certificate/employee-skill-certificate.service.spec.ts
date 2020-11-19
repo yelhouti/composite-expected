@@ -22,7 +22,7 @@ describe('Service Tests', () => {
       httpMock = TestBed.inject(HttpTestingController);
       currentDate = dayjs();
 
-      elemDefault = new EmployeeSkillCertificate(0, 0, currentDate);
+      elemDefault = new EmployeeSkillCertificate(0, currentDate);
     });
 
     describe('Service methods', () => {
@@ -34,7 +34,7 @@ describe('Service Tests', () => {
           elemDefault
         );
 
-        service.find(123).subscribe(resp => (expectedResult = resp.body));
+        service.find(123, '123', '123').subscribe(resp => (expectedResult = resp.body));
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush(returnedFromService);
@@ -44,7 +44,7 @@ describe('Service Tests', () => {
       it('should create a EmployeeSkillCertificate', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0,
+            id: 'ID',
             date: currentDate.format(DATE_FORMAT),
           },
           elemDefault
@@ -67,7 +67,6 @@ describe('Service Tests', () => {
       it('should update a EmployeeSkillCertificate', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             grade: 1,
             date: currentDate.format(DATE_FORMAT),
           },
@@ -91,7 +90,6 @@ describe('Service Tests', () => {
       it('should return a list of EmployeeSkillCertificate', () => {
         const returnedFromService = Object.assign(
           {
-            id: 1,
             grade: 1,
             date: currentDate.format(DATE_FORMAT),
           },
@@ -114,7 +112,7 @@ describe('Service Tests', () => {
       });
 
       it('should delete a EmployeeSkillCertificate', () => {
-        service.delete(123).subscribe(resp => (expectedResult = resp.ok));
+        service.delete(123, '123', '123').subscribe(resp => (expectedResult = resp.ok));
 
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });

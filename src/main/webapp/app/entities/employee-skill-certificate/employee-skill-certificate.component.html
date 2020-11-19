@@ -29,7 +29,6 @@
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
                 <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="loadPage.bind(this)">
-                    <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="grade"><span jhiTranslate="compositekeyApp.employeeSkillCertificate.grade">Grade</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col" jhiSortBy="date"><span jhiTranslate="compositekeyApp.employeeSkillCertificate.date">Date</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"  jhiSortBy="type.name"><span jhiTranslate="compositekeyApp.employeeSkillCertificate.type">Type</span> <fa-icon icon="sort"></fa-icon></th>
@@ -39,23 +38,23 @@
             </thead>
             <tbody>
                 <tr *ngFor="let employeeSkillCertificate of employeeSkillCertificates; trackBy: trackId" data-cy="entityTable">
-                    <td><a [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'view']">{{ employeeSkillCertificate.id }}</a></td>
                     <td>{{ employeeSkillCertificate.grade }}</td>
                     <td>{{ employeeSkillCertificate.date | formatMediumDate }}</td>
                     <td>
                         <div *ngIf="employeeSkillCertificate.type">
-                            <a [routerLink]="['/certificate-type', employeeSkillCertificate.type?.id, 'view']" >{{ employeeSkillCertificate.type?.name }}</a>
+                            <a [routerLink]="['/certificate-type', employeeSkillCertificate!.type!.id!, 'view']">{{ employeeSkillCertificate!.type!.name }}</a>
                         </div>
                     </td>
                     <td>
                         <div *ngIf="employeeSkillCertificate.skill">
-                            <a [routerLink]="['/employee-skill', employeeSkillCertificate.skill?.id, 'view']" >{{ employeeSkillCertificate.skill?.name }}</a>
+                            <a [routerLink]="['/employee-skill', { name: employeeSkillCertificate!.skill!.name!, employeeUsername: employeeSkillCertificate!.skill!.employee!.username! }, 'view']">{{ employeeSkillCertificate!.skill!.name }} , {{ employeeSkillCertificate!.skill!.employee!.fullname }}</a>
                         </div>
                     </td>
                     <td class="text-right">
                         <div class="btn-group">
+
                             <button type="submit"
-                                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'view']"
+                                    [routerLink]="['/employee-skill-certificate',  { typeId: employeeSkillCertificate!.type!.id!, skillName: employeeSkillCertificate!.skill!.name!, skillEmployeeUsername: employeeSkillCertificate!.skill!.employee!.username! }, 'view']"
                                     class="btn btn-info btn-sm"
                                     data-cy="entityDetailsButton">
                                 <fa-icon icon="eye"></fa-icon>
@@ -63,7 +62,7 @@
                             </button>
 
                             <button type="submit"
-                                    [routerLink]="['/employee-skill-certificate', employeeSkillCertificate.id, 'edit']"
+                                    [routerLink]="['/employee-skill-certificate', { typeId: employeeSkillCertificate!.type!.id!, skillName: employeeSkillCertificate!.skill!.name!, skillEmployeeUsername: employeeSkillCertificate!.skill!.employee!.username! }, 'edit']"
                                     class="btn btn-primary btn-sm"
                                     data-cy="entityEditButton">
                                 <fa-icon icon="pencil-alt"></fa-icon>

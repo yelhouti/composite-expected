@@ -17,7 +17,8 @@ public class WithIdStringDetails implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    private Long id;
+    @Column(name = "with_id_string_id")
+    private String withIdStringId;
 
     @Column(name = "name")
     private String name;
@@ -25,21 +26,21 @@ public class WithIdStringDetails implements Serializable {
     @JsonIgnoreProperties(value = { "withIdStringDetails" }, allowSetters = true)
     @OneToOne
     @MapsId
-    @JoinColumn(name = "id")
     private WithIdString withIdString;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
-        return id;
+
+    public String getWithIdStringId() {
+        return this.withIdStringId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public WithIdStringDetails id(Long id) {
-        this.id = id;
+    public WithIdStringDetails withIdStringId(String withIdStringId) {
+        this.withIdStringId = withIdStringId;
         return this;
+    }
+
+    public void setWithIdStringId(String withIdStringId) {
+        this.withIdStringId = withIdStringId;
     }
 
     public String getName() {
@@ -78,19 +79,20 @@ public class WithIdStringDetails implements Serializable {
         if (!(o instanceof WithIdStringDetails)) {
             return false;
         }
-        return id != null && id.equals(((WithIdStringDetails) o).id);
+        return withIdStringId != null && withIdStringId.equals(((WithIdStringDetails) o).withIdStringId);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "WithIdStringDetails{" +
-            "id=" + getId() +
+            "withIdStringId='" + getWithIdStringId() + "'" +
             ", name='" + getName() + "'" +
             "}";
     }

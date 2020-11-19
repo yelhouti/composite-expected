@@ -53,13 +53,14 @@
             </div>
         </div>
         <table class="table table-sm table-responsive">
+            <caption>Threads dump: {{ thread.threadName }}</caption>
             <thead>
                 <tr>
-                    <th jhiTranslate="metrics.jvm.threads.dump.blockedtime">Blocked Time</th>
-                    <th jhiTranslate="metrics.jvm.threads.dump.blockedcount">Blocked Count</th>
-                    <th jhiTranslate="metrics.jvm.threads.dump.waitedtime">Waited Time</th>
-                    <th jhiTranslate="metrics.jvm.threads.dump.waitedcount">Waited Count</th>
-                    <th jhiTranslate="metrics.jvm.threads.dump.lockname">Lock Name</th>
+                    <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedtime">Blocked Time</th>
+                    <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedcount">Blocked Count</th>
+                    <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedtime">Waited Time</th>
+                    <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedcount">Waited Count</th>
+                    <th scope="col" jhiTranslate="metrics.jvm.threads.dump.lockname">Lock Name</th>
                 </tr>
             </thead>
             <tbody>

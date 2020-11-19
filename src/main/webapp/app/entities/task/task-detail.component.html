@@ -10,7 +10,7 @@
             <jhi-alert></jhi-alert>
 
             <dl class="row-md jh-entity-details">
-                <dt><span jhiTranslate="global.field.id">ID</span></dt>
+                <dt><span jhiTranslate="compositekeyApp.task.id">Id</span></dt>
                 <dd>
                     <span>{{ task.id }}</span>
                 </dd>
@@ -45,14 +45,14 @@
                 <dt><span jhiTranslate="compositekeyApp.task.attachment">Attachment</span></dt>
                 <dd>
                     <div *ngIf="task.attachment">
-                        <a (click)="openFile(task.attachmentContentType, task.attachment)" jhiTranslate="entity.action.open">open</a>
+                        <a (click)="openFile(task.attachment, task.attachmentContentType)" jhiTranslate="entity.action.open">open</a>
                         {{ task.attachmentContentType }}, {{ byteSize(task.attachment) }}
                     </div>
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.task.picture">Picture</span></dt>
                 <dd>
                     <div *ngIf="task.picture">
-                        <a (click)="openFile(task.pictureContentType, task.picture)">
+                        <a (click)="openFile(task.picture, task.pictureContentType)">
                             <img [src]="'data:' + task.pictureContentType + ';base64,' + task.picture" style="max-width: 100%;" alt="task image"/>
                         </a>
                         {{ task.pictureContentType }}, {{ byteSize(task.picture) }}
@@ -60,7 +60,9 @@
                 </dd>
                 <dt><span jhiTranslate="compositekeyApp.task.user">User</span></dt>
                 <dd>
-                    {{ task.user?.login }}
+                    <div *ngIf="task.user">
+                        [routerLink]="['/user', task!.user!.id!, 'view']">{{ task!.user!.login }}
+                    </div>
                 </dd>
             </dl>
 
@@ -72,7 +74,7 @@
             </button>
 
             <button type="button"
-                    [routerLink]="['/task', task.id, 'edit']"
+                    [routerLink]="['/task', task!.id, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
             </button>

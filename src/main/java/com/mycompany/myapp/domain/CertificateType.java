@@ -34,17 +34,18 @@ public class CertificateType implements Serializable {
     private Set<EmployeeSkillCertificate> employeeSkillCertificates = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getId() {
+        return this.id;
     }
 
     public CertificateType id(Long id) {
         this.id = id;
         return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -106,7 +107,8 @@ public class CertificateType implements Serializable {
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
     }
 
     // prettier-ignore

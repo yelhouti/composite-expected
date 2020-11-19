@@ -29,7 +29,6 @@ export class EmployeeSkillCertificateUpdatePage {
   saveButton = element(by.id('save-entity'));
   cancelButton = element(by.id('cancel-save'));
 
-  idInput = element(by.id('field_id'));
   gradeInput = element(by.id('field_grade'));
   dateInput = element(by.id('field_date'));
 
@@ -38,14 +37,6 @@ export class EmployeeSkillCertificateUpdatePage {
 
   async getPageTitle(): Promise<string> {
     return this.pageTitle.getAttribute('jhiTranslate');
-  }
-
-  async setIdInput(id: string): Promise<void> {
-    await this.idInput.sendKeys(id);
-  }
-
-  async getIdInput(): Promise<string> {
-    return await this.idInput.getAttribute('value');
   }
 
   async setGradeInput(grade: string): Promise<void> {

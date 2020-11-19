@@ -24,15 +24,15 @@ public class WithIdStringCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
-    private LongFilter id;
+    private StringFilter id;
 
-    private LongFilter withIdStringDetailsId;
+    private WithIdStringDetailsCriteria withIdStringDetails;
 
     public WithIdStringCriteria() {}
 
     public WithIdStringCriteria(WithIdStringCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
-        this.withIdStringDetailsId = other.withIdStringDetailsId == null ? null : other.withIdStringDetailsId.copy();
+        this.withIdStringDetails = other.withIdStringDetails == null ? null : other.withIdStringDetails.copy();
     }
 
     @Override
@@ -40,20 +40,20 @@ public class WithIdStringCriteria implements Serializable, Criteria {
         return new WithIdStringCriteria(this);
     }
 
-    public LongFilter getId() {
+    public StringFilter getId() {
         return id;
     }
 
-    public void setId(LongFilter id) {
+    public void setId(StringFilter id) {
         this.id = id;
     }
 
-    public LongFilter getWithIdStringDetailsId() {
-        return withIdStringDetailsId;
+    public WithIdStringDetailsCriteria getWithIdStringDetails() {
+        return withIdStringDetails;
     }
 
-    public void setWithIdStringDetailsId(LongFilter withIdStringDetailsId) {
-        this.withIdStringDetailsId = withIdStringDetailsId;
+    public void setWithIdStringDetails(WithIdStringDetailsCriteria withIdStringDetails) {
+        this.withIdStringDetails = withIdStringDetails;
     }
 
     @Override
@@ -65,20 +65,20 @@ public class WithIdStringCriteria implements Serializable, Criteria {
             return false;
         }
         final WithIdStringCriteria that = (WithIdStringCriteria) o;
-        return Objects.equals(id, that.id) && Objects.equals(withIdStringDetailsId, that.withIdStringDetailsId);
+        return Objects.equals(id, that.id) && Objects.equals(withIdStringDetails, that.withIdStringDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, withIdStringDetailsId);
+        return Objects.hash(id, withIdStringDetails);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "WithIdStringCriteria{" +
-                (id != null ? "id=" + id + ", " : "") +
-                (withIdStringDetailsId != null ? "withIdStringDetailsId=" + withIdStringDetailsId + ", " : "") +
+            (id != null ? "id=" + id + ", " : "") +
+            (withIdStringDetails != null ? "withIdStringDetails=" + withIdStringDetails + ", " : "") +
             "}";
     }
 }

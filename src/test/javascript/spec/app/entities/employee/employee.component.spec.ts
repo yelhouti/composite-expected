@@ -8,7 +8,6 @@ import { of } from 'rxjs';
 
 import { EmployeeComponent } from 'app/entities/employee/employee.component';
 import { EmployeeService } from 'app/entities/employee/employee.service';
-import { Employee } from 'app/shared/model/employee.model';
 
 describe('Component Tests', () => {
   describe('Employee Management Component', () => {
@@ -26,13 +25,13 @@ describe('Component Tests', () => {
             provide: ActivatedRoute,
             useValue: {
               data: of({
-                defaultSort: 'id,asc',
+                defaultSort: 'username,asc',
               }),
               queryParamMap: of(
                 jest.requireActual('@angular/router').convertToParamMap({
                   page: '1',
                   size: '1',
-                  sort: 'id,desc',
+                  sort: 'username,desc',
                 })
               ),
             },
@@ -53,7 +52,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new Employee(123)],
+            body: [{ username: "'123'" }],
             headers,
           })
         )
@@ -64,7 +63,7 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employees?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.employees?.[0]).toEqual(jasmine.objectContaining({ username: "'123'" }));
     });
 
     it('should load a page', () => {
@@ -73,18 +72,19 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new Employee(123)],
+            body: [{ username: "'123'" }],
             headers,
           })
         )
       );
 
       // WHEN
+      comp.ngOnInit();
       comp.loadPage(1);
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employees?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.employees?.[0]).toEqual(jasmine.objectContaining({ username: "'123'" }));
     });
 
     it('should calculate the sort attribute for an id', () => {
@@ -93,7 +93,7 @@ describe('Component Tests', () => {
       const result = comp.sort();
 
       // THEN
-      expect(result).toEqual(['id,desc']);
+      expect(result).toEqual(['username,desc']);
     });
 
     it('should calculate the sort attribute for a non-id attribute', () => {
@@ -107,7 +107,7 @@ describe('Component Tests', () => {
       const result = comp.sort();
 
       // THEN
-      expect(result).toEqual(['name,desc', 'id']);
+      expect(result).toEqual(['name,desc', 'username']);
     });
   });
 });

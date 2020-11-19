@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -20,10 +21,6 @@ public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
-
     @NotNull
     @Column(name = "username", nullable = false)
     private String username;
@@ -52,18 +49,6 @@ public class Employee implements Serializable {
     private Employee manager;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Employee id(Long id) {
-        this.id = id;
-        return this;
-    }
 
     public String getUsername() {
         return this.username;
@@ -207,20 +192,20 @@ public class Employee implements Serializable {
         if (!(o instanceof Employee)) {
             return false;
         }
-        return id != null && id.equals(((Employee) o).id);
+        return username != null && username.equals(((Employee) o).username);
     }
 
     @Override
     public int hashCode() {
-        return 31;
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return Objects.hashCode(username);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "Employee{" +
-            "id=" + getId() +
-            ", username='" + getUsername() + "'" +
+            "username='" + getUsername() + "'" +
             ", fullname='" + getFullname() + "'" +
             "}";
     }

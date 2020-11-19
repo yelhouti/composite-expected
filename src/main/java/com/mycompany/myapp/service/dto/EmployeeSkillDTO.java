@@ -11,8 +11,6 @@ import javax.validation.constraints.*;
  */
 public class EmployeeSkillDTO implements Serializable {
 
-    private Long id;
-
     @NotNull
     private String name;
 
@@ -25,16 +23,8 @@ public class EmployeeSkillDTO implements Serializable {
 
     private EmployeeDTO teacher;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -42,7 +32,7 @@ public class EmployeeSkillDTO implements Serializable {
     }
 
     public Integer getLevel() {
-        return level;
+        return this.level;
     }
 
     public void setLevel(Integer level) {
@@ -50,7 +40,7 @@ public class EmployeeSkillDTO implements Serializable {
     }
 
     public Set<TaskDTO> getTasks() {
-        return tasks;
+        return this.tasks;
     }
 
     public void setTasks(Set<TaskDTO> tasks) {
@@ -58,7 +48,7 @@ public class EmployeeSkillDTO implements Serializable {
     }
 
     public EmployeeDTO getEmployee() {
-        return employee;
+        return this.employee;
     }
 
     public void setEmployee(EmployeeDTO employee) {
@@ -66,7 +56,7 @@ public class EmployeeSkillDTO implements Serializable {
     }
 
     public EmployeeDTO getTeacher() {
-        return teacher;
+        return this.teacher;
     }
 
     public void setTeacher(EmployeeDTO teacher) {
@@ -83,27 +73,26 @@ public class EmployeeSkillDTO implements Serializable {
         }
 
         EmployeeSkillDTO employeeSkillDTO = (EmployeeSkillDTO) o;
-        if (this.id == null) {
+        if (this.name == null && this.employee == null) {
             return false;
         }
-        return Objects.equals(this.id, employeeSkillDTO.id);
+        return Objects.equals(this.name, employeeSkillDTO.name) && Objects.equals(this.employee, employeeSkillDTO.employee);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(this.name, this.employee);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeSkillDTO{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
+            "name='" + getName() + "'" +
             ", level=" + getLevel() +
             ", tasks=" + getTasks() +
-            ", employee=" + getEmployee() +
-            ", teacher=" + getTeacher() +
+            ", employee='" + getEmployee() + "'" +
+            ", teacher='" + getTeacher() + "'" +
             "}";
     }
 }

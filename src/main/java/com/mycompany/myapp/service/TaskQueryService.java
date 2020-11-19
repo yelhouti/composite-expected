@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.dto.TaskCriteria;
 import com.mycompany.myapp.service.dto.TaskDTO;
 import com.mycompany.myapp.service.mapper.TaskMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,9 +34,16 @@ public class TaskQueryService extends QueryService<Task> {
 
     private final TaskMapper taskMapper;
 
-    public TaskQueryService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    private final EmployeeSkillQueryService employeeSkillQueryService;
+
+    public TaskQueryService(
+        TaskRepository taskRepository,
+        TaskMapper taskMapper,
+        @Lazy EmployeeSkillQueryService employeeSkillQueryService
+    ) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.employeeSkillQueryService = employeeSkillQueryService;
     }
 
     /**
@@ -80,7 +88,7 @@ public class TaskQueryService extends QueryService<Task> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<Task> createSpecification(TaskCriteria criteria) {
+    public Specification<Task> createSpecification(TaskCriteria criteria) {
         Specification<Task> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
@@ -104,17 +112,19 @@ public class TaskQueryService extends QueryService<Task> {
             if (criteria.getDone() != null) {
                 specification = specification.and(buildSpecification(criteria.getDone(), Task_.done));
             }
-            if (criteria.getUserId() != null) {
-                specification =
-                    specification.and(buildSpecification(criteria.getUserId(), root -> root.join(Task_.user, JoinType.LEFT).get(User_.id)));
-            }
-            if (criteria.getEmployeeSkillId() != null) {
+
+            if (criteria.getEmployeeSkill() != null) {
+                Specification<EmployeeSkill> employeeSkillSpecification =
+                    this.employeeSkillQueryService.createSpecification(criteria.getEmployeeSkill());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getEmployeeSkillId(),
-                            root -> root.join(Task_.employeeSkills, JoinType.LEFT).get(EmployeeSkill_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<EmployeeSkill> employeeSkillRoot = query.from(EmployeeSkill.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.isMember(employeeSkillRoot, root.get(Task_.employeeSkills)),
+                                employeeSkillSpecification.toPredicate(employeeSkillRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

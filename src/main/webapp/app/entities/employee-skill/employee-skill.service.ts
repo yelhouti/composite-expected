@@ -23,8 +23,8 @@ export class EmployeeSkillService {
     return this.http.put<IEmployeeSkill>(this.resourceUrl, employeeSkill, { observe: 'response' });
   }
 
-  find(id: number): Observable<EntityResponseType> {
-    return this.http.get<IEmployeeSkill>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  find(name: string, employeeUsername: string): Observable<EntityResponseType> {
+    return this.http.get<IEmployeeSkill>(`${this.resourceUrl}/name=${name};employeeUsername=${employeeUsername}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -32,7 +32,7 @@ export class EmployeeSkillService {
     return this.http.get<IEmployeeSkill[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  delete(name: string, employeeUsername: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/name=${name};employeeUsername=${employeeUsername}`, { observe: 'response' });
   }
 }

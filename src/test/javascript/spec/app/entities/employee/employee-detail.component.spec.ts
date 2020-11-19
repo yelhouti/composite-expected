@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { EmployeeDetailComponent } from 'app/entities/employee/employee-detail.component';
-import { Employee } from 'app/shared/model/employee.model';
 
 describe('Component Tests', () => {
   describe('Employee Management Detail Component', () => {
@@ -16,7 +15,7 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employee: new Employee(123) }) },
+            useValue: { data: of({ employee: { username: "'123'" } }) },
           },
         ],
       })
@@ -32,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.employee).toEqual(jasmine.objectContaining({ id: 123 }));
+        expect(comp.employee).toEqual(jasmine.objectContaining({ username: "'123'" }));
       });
     });
   });

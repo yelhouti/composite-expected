@@ -8,7 +8,6 @@ import { of } from 'rxjs';
 
 import { EmployeeSkillCertificateComponent } from 'app/entities/employee-skill-certificate/employee-skill-certificate.component';
 import { EmployeeSkillCertificateService } from 'app/entities/employee-skill-certificate/employee-skill-certificate.service';
-import { EmployeeSkillCertificate } from 'app/shared/model/employee-skill-certificate.model';
 
 describe('Component Tests', () => {
   describe('EmployeeSkillCertificate Management Component', () => {
@@ -26,13 +25,13 @@ describe('Component Tests', () => {
             provide: ActivatedRoute,
             useValue: {
               data: of({
-                defaultSort: 'id,asc',
+                defaultSort: '',
               }),
               queryParamMap: of(
                 jest.requireActual('@angular/router').convertToParamMap({
                   page: '1',
                   size: '1',
-                  sort: 'id,desc',
+                  sort: '',
                 })
               ),
             },
@@ -53,7 +52,7 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new EmployeeSkillCertificate(123)],
+            body: [{ type: { id: 123 }, skill: { name: "'123'", employee: { username: "'123'" } } }],
             headers,
           })
         )
@@ -64,7 +63,9 @@ describe('Component Tests', () => {
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employeeSkillCertificates?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.employeeSkillCertificates?.[0]).toEqual(
+        jasmine.objectContaining({ type: { id: 123 }, skill: { name: "'123'", employee: { username: "'123'" } } })
+      );
     });
 
     it('should load a page', () => {
@@ -73,18 +74,21 @@ describe('Component Tests', () => {
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
-            body: [new EmployeeSkillCertificate(123)],
+            body: [{ type: { id: 123 }, skill: { name: "'123'", employee: { username: "'123'" } } }],
             headers,
           })
         )
       );
 
       // WHEN
+      comp.ngOnInit();
       comp.loadPage(1);
 
       // THEN
       expect(service.query).toHaveBeenCalled();
-      expect(comp.employeeSkillCertificates?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+      expect(comp.employeeSkillCertificates?.[0]).toEqual(
+        jasmine.objectContaining({ type: { id: 123 }, skill: { name: "'123'", employee: { username: "'123'" } } })
+      );
     });
 
     it('should calculate the sort attribute for an id', () => {
@@ -93,7 +97,7 @@ describe('Component Tests', () => {
       const result = comp.sort();
 
       // THEN
-      expect(result).toEqual(['id,desc']);
+      expect(result).toEqual([]);
     });
 
     it('should calculate the sort attribute for a non-id attribute', () => {
@@ -102,12 +106,13 @@ describe('Component Tests', () => {
 
       // GIVEN
       comp.predicate = 'name';
+      comp.ascending = false;
 
       // WHEN
       const result = comp.sort();
 
       // THEN
-      expect(result).toEqual(['name,desc', 'id']);
+      expect(result).toEqual(['name,desc']);
     });
   });
 });

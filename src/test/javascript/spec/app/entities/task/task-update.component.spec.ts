@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 
 import { TaskUpdateComponent } from 'app/entities/task/task-update.component';
 import { TaskService } from 'app/entities/task/task.service';
-import { Task } from 'app/shared/model/task.model';
 
 describe('Component Tests', () => {
   describe('Task Management Update Component', () => {
@@ -34,7 +33,7 @@ describe('Component Tests', () => {
     describe('save', () => {
       it('Should call update service on save for existing entity', fakeAsync(() => {
         // GIVEN
-        const entity = new Task(123);
+        const entity = { id: 123 };
         spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
         comp.updateForm(entity);
         // WHEN
@@ -42,21 +41,20 @@ describe('Component Tests', () => {
         tick(); // simulate async
 
         // THEN
-        expect(service.update).toHaveBeenCalledWith(entity);
+        expect(service.update).toHaveBeenCalledWith(jasmine.objectContaining(entity));
         expect(comp.isSaving).toEqual(false);
       }));
 
       it('Should call create service on save for new entity', fakeAsync(() => {
         // GIVEN
-        const entity = new Task();
-        spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
-        comp.updateForm(entity);
+        spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: null })));
+        comp.updateForm(null);
         // WHEN
         comp.save();
         tick(); // simulate async
 
         // THEN
-        expect(service.create).toHaveBeenCalledWith(entity);
+        expect(service.create).toHaveBeenCalled();
         expect(comp.isSaving).toEqual(false);
       }));
     });

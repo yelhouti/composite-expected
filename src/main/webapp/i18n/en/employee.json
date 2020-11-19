@@ -17,7 +17,6 @@
       "detail": {
         "title": "Employee"
       },
-      "id": "ID",
       "username": "Username",
       "fullname": "Fullname",
       "teamMember": "Team Member",

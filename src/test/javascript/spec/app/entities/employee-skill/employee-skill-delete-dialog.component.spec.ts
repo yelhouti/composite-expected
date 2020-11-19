@@ -1,5 +1,4 @@
 jest.mock('@ng-bootstrap/ng-bootstrap');
-jest.mock('app/core/event-manager/event-manager.service');
 
 import { ComponentFixture, TestBed, inject, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -8,28 +7,25 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { EmployeeSkillDeleteDialogComponent } from 'app/entities/employee-skill/employee-skill-delete-dialog.component';
 import { EmployeeSkillService } from 'app/entities/employee-skill/employee-skill.service';
-import { EventManager } from 'app/core/event-manager/event-manager.service';
 
 describe('Component Tests', () => {
   describe('EmployeeSkill Management Delete Component', () => {
     let comp: EmployeeSkillDeleteDialogComponent;
     let fixture: ComponentFixture<EmployeeSkillDeleteDialogComponent>;
     let service: EmployeeSkillService;
-    let mockEventManager: EventManager;
     let mockActiveModal: NgbActiveModal;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         declarations: [EmployeeSkillDeleteDialogComponent],
-        providers: [NgbActiveModal, EventManager],
+        providers: [NgbActiveModal],
       })
         .overrideTemplate(EmployeeSkillDeleteDialogComponent, '')
         .compileComponents();
       fixture = TestBed.createComponent(EmployeeSkillDeleteDialogComponent);
       comp = fixture.componentInstance;
       service = TestBed.inject(EmployeeSkillService);
-      mockEventManager = TestBed.inject(EventManager);
       mockActiveModal = TestBed.inject(NgbActiveModal);
     });
 
@@ -41,13 +37,12 @@ describe('Component Tests', () => {
           spyOn(service, 'delete').and.returnValue(of({}));
 
           // WHEN
-          comp.confirmDelete(123);
+          comp.confirmDelete('123', '123');
           tick();
 
           // THEN
-          expect(service.delete).toHaveBeenCalledWith(123);
-          expect(mockActiveModal.close).toHaveBeenCalled();
-          expect(mockEventManager.broadcast).toHaveBeenCalled();
+          expect(service.delete).toHaveBeenCalledWith('123', '123');
+          expect(mockActiveModal.close).toHaveBeenCalledWith('deleted');
         })
       ));
 
@@ -60,6 +55,7 @@ describe('Component Tests', () => {
 
         // THEN
         expect(service.delete).not.toHaveBeenCalled();
+        expect(mockActiveModal.close).not.toHaveBeenCalled();
         expect(mockActiveModal.dismiss).toHaveBeenCalled();
       });
     });

@@ -23,8 +23,8 @@ export class TaskDetailComponent implements OnInit {
     return this.dataUtils.byteSize(base64String);
   }
 
-  openFile(contentType = '', base64String: string): void {
-    this.dataUtils.openFile(contentType, base64String);
+  openFile(base64String: string, contentType = ''): void {
+    this.dataUtils.openFile(base64String, contentType);
   }
 
   previousState(): void {

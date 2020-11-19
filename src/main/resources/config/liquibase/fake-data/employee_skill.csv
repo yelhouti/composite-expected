@@ -1,11 +1,11 @@
-id;name;level;employee_id;teacher_id
-1;Kenya;72900;1;1
-2;streamline;4874;2;2
-3;transparent niches;86117;3;3
-4;driver Ball;75563;4;4
-5;Vista Ergonomic;71597;5;5
-6;Guinea-Bissau;75469;6;6
-7;haptic Metrics;8463;7;7
-8;Berkshire open-source;91528;8;8
-9;back-end;81396;9;9
-10;extranet;58980;10;10
+name;level;employee_username;teacher_username
+1;26314;1;1
+2;51961;2;2
+3;45897;3;3
+4;88142;4;4
+5;72900;5;5
+6;29336;6;6
+7;39141;7;7
+8;6322;8;8
+9;88432;9;9
+10;4874;10;10

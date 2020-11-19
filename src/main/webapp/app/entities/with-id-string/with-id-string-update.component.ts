@@ -1,11 +1,11 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { IWithIdString, WithIdString } from 'app/shared/model/with-id-string.model';
+import { IWithIdString } from 'app/shared/model/with-id-string.model';
 import { WithIdStringService } from './with-id-string.service';
 
 @Component({
@@ -13,10 +13,11 @@ import { WithIdStringService } from './with-id-string.service';
   templateUrl: './with-id-string-update.component.html',
 })
 export class WithIdStringUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
 
   editForm = this.fb.group({
-    id: [],
+    id: [null, [Validators.required]],
   });
 
   constructor(
@@ -35,10 +36,16 @@ export class WithIdStringUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(withIdString: IWithIdString): void {
-    this.editForm.patchValue({
-      id: withIdString.id,
-    });
+  updateForm(withIdString: IWithIdString | null): void {
+    if (withIdString) {
+      this.edit = true;
+      this.editForm.reset({
+        ...withIdString,
+      });
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -51,19 +58,12 @@ export class WithIdStringUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const withIdString = this.createFromForm();
-    if (withIdString.id !== undefined) {
+    const withIdString = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.withIdStringService.update(withIdString));
     } else {
       this.subscribeToSaveResponse(this.withIdStringService.create(withIdString));
     }
-  }
-
-  private createFromForm(): IWithIdString {
-    return {
-      ...new WithIdString(),
-      id: this.editForm.get(['id'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IWithIdString>>): void {

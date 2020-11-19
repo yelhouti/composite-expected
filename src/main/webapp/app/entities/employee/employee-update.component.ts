@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { IEmployee, Employee } from 'app/shared/model/employee.model';
+import { IEmployee } from 'app/shared/model/employee.model';
 import { EmployeeService } from './employee.service';
 
 @Component({
@@ -13,11 +13,11 @@ import { EmployeeService } from './employee.service';
   templateUrl: './employee-update.component.html',
 })
 export class EmployeeUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
   employees: IEmployee[] = [];
 
   editForm = this.fb.group({
-    id: [],
     username: [null, [Validators.required]],
     fullname: [null, [Validators.required]],
     manager: [],
@@ -41,13 +41,16 @@ export class EmployeeUpdateComponent implements OnInit {
     });
   }
 
-  updateForm(employee: IEmployee): void {
-    this.editForm.patchValue({
-      id: employee.id,
-      username: employee.username,
-      fullname: employee.fullname,
-      manager: employee.manager,
-    });
+  updateForm(employee: IEmployee | null): void {
+    if (employee) {
+      this.edit = true;
+      this.editForm.reset({
+        ...employee,
+      });
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -60,22 +63,12 @@ export class EmployeeUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const employee = this.createFromForm();
-    if (employee.id !== undefined) {
+    const employee = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeService.update(employee));
     } else {
       this.subscribeToSaveResponse(this.employeeService.create(employee));
     }
-  }
-
-  private createFromForm(): IEmployee {
-    return {
-      ...new Employee(),
-      id: this.editForm.get(['id'])!.value,
-      username: this.editForm.get(['username'])!.value,
-      fullname: this.editForm.get(['fullname'])!.value,
-      manager: this.editForm.get(['manager'])!.value,
-    };
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IEmployee>>): void {
@@ -94,7 +87,7 @@ export class EmployeeUpdateComponent implements OnInit {
     this.isSaving = false;
   }
 
-  trackById(index: number, item: IEmployee): number {
-    return item.id!;
+  trackByUsername(index: number, item: IEmployee): string {
+    return item.username!;
   }
 }
