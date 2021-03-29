@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import * as dayjs from 'dayjs';
-
-import { DATE_FORMAT, DATE_TIME_FORMAT } from 'app/config/input.constants';
+import { DATE_FORMAT } from 'app/config/input.constants';
+import { DatePipe } from '@angular/common';
 import { TaskType } from 'app/entities/enumerations/task-type.model';
 import { ITask, Task } from '../task.model';
 
@@ -14,16 +13,19 @@ describe('Service Tests', () => {
     let httpMock: HttpTestingController;
     let elemDefault: ITask;
     let expectedResult: ITask | ITask[] | boolean | null;
-    let currentDate: dayjs.Dayjs;
+    let currentDate: Date;
+    let datePipe: DatePipe;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
+        providers: [DatePipe],
       });
       expectedResult = null;
       service = TestBed.inject(TaskService);
       httpMock = TestBed.inject(HttpTestingController);
-      currentDate = dayjs();
+      currentDate = new Date();
+      datePipe = TestBed.inject(DatePipe);
 
       elemDefault = {
         id: 0,
@@ -37,7 +39,7 @@ describe('Service Tests', () => {
         attachmentContentType: 'image/png',
         attachment: 'AAAAAAA',
         pictureContentType: 'image/png',
-        picture: 'AAAAAAA'
+        picture: 'AAAAAAA',
       };
     });
 
@@ -45,9 +47,9 @@ describe('Service Tests', () => {
       it('should find an element', () => {
         const returnedFromService = Object.assign(
           {
-            endDate: currentDate.format(DATE_FORMAT),
-            createdAt: currentDate.format(DATE_TIME_FORMAT),
-            modifiedAt: currentDate.format(DATE_TIME_FORMAT)
+            endDate: datePipe.transform(currentDate, DATE_FORMAT),
+            createdAt: currentDate.toISOString(),
+            modifiedAt: currentDate.toISOString(),
           },
           elemDefault
         );
@@ -63,9 +65,9 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 0,
-            endDate: currentDate.format(DATE_FORMAT),
-            createdAt: currentDate.format(DATE_TIME_FORMAT),
-            modifiedAt: currentDate.format(DATE_TIME_FORMAT)
+            endDate: datePipe.transform(currentDate, DATE_FORMAT),
+            createdAt: currentDate.toISOString(),
+            modifiedAt: currentDate.toISOString(),
           },
           elemDefault
         );
@@ -74,7 +76,7 @@ describe('Service Tests', () => {
           {
             endDate: currentDate,
             createdAt: currentDate,
-            modifiedAt: currentDate
+            modifiedAt: currentDate,
           },
           returnedFromService
         );
@@ -92,13 +94,13 @@ describe('Service Tests', () => {
             id: 1,
             name: 'BBBBBB',
             type: 'BBBBBB',
-            endDate: currentDate.format(DATE_FORMAT),
-            createdAt: currentDate.format(DATE_TIME_FORMAT),
-            modifiedAt: currentDate.format(DATE_TIME_FORMAT),
+            endDate: datePipe.transform(currentDate, DATE_FORMAT),
+            createdAt: currentDate.toISOString(),
+            modifiedAt: currentDate.toISOString(),
             done: true,
             description: 'BBBBBB',
             attachment: 'BBBBBB',
-            picture: 'BBBBBB'
+            picture: 'BBBBBB',
           },
           elemDefault
         );
@@ -107,7 +109,7 @@ describe('Service Tests', () => {
           {
             endDate: currentDate,
             createdAt: currentDate,
-            modifiedAt: currentDate
+            modifiedAt: currentDate,
           },
           returnedFromService
         );
@@ -125,13 +127,13 @@ describe('Service Tests', () => {
             id: 1,
             name: 'BBBBBB',
             type: 'BBBBBB',
-            endDate: currentDate.format(DATE_FORMAT),
-            createdAt: currentDate.format(DATE_TIME_FORMAT),
-            modifiedAt: currentDate.format(DATE_TIME_FORMAT),
+            endDate: datePipe.transform(currentDate, DATE_FORMAT),
+            createdAt: currentDate.toISOString(),
+            modifiedAt: currentDate.toISOString(),
             done: true,
             description: 'BBBBBB',
             attachment: 'BBBBBB',
-            picture: 'BBBBBB'
+            picture: 'BBBBBB',
           },
           elemDefault
         );
@@ -140,7 +142,7 @@ describe('Service Tests', () => {
           {
             endDate: currentDate,
             createdAt: currentDate,
-            modifiedAt: currentDate
+            modifiedAt: currentDate,
           },
           returnedFromService
         );
@@ -159,58 +161,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addTaskToCollectionIfMissing', () => {
-        it('should add a Task to an empty array', () => {
-          const task: ITask = { id: 123 };
-          expectedResult = service.addTaskToCollectionIfMissing([], task);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(task);
-        });
-
-        it('should not add a Task to an array that contains it', () => {
-          const task: ITask = { id: 123 };
-          const taskCollection: ITask[] = [
-            {
-              ...task
-            },
-            { id: 456 }
-          ];
-          expectedResult = service.addTaskToCollectionIfMissing(taskCollection, task);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a Task to an array that doesn't contain it", () => {
-          const task: ITask = { id: 123 };
-          const taskCollection: ITask[] = [{ id: 456 }];
-          expectedResult = service.addTaskToCollectionIfMissing(taskCollection, task);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(task);
-        });
-
-        it('should add only unique Task to an array', () => {
-          const taskArray: ITask[] = [{ id: 123 }, { id: 456 }, { id: 77763 }];
-          const taskCollection: ITask[] = [{ id: 123 }];
-          expectedResult = service.addTaskToCollectionIfMissing(taskCollection, ...taskArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const task: ITask = { id: 123 };
-          const task2: ITask = { id: 456 };
-          expectedResult = service.addTaskToCollectionIfMissing([], task, task2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(task);
-          expect(expectedResult).toContain(task2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const task: ITask = { id: 123 };
-          expectedResult = service.addTaskToCollectionIfMissing([], null, task, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(task);
-        });
       });
     });
 

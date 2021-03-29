@@ -27,6 +27,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class CertificateTypeResource {
+
     private final Logger log = LoggerFactory.getLogger(CertificateTypeResource.class);
 
     private static final String ENTITY_NAME = "certificateType";
@@ -83,11 +84,43 @@ public class CertificateTypeResource {
      */
     @PutMapping("/certificate-types/{id}")
     public ResponseEntity<CertificateTypeDTO> updateCertificateType(
-        @PathVariable(value = "id", required = false) final Long id,
+        @PathVariable Long id,
         @Valid @RequestBody CertificateTypeDTO certificateTypeDTO
-    )
-        throws URISyntaxException {
+    ) throws URISyntaxException {
         log.debug("REST request to update CertificateType : {}, {}", id, certificateTypeDTO);
+        if (certificateTypeDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, certificateTypeDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+        if (!certificateTypeRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        CertificateTypeDTO result = certificateTypeService.save(certificateTypeDTO);
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, certificateTypeDTO.getId().toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code PATCH  /certificate-types/:id} : Partial updates given fields of an existing certificateType, field will ignore if it is null
+     *
+     * @param id the id of the certificateTypeDTO to save.
+     * @param certificateTypeDTO the certificateTypeDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated certificateTypeDTO,
+     * or with status {@code 400 (Bad Request)} if the certificateTypeDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the certificateTypeDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the certificateTypeDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/certificate-types/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<CertificateTypeDTO> partialUpdateCertificateType(
+        @PathVariable Long id,
+        @NotNull @RequestBody CertificateTypeDTO certificateTypeDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update CertificateType partially : {}, {}", id, certificateTypeDTO);
         if (certificateTypeDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -97,31 +130,6 @@ public class CertificateTypeResource {
 
         if (!certificateTypeRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        CertificateTypeDTO result = certificateTypeService.save(certificateTypeDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, certificateTypeDTO.getId().toString()))
-            .body(result);
-    }
-
-    /**
-     * {@code PATCH  /certificate-types} : Updates given fields of an existing certificateType.
-     *
-     * @param certificateTypeDTO the certificateTypeDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated certificateTypeDTO,
-     * or with status {@code 400 (Bad Request)} if the certificateTypeDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the certificateTypeDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the certificateTypeDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/certificate-types", consumes = "application/merge-patch+json")
-    public ResponseEntity<CertificateTypeDTO> partialUpdateCertificateType(@NotNull @RequestBody CertificateTypeDTO certificateTypeDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update CertificateType partially : {}", certificateTypeDTO);
-        if (certificateTypeDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
         Optional<CertificateTypeDTO> result = certificateTypeService.partialUpdate(certificateTypeDTO);

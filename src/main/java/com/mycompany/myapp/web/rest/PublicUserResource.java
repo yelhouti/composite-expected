@@ -19,6 +19,7 @@ import tech.jhipster.web.util.PaginationUtil;
 @RestController
 @RequestMapping("/api")
 public class PublicUserResource {
+
     private static final List<String> ALLOWED_ORDERED_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList("id", "login", "firstName", "lastName", "email", "activated", "langKey")
     );

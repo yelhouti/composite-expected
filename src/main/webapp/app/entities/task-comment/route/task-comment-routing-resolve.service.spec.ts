@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { ITaskComment, TaskComment } from '../task-comment.model';
+import { ITaskComment } from '../task-comment.model';
 import { TaskCommentService } from '../service/task-comment.service';
 
 import { TaskCommentRoutingResolveService } from './task-comment-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: TaskCommentRoutingResolveService;
     let service: TaskCommentService;
-    let resultTaskComment: ITaskComment | undefined;
+    let resultTaskComment: ITaskComment | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(TaskCommentRoutingResolveService);
       service = TestBed.inject(TaskCommentService);
-      resultTaskComment = undefined;
+      resultTaskComment = null;
     });
 
     describe('resolve', () => {
       it('should return ITaskComment returned by find', () => {
         // GIVEN
-        service.find = jest.fn(id => of(new HttpResponse({ body: { id } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { id: 123 } })));
         mockActivatedRouteSnapshot.params = { id: 123 };
 
         // WHEN
@@ -47,7 +47,7 @@ describe('Service Tests', () => {
         expect(resultTaskComment).toEqual({ id: 123 });
       });
 
-      it('should return new ITaskComment if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultTaskComment).toEqual(new TaskComment());
+        expect(resultTaskComment).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith(123);
-        expect(resultTaskComment).toEqual(undefined);
+        expect(resultTaskComment).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

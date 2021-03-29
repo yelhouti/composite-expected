@@ -6,7 +6,7 @@ import { DataUtils } from 'app/core/util/data-util.service';
 
 @Component({
   selector: 'jhi-task-detail',
-  templateUrl: './task-detail.component.html'
+  templateUrl: './task-detail.component.html',
 })
 export class TaskDetailComponent implements OnInit {
   task: ITask | null = null;

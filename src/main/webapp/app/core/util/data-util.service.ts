@@ -14,7 +14,7 @@ export interface FileLoadError {
  * An utility service for data.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DataUtils {
   /**
@@ -39,7 +39,7 @@ export class DataUtils {
       }
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], {
-        type: contentType
+        type: contentType,
       });
       window.navigator.msSaveOrOpenBlob(blob);
     } else {
@@ -74,7 +74,7 @@ export class DataUtils {
           const error: FileLoadError = {
             message: `File was expected to be an image but was found to be '${file.type}'`,
             key: 'not.image',
-            params: { fileType: file.type }
+            params: { fileType: file.type },
           };
           observer.error(error);
         } else {
@@ -82,7 +82,7 @@ export class DataUtils {
           this.toBase64(file, (base64Data: string) => {
             editForm.patchValue({
               [field]: base64Data,
-              [fieldContentType]: file.type
+              [fieldContentType]: file.type,
             });
             observer.next();
             observer.complete();
@@ -92,7 +92,7 @@ export class DataUtils {
         const error: FileLoadError = {
           message: 'Could not extract file',
           key: 'could.not.extract',
-          params: { event }
+          params: { event },
         };
         observer.error(error);
       }
@@ -102,7 +102,7 @@ export class DataUtils {
   /**
    * Method to convert the file to base64
    */
-  private toBase64(file: File, callback: (base64Data: string) => void): void {
+  toBase64(file: File, callback: (base64Data: string) => void): void {
     const fileReader: FileReader = new FileReader();
     fileReader.onload = (e: ProgressEvent<FileReader>) => {
       if (typeof e.target?.result === 'string') {

@@ -1,0 +1,100 @@
+<div class="row justify-content-center">
+  <div class="col-8">
+    <div *ngIf="employeeSkillCertificateDetails">
+      <h2 data-cy="employeeSkillCertificateDetailsDetailsHeading">
+        <span jhiTranslate="compositekeyApp.employeeSkillCertificateDetails.detail.title">Employee Skill Certificate Details</span>
+        {{ employeeSkillCertificateDetails.employeeSkillCertificate!.type!.id! }} /
+        {{ employeeSkillCertificateDetails.employeeSkillCertificate!.skill!.name! }} /
+        {{ employeeSkillCertificateDetails.employeeSkillCertificate!.skill!.employee!.username! }}
+      </h2>
+
+      <hr />
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificateDetails.detail">Detail</span></dt>
+        <dd>
+          <span>{{ employeeSkillCertificateDetails.detail }}</span>
+        </dd>
+        <dt>
+          <span jhiTranslate="compositekeyApp.employeeSkillCertificateDetails.employeeSkillCertificate">Employee Skill Certificate</span>
+        </dt>
+        <dd>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <p-button
+              type="submit"
+              [routerLink]="[
+                '/employee-skill-certificate',
+                {
+                  typeId: employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!,
+                  skillName: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  skillEmployeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                },
+                'view'
+              ]"
+              icon="pi pi-eye"
+              styleClass="p-button-info"
+            >
+            </p-button>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="compositekeyApp.employeeSkill.employee">Employee</span></dt>
+        <dd>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a
+              [routerLink]="['/employee', employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!, 'view']"
+              >{{ employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.fullname }}</a
+            >
+          </div>
+        </dd>
+        <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.skill">Skill</span></dt>
+        <dd>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a
+              [routerLink]="[
+                '/employee-skill',
+                {
+                  name: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  employeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                },
+                'view'
+              ]"
+              >{{ employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name }}</a
+            >
+          </div>
+        </dd>
+        <dt><span jhiTranslate="compositekeyApp.employeeSkillCertificate.type">Type</span></dt>
+        <dd>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a [routerLink]="['/certificate-type', employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!, 'view']">{{
+              employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.name
+            }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="[
+          '/employee-skill-certificate-details',
+          {
+            typeId: employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!,
+            skillName: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+            skillEmployeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+          },
+          'edit'
+        ]"
+      ></button>
+    </div>
+  </div>
+</div>

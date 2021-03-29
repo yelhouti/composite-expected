@@ -15,7 +15,7 @@ describe('Component Tests', () => {
       waitForAsync(() => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
-          declarations: [MetricsComponent]
+          declarations: [MetricsComponent],
         })
           .overrideTemplate(MetricsComponent, '')
           .compileComponents();
@@ -34,14 +34,14 @@ describe('Component Tests', () => {
         const response = {
           timers: {
             service: 'test',
-            unrelatedKey: 'test'
+            unrelatedKey: 'test',
           },
           gauges: {
             'jcache.statistics': {
-              value: 2
+              value: 2,
             },
-            unrelatedKey: 'test'
-          }
+            unrelatedKey: 'test',
+          },
         };
         spyOn(service, 'getMetrics').and.returnValue(of(response));
 

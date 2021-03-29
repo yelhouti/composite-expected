@@ -18,6 +18,7 @@ import tech.jhipster.config.cache.PrefixedKeyGenerator;
 @Configuration
 @EnableCaching
 public class CacheConfiguration {
+
     private GitProperties gitProperties;
     private BuildProperties buildProperties;
     private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
@@ -64,6 +65,7 @@ public class CacheConfiguration {
             createCache(cm, com.mycompany.myapp.domain.WithIdStringDetails.class.getName());
             createCache(cm, com.mycompany.myapp.domain.WithUUID.class.getName());
             createCache(cm, com.mycompany.myapp.domain.WithUUIDDetails.class.getName());
+            createCache(cm, com.mycompany.myapp.domain.EmployeeSkillCertificateDetails.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @WithMockUser
 class WithUUIDDetailsResourceIT {
+
     private static final String DEFAULT_DETAILS = "AAAAAAAAAA";
     private static final String UPDATED_DETAILS = "BBBBBBBBBB";
 
@@ -191,7 +192,7 @@ class WithUUIDDetailsResourceIT {
 
         // Get all the withUUIDDetailsList
         restWithUUIDDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=uuid,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].uuid").value(hasItem(withUUIDDetails.getUuid().toString())))
@@ -309,13 +310,12 @@ class WithUUIDDetailsResourceIT {
         // Get already existing entity
         WithUUID withUUID = withUUIDDetails.getWithUUID();
         withUUIDDetailsRepository.saveAndFlush(withUUIDDetails);
-        UUID withUUIDId = withUUID.getUuid();
 
-        // Get all the withUUIDDetailsList where withUUID equals to withUUIDId
-        defaultWithUUIDDetailsShouldBeFound("withUUIDId.equals=" + withUUIDId);
+        // Get all the withUUIDDetailsList where withUUID.uuid equals to withUUID.getUuid()
+        defaultWithUUIDDetailsShouldBeFound("withUUID.uuid.equals=" + withUUID.getUuid());
 
-        // Get all the withUUIDDetailsList where withUUID equals to UUID.randomUUID()
-        defaultWithUUIDDetailsShouldNotBeFound("withUUIDId.equals=" + UUID.randomUUID());
+        // Get all the withUUIDDetailsList where withUUID.uuid equals to UUID.randomUUID()
+        defaultWithUUIDDetailsShouldNotBeFound("withUUID.uuid.equals=" + UUID.randomUUID());
     }
 
     /**
@@ -323,7 +323,7 @@ class WithUUIDDetailsResourceIT {
      */
     private void defaultWithUUIDDetailsShouldBeFound(String filter) throws Exception {
         restWithUUIDDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=uuid,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].uuid").value(hasItem(withUUIDDetails.getUuid().toString())))
@@ -331,7 +331,7 @@ class WithUUIDDetailsResourceIT {
 
         // Check, that the count call also returns 1
         restWithUUIDDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=uuid,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -342,7 +342,7 @@ class WithUUIDDetailsResourceIT {
      */
     private void defaultWithUUIDDetailsShouldNotBeFound(String filter) throws Exception {
         restWithUUIDDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=uuid,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -350,7 +350,7 @@ class WithUUIDDetailsResourceIT {
 
         // Check, that the count call also returns 0
         restWithUUIDDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=uuid,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -380,7 +380,7 @@ class WithUUIDDetailsResourceIT {
 
         restWithUUIDDetailsMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, withUUIDDetailsDTO.getUuid())
+                put(ENTITY_API_URL_ID, withUUIDDetails.getUuid())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(withUUIDDetailsDTO))
             )
@@ -405,7 +405,7 @@ class WithUUIDDetailsResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restWithUUIDDetailsMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, withUUIDDetailsDTO.getUuid())
+                put(ENTITY_API_URL_ID, withUUIDDetails.getUuid())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(withUUIDDetailsDTO))
             )
@@ -471,12 +471,13 @@ class WithUUIDDetailsResourceIT {
         // Update the withUUIDDetails using partial update
         WithUUIDDetails partialUpdatedWithUUIDDetails = new WithUUIDDetails();
         partialUpdatedWithUUIDDetails.setUuid(withUUIDDetails.getUuid());
+        partialUpdatedWithUUIDDetails.setWithUUID(withUUIDDetails.getWithUUID());
 
         partialUpdatedWithUUIDDetails.details(UPDATED_DETAILS);
 
         restWithUUIDDetailsMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedWithUUIDDetails.getUuid())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithUUIDDetails))
             )
@@ -500,12 +501,13 @@ class WithUUIDDetailsResourceIT {
         // Update the withUUIDDetails using partial update
         WithUUIDDetails partialUpdatedWithUUIDDetails = new WithUUIDDetails();
         partialUpdatedWithUUIDDetails.setUuid(withUUIDDetails.getUuid());
+        partialUpdatedWithUUIDDetails.setWithUUID(withUUIDDetails.getWithUUID());
 
         partialUpdatedWithUUIDDetails.details(UPDATED_DETAILS);
 
         restWithUUIDDetailsMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedWithUUIDDetails.getUuid())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithUUIDDetails))
             )
@@ -520,17 +522,71 @@ class WithUUIDDetailsResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateWithUUIDDetailsShouldThrown() throws Exception {
-        // Update the withUUIDDetails without id should throw
-        WithUUIDDetails partialUpdatedWithUUIDDetails = new WithUUIDDetails();
+    void patchNonExistingWithUUIDDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withUUIDDetailsRepository.findAll().size();
+        withUUIDDetails.setUuid(UUID.randomUUID());
 
+        // Create the WithUUIDDetails
+        WithUUIDDetailsDTO withUUIDDetailsDTO = withUUIDDetailsMapper.toDto(withUUIDDetails);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restWithUUIDDetailsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, UUID.randomUUID())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(withUUIDDetailsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the WithUUIDDetails in the database
+        List<WithUUIDDetails> withUUIDDetailsList = withUUIDDetailsRepository.findAll();
+        assertThat(withUUIDDetailsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchWithUUIDDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withUUIDDetailsRepository.findAll().size();
+        withUUIDDetails.setUuid(UUID.randomUUID());
+
+        // Create the WithUUIDDetails
+        WithUUIDDetailsDTO withUUIDDetailsDTO = withUUIDDetailsMapper.toDto(withUUIDDetails);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restWithUUIDDetailsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, UUID.randomUUID())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(withUUIDDetailsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the WithUUIDDetails in the database
+        List<WithUUIDDetails> withUUIDDetailsList = withUUIDDetailsRepository.findAll();
+        assertThat(withUUIDDetailsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamWithUUIDDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withUUIDDetailsRepository.findAll().size();
+        withUUIDDetails.setUuid(UUID.randomUUID());
+
+        // Create the WithUUIDDetails
+        WithUUIDDetailsDTO withUUIDDetailsDTO = withUUIDDetailsMapper.toDto(withUUIDDetails);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restWithUUIDDetailsMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithUUIDDetails))
+                    .content(TestUtil.convertObjectToJsonBytes(withUUIDDetailsDTO))
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the WithUUIDDetails in the database
+        List<WithUUIDDetails> withUUIDDetailsList = withUUIDDetailsRepository.findAll();
+        assertThat(withUUIDDetailsList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -543,7 +599,7 @@ class WithUUIDDetailsResourceIT {
 
         // Delete the withUUIDDetails
         restWithUUIDDetailsMockMvc
-            .perform(delete(ENTITY_API_URL_ID, withUUIDDetails.getUuid().toString()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, withUUIDDetails.getUuid()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

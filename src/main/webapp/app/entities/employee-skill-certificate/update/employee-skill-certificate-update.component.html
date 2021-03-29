@@ -8,105 +8,153 @@
       >
         Create or edit a Employee Skill Certificate
       </h2>
-
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.grade" for="field_grade">Grade</label>
-          <input type="number" class="form-control" name="grade" id="field_grade" data-cy="grade" formControlName="grade" />
-          <div *ngIf="editForm.get('grade')!.invalid && (editForm.get('grade')!.dirty || editForm.get('grade')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('grade')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-            <small class="form-text text-danger" [hidden]="!editForm.get('grade')?.errors?.number" jhiTranslate="entity.validation.number">
-              This field should be a number.
-            </small>
+      <div class="form-grid p-fluid">
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.employeeSkillCertificate.grade" for="field_grade" class="p-col-12 p-md-2">Grade</label>
+          <div class="p-col-12 p-md-10">
+            <input pInputText type="number" name="grade" id="field_grade" formControlName="grade" />
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('grade')!.invalid && (editForm.get('grade')!.dirty || editForm.get('grade')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('grade')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+                <p-message
+                  severity="error"
+                  [hidden]="!editForm.get('grade')!.errors!.number"
+                  [text]="'entity.validation.number' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.date" for="field_date">Date</label>
-          <div class="input-group">
-            <input
-              id="field_date"
-              data-cy="date"
-              type="text"
-              class="form-control"
-              name="date"
-              ngbDatepicker
-              #dateDp="ngbDatepicker"
-              formControlName="date"
-            />
-            <span class="input-group-append">
-              <button type="button" class="btn btn-secondary" (click)="dateDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
-            </span>
-          </div>
-          <div *ngIf="editForm.get('date')!.invalid && (editForm.get('date')!.dirty || editForm.get('date')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('date')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.employeeSkillCertificate.date" for="field_date" class="p-col-12 p-md-2">Date</label>
+          <div class="p-col-12 p-md-10">
+            <p-calendar id="field_date" formControlName="date" [showIcon]="true"></p-calendar>
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('date')!.invalid && (editForm.get('date')!.dirty || editForm.get('date')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('date')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
           </div>
         </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.employeeSkillCertificate.type" for="field_type" class="p-col-12 p-md-2">Type</label>
+          <div class="p-col-12 p-md-10">
+            <p-dropdown
+              id="field_type"
+              [options]="typeOptions!"
+              formControlName="type"
+              [readonly]="edit"
+              placeholder="Choose"
+              optionLabel="name"
+              dataKey="id"
+            ></p-dropdown>
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('type')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <ng-container formGroupName="skill">
+          <div class="p-field p-grid">
+            <label jhiTranslate="compositekeyApp.employeeSkill.employee" for="field_skill_employee" class="p-col-12 p-md-2">Employee</label>
+            <div class="p-col-12 p-md-10">
+              <p-dropdown
+                id="field_skill_employee"
+                [options]="skillEmployeeOptions!"
+                formControlName="employee"
+                [readonly]="edit"
+                [rows]="10"
+                [lazy]="true"
+                (onLazyLoad)="onSkillEmployeeLazyLoadEvent($event)"
+                [lazyLoadOnInit]="true"
+                [filter]="true"
+                [filterValue]="skillEmployeeFilterValue"
+                placeholder="Choose"
+                optionLabel="fullname"
+                dataKey="username"
+              ></p-dropdown>
+              <div class="validation-messages">
+                <ng-container
+                  *ngIf="skillForm.get('employee')!.invalid && (skillForm.get('employee')!.dirty || skillForm.get('employee')!.touched)"
+                >
+                  <p-message
+                    severity="error"
+                    *ngIf="skillForm.get('employee')!.errors!.required"
+                    [text]="'entity.validation.required' | translate"
+                  >
+                  </p-message>
+                </ng-container>
+              </div>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.type" for="field_type">Type</label>
-          <select class="form-control" id="field_type" data-cy="type" name="type" formControlName="type">
-            <option *ngIf="!editForm.get('type')!.value" [ngValue]="null" selected></option>
-            <option
-              [ngValue]="certificateTypeOption.id === editForm.get('type')!.value?.id ? editForm.get('type')!.value : certificateTypeOption"
-              *ngFor="let certificateTypeOption of certificateTypesSharedCollection; trackBy: trackCertificateTypeById"
-            >
-              {{ certificateTypeOption.name }}
-            </option>
-          </select>
-        </div>
-        <div *ngIf="editForm.get(['type'])!.invalid && (editForm.get(['type'])!.dirty || editForm.get(['type'])!.touched)">
-          <small class="form-text text-danger" *ngIf="editForm.get(['type'])?.errors?.required" jhiTranslate="entity.validation.required">
-            This field is required.
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.employeeSkillCertificate.skill" for="field_skill">Skill</label>
-          <select class="form-control" id="field_skill" data-cy="skill" name="skill" formControlName="skill">
-            <option *ngIf="!editForm.get('skill')!.value" [ngValue]="null" selected></option>
-            <option
-              [ngValue]="
-                employeeSkillOption.name === editForm.get('skill')!.value?.name ? editForm.get('skill')!.value : employeeSkillOption
-              "
-              *ngFor="let employeeSkillOption of employeeSkillsSharedCollection; trackBy: trackEmployeeSkillByName"
-            >
-              {{ employeeSkillOption.name }}
-            </option>
-          </select>
-        </div>
-        <div *ngIf="editForm.get(['skill'])!.invalid && (editForm.get(['skill'])!.dirty || editForm.get(['skill'])!.touched)">
-          <small class="form-text text-danger" *ngIf="editForm.get(['skill'])?.errors?.required" jhiTranslate="entity.validation.required">
-            This field is required.
-          </small>
-        </div>
+          <div class="p-field p-grid" *ngIf="skillOptions || edit">
+            <label jhiTranslate="compositekeyApp.employeeSkillCertificate.skill" for="field_skill" class="p-col-12 p-md-2">Skill</label>
+            <div class="p-col-12 p-md-10">
+              <p-dropdown
+                id="field_skill"
+                [options]="skillOptions!"
+                formControlName="name"
+                [readonly]="edit"
+                [rows]="10"
+                [lazy]="true"
+                (onLazyLoad)="onSkillLazyLoadEvent($event)"
+                [filter]="true"
+                [filterValue]="skillFilterValue"
+                placeholder="Choose"
+                optionLabel="name"
+                optionValue="name"
+              ></p-dropdown>
+              <div class="validation-messages">
+                <ng-container *ngIf="skillForm.get('name')!.invalid && (skillForm.get('name')!.dirty || skillForm.get('name')!.touched)">
+                  <p-message
+                    severity="error"
+                    *ngIf="skillForm.get('name')!.errors!.required"
+                    [text]="'entity.validation.required' | translate"
+                  >
+                  </p-message>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
       <div>
-        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
         <button
+          pButton
+          type="button"
+          id="cancel-save"
+          icon="pi pi-ban"
+          class="p-button-secondary"
+          (click)="previousState()"
+          [label]="'entity.action.cancel' | translate"
+        ></button>
+        <button
+          pButton
           type="submit"
           id="save-entity"
-          data-cy="entityCreateSaveButton"
+          icon="pi pi-save"
           [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          [label]="'entity.action.save' | translate"
+        ></button>
       </div>
     </form>
   </div>

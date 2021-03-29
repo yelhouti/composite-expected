@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import tech.jhipster.config.JHipsterProperties;
 
 class TokenProviderTest {
+
     private static final long ONE_MINUTE = 60000;
 
     private Key key;

@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employeeSkill: { name: 'ABC' } }) }
-          }
-        ]
+            useValue: { data: of({ employeeSkill: { name: 'ABC', employee: { username: 'ABC' } } }) },
+          },
+        ],
       })
         .overrideTemplate(EmployeeSkillDetailComponent, '')
         .compileComponents();
@@ -31,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ name: 'ABC' }));
+        expect(comp.employeeSkill).toEqual(jasmine.objectContaining({ name: 'ABC', employee: { username: 'ABC' } }));
       });
     });
   });

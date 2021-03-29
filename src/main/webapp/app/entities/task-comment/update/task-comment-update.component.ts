@@ -1,43 +1,65 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { lazyLoadEventToServerQueryParams } from 'app/core/request/request-util';
+import { LazyLoadEvent } from 'primeng/api';
 
-import { ITaskComment, TaskComment } from '../task-comment.model';
+import { ITaskComment } from '../task-comment.model';
 import { TaskCommentService } from '../service/task-comment.service';
+import { MessageService } from 'primeng/api';
 import { ITask } from 'app/entities/task/task.model';
 import { TaskService } from 'app/entities/task/service/task.service';
 
 @Component({
   selector: 'jhi-task-comment-update',
-  templateUrl: './task-comment-update.component.html'
+  templateUrl: './task-comment-update.component.html',
 })
 export class TaskCommentUpdateComponent implements OnInit {
   isSaving = false;
-
-  tasksSharedCollection: ITask[] = [];
+  taskOptions: ITask[] | null = null;
+  taskFilterValue?: any;
 
   editForm = this.fb.group({
     id: [],
     value: [null, [Validators.required]],
-    task: [null, Validators.required]
+    task: [null, [Validators.required]],
   });
 
   constructor(
+    protected messageService: MessageService,
     protected taskCommentService: TaskCommentService,
     protected taskService: TaskService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ taskComment }) => {
       this.updateForm(taskComment);
-
-      this.loadRelationshipsOptions();
     });
+  }
+
+  onTaskLazyLoadEvent(event: LazyLoadEvent): void {
+    this.taskService.query(lazyLoadEventToServerQueryParams(event, 'name.contains')).subscribe(
+      (res: HttpResponse<ITask[]>) => (this.taskOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  updateForm(taskComment: ITaskComment | null): void {
+    if (taskComment) {
+      this.editForm.reset({ ...taskComment }, { emitEvent: false, onlySelf: true });
+      if (taskComment.task) {
+        this.taskOptions = [taskComment.task];
+        this.taskFilterValue = taskComment.task.name;
+      }
+    } else {
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -46,61 +68,31 @@ export class TaskCommentUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const taskComment = this.createFromForm();
-    if (taskComment.id !== undefined) {
+    const taskComment = this.editForm.value;
+    if (taskComment.id !== null) {
       this.subscribeToSaveResponse(this.taskCommentService.update(taskComment));
     } else {
       this.subscribeToSaveResponse(this.taskCommentService.create(taskComment));
     }
   }
 
-  trackTaskById(index: number, item: ITask): number {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITaskComment>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(taskComment: ITaskComment): void {
-    this.editForm.patchValue({
-      id: taskComment.id,
-      value: taskComment.value,
-      task: taskComment.task
-    });
-
-    this.tasksSharedCollection = this.taskService.addTaskToCollectionIfMissing(this.tasksSharedCollection, taskComment.task);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.taskService
-      .query()
-      .pipe(map((res: HttpResponse<ITask[]>) => res.body ?? []))
-      .pipe(map((tasks: ITask[]) => this.taskService.addTaskToCollectionIfMissing(tasks, this.editForm.get('task')!.value)))
-      .subscribe((tasks: ITask[]) => (this.tasksSharedCollection = tasks));
-  }
-
-  protected createFromForm(): ITaskComment {
-    return {
-      ...new TaskComment(),
-      id: this.editForm.get(['id'])!.value,
-      value: this.editForm.get(['value'])!.value,
-      task: this.editForm.get(['task'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

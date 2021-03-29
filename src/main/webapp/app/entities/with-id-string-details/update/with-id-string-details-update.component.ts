@@ -1,43 +1,65 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { FormBuilder } from '@angular/forms';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
 
-import { IWithIdStringDetails, WithIdStringDetails } from '../with-id-string-details.model';
+import { IWithIdStringDetails } from '../with-id-string-details.model';
 import { WithIdStringDetailsService } from '../service/with-id-string-details.service';
+import { MessageService } from 'primeng/api';
 import { IWithIdString } from 'app/entities/with-id-string/with-id-string.model';
 import { WithIdStringService } from 'app/entities/with-id-string/service/with-id-string.service';
 
 @Component({
   selector: 'jhi-with-id-string-details-update',
-  templateUrl: './with-id-string-details-update.component.html'
+  templateUrl: './with-id-string-details-update.component.html',
 })
 export class WithIdStringDetailsUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
-
-  withIdStringsCollection: IWithIdString[] = [];
+  withIdStringOptions: IWithIdString[] | null = null;
+  withIdStringFilterValue?: any;
 
   editForm = this.fb.group({
     id: [],
     details: [],
-    withIdString: []
+    withIdString: [null, [Validators.required]],
   });
 
   constructor(
+    protected messageService: MessageService,
     protected withIdStringDetailsService: WithIdStringDetailsService,
     protected withIdStringService: WithIdStringService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ withIdStringDetails }) => {
       this.updateForm(withIdStringDetails);
-
-      this.loadRelationshipsOptions();
     });
+    this.loadAllWithIdStrings();
+  }
+
+  loadAllWithIdStrings(): void {
+    // TODO change this to load only unspecified + add selected to options if on edit (not create)
+    this.withIdStringService.query().subscribe(
+      (res: HttpResponse<IWithIdString[]>) => (this.withIdStringOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  updateForm(withIdStringDetails: IWithIdStringDetails | null): void {
+    if (withIdStringDetails) {
+      this.edit = true;
+      this.editForm.reset({ ...withIdStringDetails }, { emitEvent: false, onlySelf: true });
+      this.withIdStringFilterValue = withIdStringDetails.withIdString?.id;
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -46,68 +68,31 @@ export class WithIdStringDetailsUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const withIdStringDetails = this.createFromForm();
-    if (withIdStringDetails.id !== undefined) {
+    const withIdStringDetails = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.update(withIdStringDetails));
     } else {
       this.subscribeToSaveResponse(this.withIdStringDetailsService.create(withIdStringDetails));
     }
   }
 
-  trackWithIdStringById(index: number, item: IWithIdString): string {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IWithIdStringDetails>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(withIdStringDetails: IWithIdStringDetails): void {
-    this.editForm.patchValue({
-      id: withIdStringDetails.id,
-      details: withIdStringDetails.details,
-      withIdString: withIdStringDetails.withIdString
-    });
-
-    this.withIdStringsCollection = this.withIdStringService.addWithIdStringToCollectionIfMissing(
-      this.withIdStringsCollection,
-      withIdStringDetails.withIdString
-    );
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.withIdStringService
-      .query({ 'withIdStringDetailsId.specified': 'false' })
-      .pipe(map((res: HttpResponse<IWithIdString[]>) => res.body ?? []))
-      .pipe(
-        map((withIdStrings: IWithIdString[]) =>
-          this.withIdStringService.addWithIdStringToCollectionIfMissing(withIdStrings, this.editForm.get('withIdString')!.value)
-        )
-      )
-      .subscribe((withIdStrings: IWithIdString[]) => (this.withIdStringsCollection = withIdStrings));
-  }
-
-  protected createFromForm(): IWithIdStringDetails {
-    return {
-      ...new WithIdStringDetails(),
-      id: this.editForm.get(['id'])!.value,
-      details: this.editForm.get(['details'])!.value,
-      withIdString: this.editForm.get(['withIdString'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

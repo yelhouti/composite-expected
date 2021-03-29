@@ -6,7 +6,7 @@ import { MetricsModalThreadsComponent } from '../metrics-modal-threads/metrics-m
 
 @Component({
   selector: 'jhi-jvm-threads',
-  templateUrl: './jvm-threads.component.html'
+  templateUrl: './jvm-threads.component.html',
 })
 export class JvmThreadsComponent {
   threadStats = {
@@ -14,7 +14,7 @@ export class JvmThreadsComponent {
     threadDumpRunnable: 0,
     threadDumpTimedWaiting: 0,
     threadDumpWaiting: 0,
-    threadDumpBlocked: 0
+    threadDumpBlocked: 0,
   };
 
   @Input()

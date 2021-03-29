@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @IntegrationTest
 class ExceptionTranslatorIT {
+
     @Autowired
     private MockMvc mockMvc;
 

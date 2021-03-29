@@ -5,7 +5,7 @@ import { ICertificateType } from '../certificate-type.model';
 
 @Component({
   selector: 'jhi-certificate-type-detail',
-  templateUrl: './certificate-type-detail.component.html'
+  templateUrl: './certificate-type-detail.component.html',
 })
 export class CertificateTypeDetailComponent implements OnInit {
   certificateType: ICertificateType | null = null;

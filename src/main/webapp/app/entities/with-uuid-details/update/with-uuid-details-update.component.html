@@ -8,48 +8,67 @@
       >
         Create or edit a With UUID Details
       </h2>
-
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <div class="form-group" [hidden]="editForm.get('uuid')!.value == null">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.withUUID.uuid" for="field_uuid">Uuid</label>
-          <input type="text" class="form-control" name="uuid" id="field_uuid" data-cy="uuid" formControlName="uuid" [readonly]="true" />
+      <div class="form-grid p-fluid">
+        <div class="p-field p-grid">
+          <ng-container *ngIf="editForm.get('uuid')!.value">
+            <label jhiTranslate="compositekeyApp.withUUID.uuid" for="field_uuid" class="p-col-12 p-md-2">Uuid</label>
+            <div class="p-col-12 p-md-10">
+              <input pInputText type="text" name="uuid" id="field_uuid" formControlName="uuid" readonly />
+            </div>
+          </ng-container>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.withUUIDDetails.details" for="field_details">Details</label>
-          <input type="text" class="form-control" name="details" id="field_details" data-cy="details" formControlName="details" />
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.withUUIDDetails.details" for="field_details" class="p-col-12 p-md-2">Details</label>
+          <div class="p-col-12 p-md-10">
+            <input pInputText type="text" name="details" id="field_details" formControlName="details" />
+          </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.withUUIDDetails.withUUID" for="field_withUUID">With UUID</label>
-          <select class="form-control" id="field_withUUID" data-cy="withUUID" name="withUUID" formControlName="withUUID">
-            <option [ngValue]="null"></option>
-            <option
-              [ngValue]="withUUIDOption.uuid === editForm.get('withUUID')!.value?.uuid ? editForm.get('withUUID')!.value : withUUIDOption"
-              *ngFor="let withUUIDOption of withUUIDSCollection; trackBy: trackWithUUIDByUuid"
-            >
-              {{ withUUIDOption.uuid }}
-            </option>
-          </select>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.withUUIDDetails.withUUID" for="field_with_uuid" class="p-col-12 p-md-2">With UUID</label>
+          <div class="p-col-12 p-md-10">
+            <p-dropdown
+              id="field_with_uuid"
+              [options]="withUUIDOptions!"
+              formControlName="withUUID"
+              [readonly]="edit"
+              placeholder="Choose"
+              optionLabel="uuid"
+              dataKey="uuid"
+            ></p-dropdown>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('withUUID')!.invalid && (editForm.get('withUUID')!.dirty || editForm.get('withUUID')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('withUUID')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
         </div>
       </div>
 
       <div>
-        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
         <button
+          pButton
+          type="button"
+          id="cancel-save"
+          icon="pi pi-ban"
+          class="p-button-secondary"
+          (click)="previousState()"
+          [label]="'entity.action.cancel' | translate"
+        ></button>
+        <button
+          pButton
           type="submit"
           id="save-entity"
-          data-cy="entityCreateSaveButton"
+          icon="pi pi-save"
           [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          [label]="'entity.action.save' | translate"
+        ></button>
       </div>
     </form>
   </div>

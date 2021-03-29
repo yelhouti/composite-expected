@@ -5,12 +5,11 @@ import com.mycompany.myapp.repository.TaskRepository;
 import com.mycompany.myapp.service.TaskService;
 import com.mycompany.myapp.service.dto.TaskDTO;
 import com.mycompany.myapp.service.mapper.TaskMapper;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class TaskServiceImpl implements TaskService {
+
     private final Logger log = LoggerFactory.getLogger(TaskServiceImpl.class);
 
     private final TaskRepository taskRepository;
@@ -44,51 +44,10 @@ public class TaskServiceImpl implements TaskService {
         log.debug("Request to partially update Task : {}", taskDTO);
 
         return taskRepository
-            .findById(taskDTO.getId())
+            .findById(taskMapper.toEntity(taskDTO).getId())
             .map(
                 existingTask -> {
-                    if (taskDTO.getName() != null) {
-                        existingTask.setName(taskDTO.getName());
-                    }
-
-                    if (taskDTO.getType() != null) {
-                        existingTask.setType(taskDTO.getType());
-                    }
-
-                    if (taskDTO.getEndDate() != null) {
-                        existingTask.setEndDate(taskDTO.getEndDate());
-                    }
-
-                    if (taskDTO.getCreatedAt() != null) {
-                        existingTask.setCreatedAt(taskDTO.getCreatedAt());
-                    }
-
-                    if (taskDTO.getModifiedAt() != null) {
-                        existingTask.setModifiedAt(taskDTO.getModifiedAt());
-                    }
-
-                    if (taskDTO.getDone() != null) {
-                        existingTask.setDone(taskDTO.getDone());
-                    }
-
-                    if (taskDTO.getDescription() != null) {
-                        existingTask.setDescription(taskDTO.getDescription());
-                    }
-
-                    if (taskDTO.getAttachment() != null) {
-                        existingTask.setAttachment(taskDTO.getAttachment());
-                    }
-                    if (taskDTO.getAttachmentContentType() != null) {
-                        existingTask.setAttachmentContentType(taskDTO.getAttachmentContentType());
-                    }
-
-                    if (taskDTO.getPicture() != null) {
-                        existingTask.setPicture(taskDTO.getPicture());
-                    }
-                    if (taskDTO.getPictureContentType() != null) {
-                        existingTask.setPictureContentType(taskDTO.getPictureContentType());
-                    }
-
+                    taskMapper.partialUpdate(existingTask, taskDTO);
                     return existingTask;
                 }
             )
@@ -98,9 +57,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskDTO> findAll() {
+    public Page<TaskDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Tasks");
-        return taskRepository.findAll().stream().map(taskMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return taskRepository.findAll(pageable).map(taskMapper::toDto);
     }
 
     @Override

@@ -15,9 +15,11 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employeeSkillCertificate: { id: 123 } }) }
-          }
-        ]
+            useValue: {
+              data: of({ employeeSkillCertificate: { type: { id: 123 }, skill: { name: 'ABC', employee: { username: 'ABC' } } } }),
+            },
+          },
+        ],
       })
         .overrideTemplate(EmployeeSkillCertificateDetailComponent, '')
         .compileComponents();
@@ -31,7 +33,9 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.employeeSkillCertificate).toEqual(jasmine.objectContaining({ id: 123 }));
+        expect(comp.employeeSkillCertificate).toEqual(
+          jasmine.objectContaining({ type: { id: 123 }, skill: { name: 'ABC', employee: { username: 'ABC' } } })
+        );
       });
     });
   });

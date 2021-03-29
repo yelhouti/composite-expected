@@ -7,6 +7,7 @@ import java.util.Objects;
  * A DTO for the {@link com.mycompany.myapp.domain.WithIdStringDetails} entity.
  */
 public class WithIdStringDetailsDTO implements Serializable {
+
     private String id;
 
     private String details;

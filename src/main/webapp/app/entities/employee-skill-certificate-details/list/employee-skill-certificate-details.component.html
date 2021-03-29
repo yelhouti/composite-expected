@@ -1,0 +1,191 @@
+<div>
+  <h2 id="page-heading" data-cy="EmployeeSkillCertificateDetailsHeading">
+    <span jhiTranslate="compositekeyApp.employeeSkillCertificateDetails.home.title">Employee Skill Certificate Details</span>
+    <p-button
+      id="jh-create-entity"
+      class="float-right jh-create-entity create-employee-skill-certificate-details"
+      [routerLink]="['/employee-skill-certificate-details/new']"
+      [label]="'compositekeyApp.employeeSkillCertificateDetails.home.createLabel' | translate"
+      icon="pi pi-plus"
+      iconPos="left"
+    >
+    </p-button>
+  </h2>
+  <br />
+  <p-table #employeeSkillCertificateDetailsTable [value]="employeeSkillCertificateDetails!" [rowTrackBy]="trackId" [responsive]="true">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>
+          <span jhiTranslate="compositekeyApp.employeeSkillCertificateDetails.detail">Detail</span>
+          <p-columnFilter
+            type="text"
+            matchMode="contains"
+            field="detail"
+            display="menu"
+            [showOperator]="false"
+            class="p-ml-auto"
+          ></p-columnFilter>
+        </th>
+        <th>
+          <span jhiTranslate="compositekeyApp.employeeSkill.employee">Employee</span>
+          <p-columnFilter
+            field="employeeSkillCertificate.skill.employee.username"
+            matchMode="in"
+            display="menu"
+            [showOperator]="false"
+            [showMatchModes]="false"
+            [showAddButton]="false"
+            class="p-ml-auto"
+          >
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect
+                [ngModel]="value"
+                [options]="employeeSkillCertificateSkillEmployeeOptions!"
+                (onChange)="filter($event.value)"
+                optionLabel="fullname"
+                optionValue="username"
+                [lazy]="true"
+                [rows]="10"
+                [lazySelectedOptions]="employeeSkillCertificateSkillEmployeeSelectedOptions!"
+                (onLazyLoad)="onEmployeeSkillCertificateSkillEmployeeLazyLoadEvent($event)"
+              ></p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th>
+          <span jhiTranslate="compositekeyApp.employeeSkillCertificate.skill">Skill</span>
+          <p-columnFilter
+            field="employeeSkillCertificate.skill.name"
+            matchMode="in"
+            display="menu"
+            [showOperator]="false"
+            [showMatchModes]="false"
+            [showAddButton]="false"
+            class="p-ml-auto"
+          >
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect
+                [ngModel]="value"
+                [options]="employeeSkillCertificateSkillOptions!"
+                (onChange)="filter($event.value)"
+                optionLabel="name"
+                optionValue="name"
+                [lazy]="true"
+                [rows]="10"
+                [lazySelectedOptions]="employeeSkillCertificateSkillSelectedOptions!"
+                (onLazyLoad)="onEmployeeSkillCertificateSkillLazyLoadEvent($event)"
+              ></p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th>
+          <span jhiTranslate="compositekeyApp.employeeSkillCertificate.type">Type</span>
+          <p-columnFilter
+            field="employeeSkillCertificate.type.id"
+            matchMode="in"
+            display="menu"
+            [showOperator]="false"
+            [showMatchModes]="false"
+            [showAddButton]="false"
+            class="p-ml-auto"
+          >
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect
+                [ngModel]="value"
+                [options]="employeeSkillCertificateTypeOptions!"
+                (onChange)="filter($event.value)"
+                optionLabel="name"
+                optionValue="id"
+              ></p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th style="width: 124px"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-employeeSkillCertificateDetails>
+      <tr>
+        <td>{{ employeeSkillCertificateDetails.detail }}</td>
+        <td>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a
+              [routerLink]="['/employee', employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!, 'view']"
+              >{{ employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.fullname }}</a
+            >
+          </div>
+        </td>
+        <td>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a
+              [routerLink]="[
+                '/employee-skill',
+                {
+                  name: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  employeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                },
+                'view'
+              ]"
+              >{{ employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name }}</a
+            >
+          </div>
+        </td>
+        <td>
+          <div *ngIf="employeeSkillCertificateDetails.employeeSkillCertificate">
+            <a [routerLink]="['/certificate-type', employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!, 'view']">{{
+              employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.name
+            }}</a>
+          </div>
+        </td>
+        <td>
+          <div class="btn-group flex-btn-group-container">
+            <p-button
+              type="submit"
+              [routerLink]="[
+                '/employee-skill-certificate-details',
+                {
+                  typeId: employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!,
+                  skillName: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  skillEmployeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                },
+                'view'
+              ]"
+              icon="pi pi-eye"
+              styleClass="p-button-info"
+            >
+            </p-button>
+            <p-button
+              type="submit"
+              [routerLink]="[
+                '/employee-skill-certificate-details',
+                {
+                  typeId: employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!,
+                  skillName: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  skillEmployeeUsername: employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                },
+                'edit'
+              ]"
+              icon="pi pi-pencil"
+              styleClass="p-button-warning"
+              data-cy="entityEditButton"
+            >
+            </p-button>
+            <p-button
+              type="submit"
+              (click)="
+                delete(
+                  employeeSkillCertificateDetails!.employeeSkillCertificate!.type!.id!,
+                  employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.name!,
+                  employeeSkillCertificateDetails!.employeeSkillCertificate!.skill!.employee!.username!
+                )
+              "
+              icon="pi pi-times"
+              styleClass="p-button-danger"
+              data-cy="entityDeleteButton"
+            >
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

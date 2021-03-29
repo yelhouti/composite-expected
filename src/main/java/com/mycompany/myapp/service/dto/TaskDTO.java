@@ -13,6 +13,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.Task} entity.
  */
 public class TaskDTO implements Serializable {
+
     private Long id;
 
     @NotNull

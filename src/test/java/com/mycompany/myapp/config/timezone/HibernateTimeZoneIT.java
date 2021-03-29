@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @IntegrationTest
 class HibernateTimeZoneIT {
+
     @Autowired
     private DateTimeWrapperRepository dateTimeWrapperRepository;
 

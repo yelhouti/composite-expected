@@ -17,9 +17,11 @@ class WithUUIDDetailsDTOTest {
         assertThat(withUUIDDetailsDTO1).isNotEqualTo(withUUIDDetailsDTO2);
         withUUIDDetailsDTO2.setUuid(withUUIDDetailsDTO1.getUuid());
         assertThat(withUUIDDetailsDTO1).isEqualTo(withUUIDDetailsDTO2);
-        withUUIDDetailsDTO2.setUuid(UUID.randomUUID());
-        assertThat(withUUIDDetailsDTO1).isNotEqualTo(withUUIDDetailsDTO2);
-        withUUIDDetailsDTO1.setUuid(null);
-        assertThat(withUUIDDetailsDTO1).isNotEqualTo(withUUIDDetailsDTO2);
+        WithUUIDDetailsDTO withUUIDDetailsDTO3 = new WithUUIDDetailsDTO();
+        withUUIDDetailsDTO3.setUuid(UUID.randomUUID());
+        assertThat(withUUIDDetailsDTO1).isNotEqualTo(withUUIDDetailsDTO3);
+        WithUUIDDetailsDTO withUUIDDetailsDTO4 = new WithUUIDDetailsDTO();
+        withUUIDDetailsDTO4.setUuid(null);
+        assertThat(withUUIDDetailsDTO1).isNotEqualTo(withUUIDDetailsDTO4);
     }
 }

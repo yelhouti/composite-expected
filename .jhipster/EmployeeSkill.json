@@ -36,7 +36,10 @@
       "otherEntityRelationshipName": "skill",
       "relationshipValidateRules": "required",
       "relationshipName": "employee",
-      "otherEntityField": "fullname"
+      "otherEntityField": "fullname",
+      "options": {
+        "id": true
+      }
     },
     {
       "relationshipType": "many-to-one",

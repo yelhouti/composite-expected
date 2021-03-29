@@ -16,7 +16,7 @@ describe('Component Tests', () => {
       fixture = TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         declarations: [PasswordResetInitComponent],
-        providers: [FormBuilder]
+        providers: [FormBuilder],
       })
         .overrideTemplate(PasswordResetInitComponent, '')
         .createComponent(PasswordResetInitComponent);
@@ -25,7 +25,7 @@ describe('Component Tests', () => {
 
     it('sets focus after the view has been initialized', () => {
       const node = {
-        focus: jest.fn()
+        focus: jest.fn(),
       };
       comp.email = new ElementRef(node);
 
@@ -37,7 +37,7 @@ describe('Component Tests', () => {
     it('notifies of success upon successful requestReset', inject([PasswordResetInitService], (service: PasswordResetInitService) => {
       spyOn(service, 'save').and.returnValue(of({}));
       comp.resetRequestForm.patchValue({
-        email: 'user@domain.com'
+        email: 'user@domain.com',
       });
 
       comp.requestReset();
@@ -50,11 +50,11 @@ describe('Component Tests', () => {
       spyOn(service, 'save').and.returnValue(
         throwError({
           status: 503,
-          data: 'something else'
+          data: 'something else',
         })
       );
       comp.resetRequestForm.patchValue({
-        email: 'user@domain.com'
+        email: 'user@domain.com',
       });
       comp.requestReset();
 

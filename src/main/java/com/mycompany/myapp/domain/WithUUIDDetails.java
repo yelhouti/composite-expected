@@ -14,9 +14,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "with_uuid_details")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class WithUUIDDetails implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name = "uuid")
     private UUID uuid;
 
     @Column(name = "details")
@@ -25,21 +27,22 @@ public class WithUUIDDetails implements Serializable {
     @JsonIgnoreProperties(value = { "withUUIDDetails" }, allowSetters = true)
     @OneToOne
     @MapsId
-    @JoinColumn(name = "uuid")
+    @JoinColumn(name = "uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
     private WithUUID withUUID;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public UUID getUuid() {
-        return uuid;
-    }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     public WithUUIDDetails uuid(UUID uuid) {
         this.uuid = uuid;
         return this;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getDetails() {
@@ -91,7 +94,7 @@ public class WithUUIDDetails implements Serializable {
     @Override
     public String toString() {
         return "WithUUIDDetails{" +
-            "uuid=" + getUuid() +
+            "uuid='" + getUuid() + "'" +
             ", details='" + getDetails() + "'" +
             "}";
     }

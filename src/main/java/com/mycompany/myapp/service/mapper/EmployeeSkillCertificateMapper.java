@@ -11,5 +11,17 @@ import org.mapstruct.*;
 public interface EmployeeSkillCertificateMapper extends EntityMapper<EmployeeSkillCertificateDTO, EmployeeSkillCertificate> {
     @Mapping(target = "type", source = "type", qualifiedByName = "name")
     @Mapping(target = "skill", source = "skill", qualifiedByName = "name")
-    EmployeeSkillCertificateDTO toDto(EmployeeSkillCertificate s);
+    EmployeeSkillCertificateDTO toDto(EmployeeSkillCertificate employeeSkillCertificate);
+
+    @Mapping(target = "id.typeId", source = "type.id")
+    @Mapping(target = "id.skillName", source = "skill.name")
+    @Mapping(target = "id.skillEmployeeUsername", source = "skill.employee.username")
+    @Mapping(target = "employeeSkillCertificateDetails", ignore = true)
+    EmployeeSkillCertificate toEntity(EmployeeSkillCertificateDTO employeeSkillCertificateDTO);
+
+    @Named("id")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "type", source = "type", qualifiedByName = "name")
+    @Mapping(target = "skill", source = "skill", qualifiedByName = "name")
+    EmployeeSkillCertificateDTO toDtoId(EmployeeSkillCertificate employeeSkillCertificate);
 }

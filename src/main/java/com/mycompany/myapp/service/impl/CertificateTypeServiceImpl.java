@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CertificateTypeServiceImpl implements CertificateTypeService {
+
     private final Logger log = LoggerFactory.getLogger(CertificateTypeServiceImpl.class);
 
     private final CertificateTypeRepository certificateTypeRepository;
@@ -44,13 +45,10 @@ public class CertificateTypeServiceImpl implements CertificateTypeService {
         log.debug("Request to partially update CertificateType : {}", certificateTypeDTO);
 
         return certificateTypeRepository
-            .findById(certificateTypeDTO.getId())
+            .findById(certificateTypeMapper.toEntity(certificateTypeDTO).getId())
             .map(
                 existingCertificateType -> {
-                    if (certificateTypeDTO.getName() != null) {
-                        existingCertificateType.setName(certificateTypeDTO.getName());
-                    }
-
+                    certificateTypeMapper.partialUpdate(existingCertificateType, certificateTypeDTO);
                     return existingCertificateType;
                 }
             )

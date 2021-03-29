@@ -1,113 +1,63 @@
 jest.mock('@angular/router');
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { of, Subject } from 'rxjs';
-
-import { WithIdStringService } from '../service/with-id-string.service';
-import { IWithIdString, WithIdString } from '../with-id-string.model';
+import { MessageService } from 'primeng/api';
+import { of } from 'rxjs';
 
 import { WithIdStringUpdateComponent } from './with-id-string-update.component';
+import { WithIdStringService } from '../service/with-id-string.service';
 
 describe('Component Tests', () => {
   describe('WithIdString Management Update Component', () => {
     let comp: WithIdStringUpdateComponent;
     let fixture: ComponentFixture<WithIdStringUpdateComponent>;
-    let activatedRoute: ActivatedRoute;
-    let withIdStringService: WithIdStringService;
+    let service: WithIdStringService;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         declarations: [WithIdStringUpdateComponent],
-        providers: [FormBuilder, ActivatedRoute]
+        providers: [FormBuilder, ActivatedRoute, MessageService],
       })
         .overrideTemplate(WithIdStringUpdateComponent, '')
         .compileComponents();
 
       fixture = TestBed.createComponent(WithIdStringUpdateComponent);
-      activatedRoute = TestBed.inject(ActivatedRoute);
-      withIdStringService = TestBed.inject(WithIdStringService);
-
       comp = fixture.componentInstance;
-    });
-
-    describe('ngOnInit', () => {
-      it('Should update editForm', () => {
-        const withIdString: IWithIdString = { id: 'CBA' };
-
-        activatedRoute.data = of({ withIdString });
-        comp.ngOnInit();
-
-        expect(comp.editForm.value).toEqual(expect.objectContaining(withIdString));
-      });
+      service = TestBed.inject(WithIdStringService);
     });
 
     describe('save', () => {
-      it('Should call update service on save for existing entity', () => {
+      it('Should call update service on save for existing entity', fakeAsync(() => {
         // GIVEN
-        const saveSubject = new Subject();
-        const withIdString = { id: 'ABC' };
-        spyOn(withIdStringService, 'update').and.returnValue(saveSubject);
-        spyOn(comp, 'previousState');
-        activatedRoute.data = of({ withIdString });
-        comp.ngOnInit();
-
+        const entity = { id: 'ABC' };
+        spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
+        comp.updateForm(entity);
         // WHEN
         comp.save();
-        expect(comp.isSaving).toEqual(true);
-        saveSubject.next(new HttpResponse({ body: withIdString }));
-        saveSubject.complete();
+        tick(); // simulate async
 
         // THEN
-        expect(comp.previousState).toHaveBeenCalled();
-        expect(withIdStringService.update).toHaveBeenCalledWith(withIdString);
+        expect(service.update).toHaveBeenCalledWith(jasmine.objectContaining(entity));
         expect(comp.isSaving).toEqual(false);
-      });
+      }));
 
-      it('Should call create service on save for new entity', () => {
+      it('Should call create service on save for new entity', fakeAsync(() => {
         // GIVEN
-        const saveSubject = new Subject();
-        const withIdString = new WithIdString();
-        spyOn(withIdStringService, 'create').and.returnValue(saveSubject);
-        spyOn(comp, 'previousState');
-        activatedRoute.data = of({ withIdString });
-        comp.ngOnInit();
-
+        spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: null })));
+        comp.updateForm(null);
         // WHEN
         comp.save();
-        expect(comp.isSaving).toEqual(true);
-        saveSubject.next(new HttpResponse({ body: withIdString }));
-        saveSubject.complete();
+        tick(); // simulate async
 
         // THEN
-        expect(withIdStringService.create).toHaveBeenCalledWith(withIdString);
+        expect(service.create).toHaveBeenCalledWith(comp.editForm.value);
         expect(comp.isSaving).toEqual(false);
-        expect(comp.previousState).toHaveBeenCalled();
-      });
-
-      it('Should set isSaving to false on error', () => {
-        // GIVEN
-        const saveSubject = new Subject();
-        const withIdString = { id: 'ABC' };
-        spyOn(withIdStringService, 'update').and.returnValue(saveSubject);
-        spyOn(comp, 'previousState');
-        activatedRoute.data = of({ withIdString });
-        comp.ngOnInit();
-
-        // WHEN
-        comp.save();
-        expect(comp.isSaving).toEqual(true);
-        saveSubject.error('This is an error!');
-
-        // THEN
-        expect(withIdStringService.update).toHaveBeenCalledWith(withIdString);
-        expect(comp.isSaving).toEqual(false);
-        expect(comp.previousState).not.toHaveBeenCalled();
-      });
+      }));
     });
   });
 });

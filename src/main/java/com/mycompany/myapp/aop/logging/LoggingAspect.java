@@ -20,6 +20,7 @@ import tech.jhipster.config.JHipsterConstants;
  */
 @Aspect
 public class LoggingAspect {
+
     private final Environment env;
 
     public LoggingAspect(Environment env) {

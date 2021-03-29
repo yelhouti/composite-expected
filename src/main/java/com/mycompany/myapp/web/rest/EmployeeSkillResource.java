@@ -1,14 +1,19 @@
 package com.mycompany.myapp.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycompany.myapp.domain.EmployeeSkillId;
+import com.mycompany.myapp.domain.EmployeeSkillId;
 import com.mycompany.myapp.repository.EmployeeSkillRepository;
 import com.mycompany.myapp.service.EmployeeSkillQueryService;
 import com.mycompany.myapp.service.EmployeeSkillService;
 import com.mycompany.myapp.service.criteria.EmployeeSkillCriteria;
 import com.mycompany.myapp.service.dto.EmployeeSkillDTO;
+import com.mycompany.myapp.service.mapper.EmployeeSkillMapper;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -33,6 +38,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class EmployeeSkillResource {
+
     private final Logger log = LoggerFactory.getLogger(EmployeeSkillResource.class);
 
     private static final String ENTITY_NAME = "employeeSkill";
@@ -46,14 +52,18 @@ public class EmployeeSkillResource {
 
     private final EmployeeSkillQueryService employeeSkillQueryService;
 
+    private final EmployeeSkillMapper employeeSkillMapper;
+
     public EmployeeSkillResource(
         EmployeeSkillService employeeSkillService,
         EmployeeSkillRepository employeeSkillRepository,
-        EmployeeSkillQueryService employeeSkillQueryService
+        EmployeeSkillQueryService employeeSkillQueryService,
+        EmployeeSkillMapper employeeSkillMapper
     ) {
         this.employeeSkillService = employeeSkillService;
         this.employeeSkillRepository = employeeSkillRepository;
         this.employeeSkillQueryService = employeeSkillQueryService;
+        this.employeeSkillMapper = employeeSkillMapper;
     }
 
     /**
@@ -67,54 +77,73 @@ public class EmployeeSkillResource {
     public ResponseEntity<EmployeeSkillDTO> createEmployeeSkill(@Valid @RequestBody EmployeeSkillDTO employeeSkillDTO)
         throws URISyntaxException {
         log.debug("REST request to save EmployeeSkill : {}", employeeSkillDTO);
-        if (employeeSkillDTO.getName() != null) {
-            throw new BadRequestAlertException("A new employeeSkill cannot already have an ID", ENTITY_NAME, "idexists");
+        EmployeeSkillId id = employeeSkillMapper.toEntity(employeeSkillDTO).getId();
+        if (id == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (employeeSkillService.findOne(id).isPresent()) {
+            throw new BadRequestAlertException("This employeeSkill already exists", ENTITY_NAME, "idexists");
         }
         EmployeeSkillDTO result = employeeSkillService.save(employeeSkillDTO);
         return ResponseEntity
-            .created(new URI("/api/employee-skills/" + result.getName()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getName()))
+            .created(
+                new URI(
+                    "/api/employee-skills/" + "name=" + result.getName() + ";" + "employeeUsername=" + result.getEmployee().getUsername()
+                )
+            )
+            .headers(
+                HeaderUtil.createEntityCreationAlert(
+                    applicationName,
+                    true,
+                    ENTITY_NAME,
+                    "name=" + result.getName() + ";" + "employeeUsername=" + result.getEmployee().getUsername()
+                )
+            )
             .body(result);
     }
 
     /**
-     * {@code PUT  /employee-skills/:name} : Updates an existing employeeSkill.
+     * {@code PUT  /employee-skills/:id} : Updates an existing employeeSkill.
      *
-     * @param name the id of the employeeSkillDTO to save.
+     * @param idMap a Map representation of the id of the employeeSkillDTO to save.
      * @param employeeSkillDTO the employeeSkillDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated employeeSkillDTO,
      * or with status {@code 400 (Bad Request)} if the employeeSkillDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the employeeSkillDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/employee-skills/{name}")
+    @PutMapping("/employee-skills/{id}")
     public ResponseEntity<EmployeeSkillDTO> updateEmployeeSkill(
-        @PathVariable(value = "name", required = false) final String name,
+        @MatrixVariable(pathVar = "id") Map<String, String> idMap,
         @Valid @RequestBody EmployeeSkillDTO employeeSkillDTO
-    )
-        throws URISyntaxException {
-        log.debug("REST request to update EmployeeSkill : {}, {}", name, employeeSkillDTO);
-        if (employeeSkillDTO.getName() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(name, employeeSkillDTO.getName())) {
+    ) throws URISyntaxException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillId id = mapper.convertValue(idMap, EmployeeSkillId.class);
+        log.debug("REST request to update EmployeeSkill : {}, {}", id, employeeSkillDTO);
+        if (!Objects.equals(id, employeeSkillMapper.toEntity(employeeSkillDTO).getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
-        if (!employeeSkillRepository.existsById(name)) {
+        if (!employeeSkillRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
         EmployeeSkillDTO result = employeeSkillService.save(employeeSkillDTO);
         return ResponseEntity
             .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeSkillDTO.getName()))
+            .headers(
+                HeaderUtil.createEntityUpdateAlert(
+                    applicationName,
+                    true,
+                    ENTITY_NAME,
+                    "name=" + employeeSkillDTO.getName() + ";" + "employeeUsername=" + employeeSkillDTO.getEmployee().getUsername()
+                )
+            )
             .body(result);
     }
 
     /**
-     * {@code PATCH  /employee-skills} : Updates given fields of an existing employeeSkill.
+     * {@code PATCH  /employee-skills/:id} : Partial updates given fields of an existing employeeSkill, field will ignore if it is null
      *
+     * @param idMap a Map representation of the id of the employeeSkillDTO to save.
      * @param employeeSkillDTO the employeeSkillDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated employeeSkillDTO,
      * or with status {@code 400 (Bad Request)} if the employeeSkillDTO is not valid,
@@ -122,19 +151,32 @@ public class EmployeeSkillResource {
      * or with status {@code 500 (Internal Server Error)} if the employeeSkillDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/employee-skills", consumes = "application/merge-patch+json")
-    public ResponseEntity<EmployeeSkillDTO> partialUpdateEmployeeSkill(@NotNull @RequestBody EmployeeSkillDTO employeeSkillDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update EmployeeSkill partially : {}", employeeSkillDTO);
-        if (employeeSkillDTO.getName() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    @PatchMapping(value = "/employee-skills/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<EmployeeSkillDTO> partialUpdateEmployeeSkill(
+        @MatrixVariable(pathVar = "id") Map<String, String> idMap,
+        @NotNull @RequestBody EmployeeSkillDTO employeeSkillDTO
+    ) throws URISyntaxException {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillId id = mapper.convertValue(idMap, EmployeeSkillId.class);
+        log.debug("REST request to partial update EmployeeSkill partially : {}, {}", id, employeeSkillDTO);
+        if (!Objects.equals(id, employeeSkillMapper.toEntity(employeeSkillDTO).getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!employeeSkillRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<EmployeeSkillDTO> result = employeeSkillService.partialUpdate(employeeSkillDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, employeeSkillDTO.getName())
+            HeaderUtil.createEntityUpdateAlert(
+                applicationName,
+                true,
+                ENTITY_NAME,
+                "name=" + employeeSkillDTO.getName() + ";" + "employeeUsername=" + employeeSkillDTO.getEmployee().getUsername()
+            )
         );
     }
 
@@ -168,11 +210,13 @@ public class EmployeeSkillResource {
     /**
      * {@code GET  /employee-skills/:id} : get the "id" employeeSkill.
      *
-     * @param id the id of the employeeSkillDTO to retrieve.
+     * @param idMap a Map representation of the id of the employeeSkillDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the employeeSkillDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/employee-skills/{id}")
-    public ResponseEntity<EmployeeSkillDTO> getEmployeeSkill(@PathVariable String id) {
+    public ResponseEntity<EmployeeSkillDTO> getEmployeeSkill(@MatrixVariable(pathVar = "id") Map<String, String> idMap) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillId id = mapper.convertValue(idMap, EmployeeSkillId.class);
         log.debug("REST request to get EmployeeSkill : {}", id);
         Optional<EmployeeSkillDTO> employeeSkillDTO = employeeSkillService.findOne(id);
         return ResponseUtil.wrapOrNotFound(employeeSkillDTO);
@@ -181,13 +225,18 @@ public class EmployeeSkillResource {
     /**
      * {@code DELETE  /employee-skills/:id} : delete the "id" employeeSkill.
      *
-     * @param id the id of the employeeSkillDTO to delete.
+     * @param idMap a Map representation of the id of the employeeSkillDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/employee-skills/{id}")
-    public ResponseEntity<Void> deleteEmployeeSkill(@PathVariable String id) {
+    public ResponseEntity<Void> deleteEmployeeSkill(@MatrixVariable(pathVar = "id") Map<String, String> idMap) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final EmployeeSkillId id = mapper.convertValue(idMap, EmployeeSkillId.class);
         log.debug("REST request to delete EmployeeSkill : {}", id);
         employeeSkillService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
+        return ResponseEntity
+            .noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .build();
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @IntegrationTest
 class UserJWTControllerIT {
+
     @Autowired
     private UserRepository userRepository;
 

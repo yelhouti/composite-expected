@@ -7,12 +7,11 @@
         Added the constraints for entity Employee.
     -->
     <changeSet id="20210313070552-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="manager_username"
                                  baseTableName="employee"
                                  constraintName="fk_employee__manager_id"
                                  referencedColumnNames="username"
                                  referencedTableName="employee"/>
-
     </changeSet>
 </databaseChangeLog>

@@ -16,6 +16,7 @@ import tech.jhipster.config.JHipsterDefaults;
 import tech.jhipster.config.JHipsterProperties;
 
 class StaticResourcesWebConfigurerTest {
+
     public static final int MAX_AGE_TEST = 5;
     public StaticResourcesWebConfiguration staticResourcesWebConfiguration;
     private ResourceHandlerRegistry resourceHandlerRegistry;

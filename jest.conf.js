@@ -8,7 +8,7 @@ module.exports = {
   reporters: ['default', ['jest-junit', { outputDirectory: './build/test-results/', outputName: 'TESTS-results-jest.xml' }]],
   testResultsProcessor: 'jest-sonar-reporter',
   testMatch: ['<rootDir>/src/main/webapp/app/**/@(*.)@(spec.ts)'],
-  testURL: 'http://localhost/'
+  testURL: 'http://localhost/',
 };
 
 function mapTypescriptAliasToJestAlias(alias = {}) {

@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
 import { IWithIdStringDetails, WithIdStringDetails } from '../with-id-string-details.model';
 
 import { WithIdStringDetailsService } from './with-id-string-details.service';
@@ -14,7 +13,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(WithIdStringDetailsService);
@@ -22,7 +21,7 @@ describe('Service Tests', () => {
 
       elemDefault = {
         id: 'AAAAAAA',
-        details: 'AAAAAAA'
+        details: 'AAAAAAA',
       };
     });
 
@@ -40,7 +39,7 @@ describe('Service Tests', () => {
       it('should create a WithIdStringDetails', () => {
         const returnedFromService = Object.assign(
           {
-            id: 'ID'
+            id: 'ID',
           },
           elemDefault
         );
@@ -58,7 +57,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 'BBBBBB',
-            details: 'BBBBBB'
+            details: 'BBBBBB',
           },
           elemDefault
         );
@@ -76,7 +75,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 'BBBBBB',
-            details: 'BBBBBB'
+            details: 'BBBBBB',
           },
           elemDefault
         );
@@ -97,58 +96,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addWithIdStringDetailsToCollectionIfMissing', () => {
-        it('should add a WithIdStringDetails to an empty array', () => {
-          const withIdStringDetails: IWithIdStringDetails = { id: 'ABC' };
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing([], withIdStringDetails);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(withIdStringDetails);
-        });
-
-        it('should not add a WithIdStringDetails to an array that contains it', () => {
-          const withIdStringDetails: IWithIdStringDetails = { id: 'ABC' };
-          const withIdStringDetailsCollection: IWithIdStringDetails[] = [
-            {
-              ...withIdStringDetails
-            },
-            { id: 'CBA' }
-          ];
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing(withIdStringDetailsCollection, withIdStringDetails);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a WithIdStringDetails to an array that doesn't contain it", () => {
-          const withIdStringDetails: IWithIdStringDetails = { id: 'ABC' };
-          const withIdStringDetailsCollection: IWithIdStringDetails[] = [{ id: 'CBA' }];
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing(withIdStringDetailsCollection, withIdStringDetails);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(withIdStringDetails);
-        });
-
-        it('should add only unique WithIdStringDetails to an array', () => {
-          const withIdStringDetailsArray: IWithIdStringDetails[] = [{ id: 'ABC' }, { id: 'CBA' }, { id: 'parse' }];
-          const withIdStringDetailsCollection: IWithIdStringDetails[] = [{ id: 'ABC' }];
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing(withIdStringDetailsCollection, ...withIdStringDetailsArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const withIdStringDetails: IWithIdStringDetails = { id: 'ABC' };
-          const withIdStringDetails2: IWithIdStringDetails = { id: 'CBA' };
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing([], withIdStringDetails, withIdStringDetails2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(withIdStringDetails);
-          expect(expectedResult).toContain(withIdStringDetails2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const withIdStringDetails: IWithIdStringDetails = { id: 'ABC' };
-          expectedResult = service.addWithIdStringDetailsToCollectionIfMissing([], null, withIdStringDetails, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(withIdStringDetails);
-        });
       });
     });
 

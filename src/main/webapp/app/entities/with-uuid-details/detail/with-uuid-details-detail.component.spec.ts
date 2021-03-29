@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ withUUIDDetails: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } }) }
-          }
-        ]
+            useValue: { data: of({ withUUIDDetails: { withUUID: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } } }) },
+          },
+        ],
       })
         .overrideTemplate(WithUUIDDetailsDetailComponent, '')
         .compileComponents();
@@ -31,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.withUUIDDetails).toEqual(jasmine.objectContaining({ uuid: '9fec3727-3421-4967-b213-ba36557ca194' }));
+        expect(comp.withUUIDDetails).toEqual(jasmine.objectContaining({ withUUID: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } }));
       });
     });
   });

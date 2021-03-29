@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WithIdStringServiceImpl implements WithIdStringService {
+
     private final Logger log = LoggerFactory.getLogger(WithIdStringServiceImpl.class);
 
     private final WithIdStringRepository withIdStringRepository;
@@ -45,13 +46,10 @@ public class WithIdStringServiceImpl implements WithIdStringService {
         log.debug("Request to partially update WithIdString : {}", withIdStringDTO);
 
         return withIdStringRepository
-            .findById(withIdStringDTO.getId())
+            .findById(withIdStringMapper.toEntity(withIdStringDTO).getId())
             .map(
                 existingWithIdString -> {
-                    if (withIdStringDTO.getName() != null) {
-                        existingWithIdString.setName(withIdStringDTO.getName());
-                    }
-
+                    withIdStringMapper.partialUpdate(existingWithIdString, withIdStringDTO);
                     return existingWithIdString;
                 }
             )

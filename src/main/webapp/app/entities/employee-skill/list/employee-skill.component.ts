@@ -1,117 +1,141 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Subscription } from 'rxjs';
+import { filter, tap, switchMap } from 'rxjs/operators';
+import { FilterMetadata, MessageService } from 'primeng/api';
 import { IEmployeeSkill } from '../employee-skill.model';
+import { EmployeeSkillService } from '../service/employee-skill.service';
 
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
-import { EmployeeSkillService } from '../service/employee-skill.service';
-import { EmployeeSkillDeleteDialogComponent } from '../delete/employee-skill-delete-dialog.component';
+import {
+  lazyLoadEventToServerQueryParams,
+  lazyLoadEventToRouterQueryParams,
+  fillTableFromQueryParams,
+} from 'app/core/request/request-util';
+import { ConfirmationService, LazyLoadEvent } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { ITask } from 'app/entities/task/task.model';
+import { TaskService } from 'app/entities/task/service/task.service';
+import { IEmployee } from 'app/entities/employee/employee.model';
+import { EmployeeService } from 'app/entities/employee/service/employee.service';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'jhi-employee-skill',
-  templateUrl: './employee-skill.component.html'
+  templateUrl: './employee-skill.component.html',
 })
 export class EmployeeSkillComponent implements OnInit {
   employeeSkills?: IEmployeeSkill[];
-  isLoading = false;
-  totalItems = 0;
-  itemsPerPage = ITEMS_PER_PAGE;
-  page?: number;
-  predicate!: string;
-  ascending!: boolean;
-  ngbPaginationPage = 1;
+  eventSubscriber?: Subscription;
+  taskOptions: ITask[] | null = null;
+  employeeOptions: IEmployee[] | null = null;
+  employeeSelectedOptions: IEmployee[] | null = null;
+  teacherOptions: IEmployee[] | null = null;
+  teacherSelectedOptions: IEmployee[] | null = null;
+
+  totalItems?: number;
+  itemsPerPage!: number;
+  loading!: boolean;
+
+  @ViewChild('employeeSkillTable', { static: true })
+  employeeSkillTable!: Table;
+
+  private filtersDetails: { [_: string]: { type: string } } = {
+    name: { type: 'string' },
+    level: { type: 'number' },
+    ['task.id']: { type: 'number' },
+    ['employee.username']: { type: 'string' },
+    ['teacher.username']: { type: 'string' },
+  };
 
   constructor(
     protected employeeSkillService: EmployeeSkillService,
+    protected taskService: TaskService,
+    protected employeeService: EmployeeService,
+    protected messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected modalService: NgbModal
-  ) {}
+    protected confirmationService: ConfirmationService,
+    protected translateService: TranslateService
+  ) {
+    this.itemsPerPage = ITEMS_PER_PAGE;
+    this.loading = true;
+  }
 
-  loadPage(page?: number, dontNavigate?: boolean): void {
-    this.isLoading = true;
-    const pageToLoad: number = page ?? this.page ?? 1;
-
-    this.employeeSkillService
-      .query({
-        page: pageToLoad - 1,
-        size: this.itemsPerPage,
-        sort: this.sort()
-      })
+  ngOnInit(): void {
+    this.activatedRoute.queryParams
+      .pipe(
+        tap(queryParams => fillTableFromQueryParams(this.employeeSkillTable, queryParams, this.filtersDetails)),
+        tap(() => (this.loading = true)),
+        switchMap(() =>
+          this.employeeSkillService.query(
+            lazyLoadEventToServerQueryParams(this.employeeSkillTable.createLazyLoadMetadata(), undefined, this.filtersDetails)
+          )
+        ),
+        // TODO add catchError inside switchMap in blueprint
+        filter((res: HttpResponse<IEmployeeSkill[]>) => res.ok)
+      )
       .subscribe(
         (res: HttpResponse<IEmployeeSkill[]>) => {
-          this.isLoading = false;
-          this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate);
+          this.paginateEmployeeSkills(res.body!, res.headers);
+          this.loading = false;
         },
-        () => {
-          this.isLoading = false;
-          this.onError();
+        (err: HttpErrorResponse) => {
+          this.onError(err.message);
+          console.error(err);
+          this.loading = false;
         }
       );
   }
 
-  ngOnInit(): void {
-    this.handleNavigation();
+  get filters(): { [s: string]: FilterMetadata } {
+    return this.employeeSkillTable.filters as { [s: string]: FilterMetadata };
   }
 
-  trackName(index: number, item: IEmployeeSkill): string {
-    return item.name!;
+  onLazyLoadEvent(event: LazyLoadEvent): void {
+    const queryParams = lazyLoadEventToRouterQueryParams(event, this.filtersDetails);
+    this.router.navigate(['/employee-skill'], { queryParams });
   }
 
-  delete(employeeSkill: IEmployeeSkill): void {
-    const modalRef = this.modalService.open(EmployeeSkillDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.employeeSkill = employeeSkill;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.loadPage();
-      }
+  delete(name: string, employeeUsername: string): void {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('entity.delete.title'),
+      message: this.translateService.instant('compositekeyApp.employeeSkill.delete.question', { id: `${name} , ${employeeUsername}` }),
+      accept: () => {
+        this.employeeSkillService.delete(name, employeeUsername).subscribe(() => {
+          this.router.navigate(['/employee-skill'], { queryParams: { r: Date.now() }, queryParamsHandling: 'merge' });
+        });
+      },
     });
   }
 
-  protected sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'name') {
-      result.push('name');
-    }
-    return result;
+  onTaskLazyLoadEvent(event: LazyLoadEvent): void {
+    this.taskService.query(lazyLoadEventToServerQueryParams(event, 'name.contains')).subscribe(res => (this.taskOptions = res.body));
   }
 
-  protected handleNavigation(): void {
-    combineLatest([this.activatedRoute.data, this.activatedRoute.queryParamMap]).subscribe(([data, params]) => {
-      const page = params.get('page');
-      const pageNumber = page !== null ? +page : 1;
-      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      const predicate = sort[0];
-      const ascending = sort[1] === 'asc';
-      if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
-        this.predicate = predicate;
-        this.ascending = ascending;
-        this.loadPage(pageNumber, true);
-      }
-    });
+  onEmployeeLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService
+      .query(lazyLoadEventToServerQueryParams(event, 'fullname.contains'))
+      .subscribe(res => (this.employeeOptions = res.body));
   }
 
-  protected onSuccess(data: IEmployeeSkill[] | null, headers: HttpHeaders, page: number, navigate: boolean): void {
+  onTeacherLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService
+      .query(lazyLoadEventToServerQueryParams(event, 'fullname.contains'))
+      .subscribe(res => (this.teacherOptions = res.body));
+  }
+
+  trackId(index: number, item: IEmployeeSkill): string {
+    return `${item.name!},${item.employee!.username!}`;
+  }
+
+  protected paginateEmployeeSkills(data: IEmployeeSkill[], headers: HttpHeaders): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.page = page;
-    if (navigate) {
-      this.router.navigate(['/employee-skill'], {
-        queryParams: {
-          page: this.page,
-          size: this.itemsPerPage,
-          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-        }
-      });
-    }
-    this.employeeSkills = data ?? [];
-    this.ngbPaginationPage = this.page;
+    this.employeeSkills = data;
   }
 
-  protected onError(): void {
-    this.ngbPaginationPage = this.page ?? 1;
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

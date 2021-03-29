@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
 import { ICertificateType, CertificateType } from '../certificate-type.model';
 
 import { CertificateTypeService } from './certificate-type.service';
@@ -14,7 +13,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(CertificateTypeService);
@@ -22,7 +21,7 @@ describe('Service Tests', () => {
 
       elemDefault = {
         id: 0,
-        name: 'AAAAAAA'
+        name: 'AAAAAAA',
       };
     });
 
@@ -40,7 +39,7 @@ describe('Service Tests', () => {
       it('should create a CertificateType', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0
+            id: 0,
           },
           elemDefault
         );
@@ -58,7 +57,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 1,
-            name: 'BBBBBB'
+            name: 'BBBBBB',
           },
           elemDefault
         );
@@ -76,7 +75,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 1,
-            name: 'BBBBBB'
+            name: 'BBBBBB',
           },
           elemDefault
         );
@@ -97,58 +96,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addCertificateTypeToCollectionIfMissing', () => {
-        it('should add a CertificateType to an empty array', () => {
-          const certificateType: ICertificateType = { id: 123 };
-          expectedResult = service.addCertificateTypeToCollectionIfMissing([], certificateType);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(certificateType);
-        });
-
-        it('should not add a CertificateType to an array that contains it', () => {
-          const certificateType: ICertificateType = { id: 123 };
-          const certificateTypeCollection: ICertificateType[] = [
-            {
-              ...certificateType
-            },
-            { id: 456 }
-          ];
-          expectedResult = service.addCertificateTypeToCollectionIfMissing(certificateTypeCollection, certificateType);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a CertificateType to an array that doesn't contain it", () => {
-          const certificateType: ICertificateType = { id: 123 };
-          const certificateTypeCollection: ICertificateType[] = [{ id: 456 }];
-          expectedResult = service.addCertificateTypeToCollectionIfMissing(certificateTypeCollection, certificateType);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(certificateType);
-        });
-
-        it('should add only unique CertificateType to an array', () => {
-          const certificateTypeArray: ICertificateType[] = [{ id: 123 }, { id: 456 }, { id: 44708 }];
-          const certificateTypeCollection: ICertificateType[] = [{ id: 123 }];
-          expectedResult = service.addCertificateTypeToCollectionIfMissing(certificateTypeCollection, ...certificateTypeArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const certificateType: ICertificateType = { id: 123 };
-          const certificateType2: ICertificateType = { id: 456 };
-          expectedResult = service.addCertificateTypeToCollectionIfMissing([], certificateType, certificateType2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(certificateType);
-          expect(expectedResult).toContain(certificateType2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const certificateType: ICertificateType = { id: 123 };
-          expectedResult = service.addCertificateTypeToCollectionIfMissing([], null, certificateType, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(certificateType);
-        });
       });
     });
 

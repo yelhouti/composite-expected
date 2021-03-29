@@ -1,98 +1,188 @@
 <div>
   <h2 id="page-heading" data-cy="TaskHeading">
     <span jhiTranslate="compositekeyApp.task.home.title">Tasks</span>
-
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info mr-2" (click)="loadAll()" [disabled]="isLoading">
-        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
-        <span jhiTranslate="compositekeyApp.task.home.refreshListLabel">Refresh List</span>
-      </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-task"
-        [routerLink]="['/task/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="compositekeyApp.task.home.createLabel"> Create a new Task </span>
-      </button>
-    </div>
+    <p-button
+      id="jh-create-entity"
+      class="float-right jh-create-entity create-task"
+      [routerLink]="['/task/new']"
+      [label]="'compositekeyApp.task.home.createLabel' | translate"
+      icon="pi pi-plus"
+      iconPos="left"
+    >
+    </p-button>
   </h2>
-
-  <jhi-alert-error></jhi-alert-error>
-
-  <jhi-alert></jhi-alert>
-
-  <div class="alert alert-warning" id="no-result" *ngIf="tasks?.length === 0">
-    <span jhiTranslate="compositekeyApp.task.home.notFound">No tasks found</span>
-  </div>
-
-  <div class="table-responsive" id="entities" *ngIf="tasks && tasks.length > 0">
-    <table class="table table-striped" aria-describedby="page-heading">
-      <thead>
-        <tr>
-          <th scope="col"><span jhiTranslate="global.field.id">ID</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.name">Name</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.type">Type</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.endDate">End Date</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.createdAt">Created At</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.modifiedAt">Modified At</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.done">Done</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.description">Description</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.attachment">Attachment</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.picture">Picture</span></th>
-          <th scope="col"><span jhiTranslate="compositekeyApp.task.user">User</span></th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let task of tasks; trackBy: trackId" data-cy="entityTable">
-          <td>
-            <a [routerLink]="['/task', task.id, 'view']">{{ task.id }}</a>
-          </td>
-          <td>{{ task.name }}</td>
-          <td jhiTranslate="{{ 'compositekeyApp.TaskType.' + task.type }}">{{ task.type }}</td>
-          <td>{{ task.endDate | formatMediumDate }}</td>
-          <td>{{ task.createdAt | formatMediumDatetime }}</td>
-          <td>{{ task.modifiedAt | formatMediumDatetime }}</td>
-          <td>{{ task.done }}</td>
-          <td>{{ task.description }}</td>
-          <td>
-            <a *ngIf="task.attachment" (click)="openFile(task.attachment, task.attachmentContentType)" jhiTranslate="entity.action.open"
-              >open</a
+  <br />
+  <p-table
+    #taskTable
+    [value]="tasks!"
+    [rowTrackBy]="trackId"
+    [responsive]="true"
+    [lazy]="true"
+    [rows]="itemsPerPage"
+    [totalRecords]="totalItems!"
+    [loading]="loading"
+    sortMode="multiple"
+    [lazyLoadOnInit]="false"
+    [paginator]="true"
+    (onLazyLoad)="onLazyLoadEvent($event)"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id">
+          <span jhiTranslate="compositekeyApp.task.id">ID</span>
+          <p-sortIcon field="id"></p-sortIcon>
+          <p-columnFilter type="numeric" field="id" display="menu" [showOperator]="false" class="p-ml-auto"></p-columnFilter>
+        </th>
+        <th pSortableColumn="name">
+          <span jhiTranslate="compositekeyApp.task.name">Name</span>
+          <p-sortIcon field="name"></p-sortIcon>
+          <p-columnFilter
+            type="text"
+            matchMode="contains"
+            field="name"
+            display="menu"
+            [showOperator]="false"
+            class="p-ml-auto"
+          ></p-columnFilter>
+        </th>
+        <th pSortableColumn="type">
+          <span jhiTranslate="compositekeyApp.task.type">Type</span>
+          <p-sortIcon field="type"></p-sortIcon>
+          <p-columnFilter
+            field="type"
+            matchMode="in"
+            display="menu"
+            [showOperator]="false"
+            [showMatchModes]="false"
+            [showOperator]="false"
+            [showAddButton]="false"
+            class="p-ml-auto"
+          >
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect [ngModel]="value" [options]="typeOptions!" (onChange)="filter($event.value)">
+                <ng-template let-type pTemplate="item">{{ 'compositekeyApp.TaskType.' + type.label | translate }}</ng-template>
+              </p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th pSortableColumn="endDate">
+          <span jhiTranslate="compositekeyApp.task.endDate">End Date</span>
+          <p-sortIcon field="endDate"></p-sortIcon>
+          <p-columnFilter type="date" field="endDate" display="menu" [showOperator]="false" class="p-ml-auto"></p-columnFilter>
+        </th>
+        <th pSortableColumn="createdAt">
+          <span jhiTranslate="compositekeyApp.task.createdAt">Created At</span>
+          <p-sortIcon field="createdAt"></p-sortIcon>
+          <p-columnFilter type="dateTime" field="createdAt" display="menu" [showOperator]="false" class="p-ml-auto">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" [showTime]="true"></p-calendar>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th pSortableColumn="modifiedAt">
+          <span jhiTranslate="compositekeyApp.task.modifiedAt">Modified At</span>
+          <p-sortIcon field="modifiedAt"></p-sortIcon>
+          <p-columnFilter type="dateTime" field="modifiedAt" display="menu" [showOperator]="false" class="p-ml-auto">
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-calendar [ngModel]="value" (ngModelChange)="filter($event)" [showTime]="true"></p-calendar>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th pSortableColumn="done">
+          <span jhiTranslate="compositekeyApp.task.done">Done</span>
+          <p-sortIcon field="done"></p-sortIcon>
+          <p-columnFilter
+            type="boolean"
+            matchMode="equals"
+            field="done"
+            display="menu"
+            [showOperator]="false"
+            class="p-ml-auto"
+          ></p-columnFilter>
+        </th>
+        <th pSortableColumn="description">
+          <span jhiTranslate="compositekeyApp.task.description">Description</span>
+          <p-sortIcon field="description"></p-sortIcon>
+        </th>
+        <th pSortableColumn="attachment">
+          <span jhiTranslate="compositekeyApp.task.attachment">Attachment</span>
+          <p-sortIcon field="attachment"></p-sortIcon>
+        </th>
+        <th pSortableColumn="picture">
+          <span jhiTranslate="compositekeyApp.task.picture">Picture</span>
+          <p-sortIcon field="picture"></p-sortIcon>
+        </th>
+        <th pSortableColumn="user.login">
+          <span jhiTranslate="compositekeyApp.task.user">User</span>
+          <p-sortIcon field="user.login"></p-sortIcon>
+          <p-columnFilter
+            field="user.id"
+            matchMode="in"
+            display="menu"
+            [showOperator]="false"
+            [showMatchModes]="false"
+            [showAddButton]="false"
+            class="p-ml-auto"
+          >
+            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+              <p-multiSelect
+                [ngModel]="value"
+                [options]="userOptions!"
+                (onChange)="filter($event.value)"
+                optionLabel="login"
+                optionValue="id"
+              ></p-multiSelect>
+            </ng-template>
+          </p-columnFilter>
+        </th>
+        <th style="width: 124px"></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-task>
+      <tr>
+        <td>
+          <a [routerLink]="['/task', task!.id!, 'view']">{{ task.id }}</a>
+        </td>
+        <td>{{ task.name }}</td>
+        <td jhiTranslate="{{ 'compositekeyApp.TaskType.' + task.type }}">{{ task.type }}</td>
+        <td>{{ task.endDate | date: 'mediumDate' }}</td>
+        <td>{{ task.createdAt | date: 'medium' }}</td>
+        <td>{{ task.modifiedAt | date: 'medium' }}</td>
+        <td>{{ task.done }}</td>
+        <td>{{ task.description }}</td>
+        <td>
+          <a *ngIf="task.attachment" (click)="openFile(task.attachment, task.attachmentContentType)" jhiTranslate="entity.action.open"
+            >open</a
+          >
+          <span *ngIf="task.attachment">{{ task.attachmentContentType }}, {{ byteSize(task.attachment) }}</span>
+        </td>
+        <td>
+          <a *ngIf="task.picture" (click)="openFile(task.picture, task.pictureContentType)">
+            <img [src]="'data:' + task.pictureContentType + ';base64,' + task.picture" style="max-height: 30px" alt="task image" />
+          </a>
+          <span *ngIf="task.picture">{{ task.pictureContentType }}, {{ byteSize(task.picture) }}</span>
+        </td>
+        <td>
+          <div *ngIf="task.user">
+            {{ task!.user!.login }}
+          </div>
+        </td>
+        <td>
+          <div class="btn-group flex-btn-group-container">
+            <p-button type="submit" [routerLink]="['/task', task.id!, 'view']" icon="pi pi-eye" styleClass="p-button-info"> </p-button>
+            <p-button
+              type="submit"
+              [routerLink]="['/task', task.id!, 'edit']"
+              icon="pi pi-pencil"
+              styleClass="p-button-warning"
+              data-cy="entityEditButton"
             >
-            <span *ngIf="task.attachment">{{ task.attachmentContentType }}, {{ byteSize(task.attachment) }}</span>
-          </td>
-          <td>
-            <a *ngIf="task.picture" (click)="openFile(task.picture, task.pictureContentType)">
-              <img [src]="'data:' + task.pictureContentType + ';base64,' + task.picture" style="max-height: 30px" alt="task image" />
-            </a>
-            <span *ngIf="task.picture">{{ task.pictureContentType }}, {{ byteSize(task.picture) }}</span>
-          </td>
-          <td>
-            {{ task.user?.login }}
-          </td>
-          <td class="text-right">
-            <div class="btn-group">
-              <button type="submit" [routerLink]="['/task', task.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                <fa-icon icon="eye"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
-              </button>
-
-              <button type="submit" [routerLink]="['/task', task.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                <fa-icon icon="pencil-alt"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
-              </button>
-
-              <button type="submit" (click)="delete(task)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                <fa-icon icon="times"></fa-icon>
-                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+            </p-button>
+            <p-button type="submit" (click)="delete(task.id)" icon="pi pi-times" styleClass="p-button-danger" data-cy="entityDeleteButton">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>

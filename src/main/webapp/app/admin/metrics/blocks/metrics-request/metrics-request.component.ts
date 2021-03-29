@@ -5,7 +5,7 @@ import { HttpServerRequests } from 'app/admin/metrics/metrics.model';
 @Component({
   selector: 'jhi-metrics-request',
   templateUrl: './metrics-request.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsRequestComponent {
   /**

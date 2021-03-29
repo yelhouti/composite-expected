@@ -8,6 +8,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.TaskComment} entity.
  */
 public class TaskCommentDTO implements Serializable {
+
     private Long id;
 
     @NotNull

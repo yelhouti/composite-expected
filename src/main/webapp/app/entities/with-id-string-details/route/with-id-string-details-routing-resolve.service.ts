@@ -4,18 +4,18 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IWithIdStringDetails, WithIdStringDetails } from '../with-id-string-details.model';
+import { IWithIdStringDetails } from '../with-id-string-details.model';
 import { WithIdStringDetailsService } from '../service/with-id-string-details.service';
 
 @Injectable({ providedIn: 'root' })
-export class WithIdStringDetailsRoutingResolveService implements Resolve<IWithIdStringDetails> {
-  constructor(protected service: WithIdStringDetailsService, protected router: Router) {}
+export class WithIdStringDetailsRoutingResolveService implements Resolve<IWithIdStringDetails | null> {
+  constructor(private service: WithIdStringDetailsService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IWithIdStringDetails> | Observable<never> {
-    const id = route.params['id'];
+  resolve(route: ActivatedRouteSnapshot): Observable<IWithIdStringDetails | null> | Observable<never> {
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
-        mergeMap((withIdStringDetails: HttpResponse<WithIdStringDetails>) => {
+        mergeMap((withIdStringDetails: HttpResponse<IWithIdStringDetails>) => {
           if (withIdStringDetails.body) {
             return of(withIdStringDetails.body);
           } else {
@@ -25,6 +25,6 @@ export class WithIdStringDetailsRoutingResolveService implements Resolve<IWithId
         })
       );
     }
-    return of(new WithIdStringDetails());
+    return of(null);
   }
 }

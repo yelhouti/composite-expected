@@ -20,10 +20,10 @@
     "prodDatabaseType": "postgresql",
     "searchEngine": false,
     "skipClient": false,
-    "testFrameworks": ["protractor"],
+    "testFrameworks": ["cypress"],
     "websocket": false,
     "applicationType": "monolith",
-    "jhipsterVersion": "7.0.0-beta.1",
+    "jhipsterVersion": "7.0.1",
     "skipServer": false,
     "packageFolder": "com/mycompany/myapp",
     "packageName": "com.mycompany.myapp",
@@ -43,16 +43,36 @@
       "WithIdString",
       "WithIdStringDetails",
       "WithUUID",
-      "WithUUIDDetails"
+      "WithUUIDDetails",
+      "EmployeeSkillCertificateDetails"
     ],
     "skipCheckLengthOfIdentifier": false,
     "skipFakeData": false,
-    "blueprints": [],
-    "otherModules": [],
+    "blueprints": [
+      {
+        "name": "generator-jhipster-composite-key-server",
+        "version": "7.0.0"
+      },
+      {
+        "name": "generator-jhipster-primeng-blueprint",
+        "version": "7.0.1"
+      }
+    ],
+    "otherModules": [
+      {
+        "name": "generator-jhipster-composite-key-server",
+        "version": "7.0.0"
+      },
+      {
+        "name": "generator-jhipster-primeng-blueprint",
+        "version": "7.0.1"
+      }
+    ],
     "pages": [],
     "nativeLanguage": "en",
     "creationTimestamp": 1615619092696,
     "jwtSecretKey": "NGNiMzI0ZTU2ZmI5NWMyN2RjZmI2NGVmMmQ3OWVjYzY3ZjE4M2E1YjZiNGI1NTg2YTQ4YTgwNDYzMjIxMjQyMTdlYTQ0MzMxOTg5MDliMDAzMzUzNmE4NTg3MDNkZTU2NmRlZTAyZmUxNjA2YzhlODViOTU2NmViMzk5MzhkNmE=",
-    "lastLiquibaseTimestamp": 1615619692000
+    "lastLiquibaseTimestamp": 1617186569000,
+    "backwardCompatibleDerivedName": false
   }
 }

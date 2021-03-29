@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
 import { IEmployee, Employee } from '../employee.model';
 
 import { EmployeeService } from './employee.service';
@@ -14,7 +13,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(EmployeeService);
@@ -22,7 +21,7 @@ describe('Service Tests', () => {
 
       elemDefault = {
         username: 'AAAAAAA',
-        fullname: 'AAAAAAA'
+        fullname: 'AAAAAAA',
       };
     });
 
@@ -40,7 +39,7 @@ describe('Service Tests', () => {
       it('should create a Employee', () => {
         const returnedFromService = Object.assign(
           {
-            id: 'ID'
+            id: 'ID',
           },
           elemDefault
         );
@@ -58,7 +57,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             username: 'BBBBBB',
-            fullname: 'BBBBBB'
+            fullname: 'BBBBBB',
           },
           elemDefault
         );
@@ -76,7 +75,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             username: 'BBBBBB',
-            fullname: 'BBBBBB'
+            fullname: 'BBBBBB',
           },
           elemDefault
         );
@@ -97,58 +96,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addEmployeeToCollectionIfMissing', () => {
-        it('should add a Employee to an empty array', () => {
-          const employee: IEmployee = { username: 'ABC' };
-          expectedResult = service.addEmployeeToCollectionIfMissing([], employee);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(employee);
-        });
-
-        it('should not add a Employee to an array that contains it', () => {
-          const employee: IEmployee = { username: 'ABC' };
-          const employeeCollection: IEmployee[] = [
-            {
-              ...employee
-            },
-            { username: 'CBA' }
-          ];
-          expectedResult = service.addEmployeeToCollectionIfMissing(employeeCollection, employee);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a Employee to an array that doesn't contain it", () => {
-          const employee: IEmployee = { username: 'ABC' };
-          const employeeCollection: IEmployee[] = [{ username: 'CBA' }];
-          expectedResult = service.addEmployeeToCollectionIfMissing(employeeCollection, employee);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(employee);
-        });
-
-        it('should add only unique Employee to an array', () => {
-          const employeeArray: IEmployee[] = [{ username: 'ABC' }, { username: 'CBA' }, { username: 'calculate networks' }];
-          const employeeCollection: IEmployee[] = [{ username: 'ABC' }];
-          expectedResult = service.addEmployeeToCollectionIfMissing(employeeCollection, ...employeeArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const employee: IEmployee = { username: 'ABC' };
-          const employee2: IEmployee = { username: 'CBA' };
-          expectedResult = service.addEmployeeToCollectionIfMissing([], employee, employee2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(employee);
-          expect(expectedResult).toContain(employee2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const employee: IEmployee = { username: 'ABC' };
-          expectedResult = service.addEmployeeToCollectionIfMissing([], null, employee, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(employee);
-        });
       });
     });
 

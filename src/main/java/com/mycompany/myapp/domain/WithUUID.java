@@ -15,10 +15,12 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "with_uuid")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class WithUUID implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
+    @Column(name = "uuid")
     private UUID uuid;
 
     @NotNull
@@ -30,17 +32,18 @@ public class WithUUID implements Serializable {
     private WithUUIDDetails withUUIDDetails;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public UUID getUuid() {
-        return uuid;
-    }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     public WithUUID uuid(UUID uuid) {
         this.uuid = uuid;
         return this;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -98,7 +101,7 @@ public class WithUUID implements Serializable {
     @Override
     public String toString() {
         return "WithUUID{" +
-            "uuid=" + getUuid() +
+            "uuid='" + getUuid() + "'" +
             ", name='" + getName() + "'" +
             "}";
     }

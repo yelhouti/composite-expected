@@ -1,6 +1,6 @@
 # compositekey
 
-This application was generated using JHipster 7.0.0-beta.1, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1](https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1).
+This application was generated using JHipster 7.0.1, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v7.0.1](https://www.jhipster.tech/documentation-archive/v7.0.1).
 
 ## Development
 
@@ -24,12 +24,6 @@ auto-refreshes when files change on your hard drive.
 ```
 ./gradlew -x webapp
 npm start
-```
-
-If you want to use [HMR](https://webpack.js.org/guides/hot-module-replacement) for instant page updates and data + scroll position preservation on file changes then instead of `npm start` run
-
-```
-npm run start-hmr
 ```
 
 Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
@@ -142,9 +136,6 @@ Unit tests are run by [Jest][]. They're located in [src/test/javascript/](src/te
 npm test
 ```
 
-UI end-to-end tests are powered by [Protractor][], which is built on top of WebDriverJS. They're located in [src/test/javascript/e2e](src/test/javascript/e2e)
-and can be run by starting Spring Boot in one terminal (`./gradlew bootRun`) and running the tests (`npm run e2e`) in a second one.
-
 For more information, refer to the [Running tests page][].
 
 ### Code quality
@@ -203,13 +194,13 @@ For more information refer to [Using Docker and Docker-Compose][], this page als
 To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
 
 [jhipster homepage and latest documentation]: https://www.jhipster.tech
-[jhipster 7.0.0-beta.1 archive]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1
-[using jhipster in development]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/development/
-[using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/docker-compose
-[using jhipster in production]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/production/
-[running tests page]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/running-tests/
-[code quality page]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/code-quality/
-[setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v7.0.0-beta.1/setting-up-ci/
+[jhipster 7.0.1 archive]: https://www.jhipster.tech/documentation-archive/v7.0.1
+[using jhipster in development]: https://www.jhipster.tech/documentation-archive/v7.0.1/development/
+[using docker and docker-compose]: https://www.jhipster.tech/documentation-archive/v7.0.1/docker-compose
+[using jhipster in production]: https://www.jhipster.tech/documentation-archive/v7.0.1/production/
+[running tests page]: https://www.jhipster.tech/documentation-archive/v7.0.1/running-tests/
+[code quality page]: https://www.jhipster.tech/documentation-archive/v7.0.1/code-quality/
+[setting up continuous integration]: https://www.jhipster.tech/documentation-archive/v7.0.1/setting-up-ci/
 [node.js]: https://nodejs.org/
 [webpack]: https://webpack.github.io/
 [angular cli]: https://cli.angular.io/

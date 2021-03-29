@@ -14,6 +14,18 @@ export class UserService {
 
   constructor(private http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
 
+  create(user: IUser): Observable<IUser> {
+    return this.http.post<IUser>(this.resourceUrl, user);
+  }
+
+  update(user: IUser): Observable<IUser> {
+    return this.http.put<IUser>(this.resourceUrl, user);
+  }
+
+  find(login: string): Observable<IUser> {
+    return this.http.get<IUser>(`${this.resourceUrl}/${login}`);
+  }
+
   query(req?: Pagination): Observable<HttpResponse<IUser[]>> {
     const options = createRequestOption(req);
     return this.http.get<IUser[]>(this.resourceUrl, { params: options, observe: 'response' });

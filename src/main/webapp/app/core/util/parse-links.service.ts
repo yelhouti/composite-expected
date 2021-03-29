@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
  * An utility service for link parsing.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParseLinks {
   /**

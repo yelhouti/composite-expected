@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 
 @Embeddable
 public class EmployeeSkillId implements java.io.Serializable {
+
     @NotNull
     @Column(name = "name")
     private String name;

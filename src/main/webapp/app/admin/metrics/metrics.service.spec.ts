@@ -11,7 +11,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       service = TestBed.inject(MetricsService);
       httpMock = TestBed.inject(HttpTestingController);
@@ -31,7 +31,7 @@ describe('Service Tests', () => {
           services: {},
           databases: {},
           garbageCollector: {},
-          processMetrics: {}
+          processMetrics: {},
         };
 
         service.getMetrics().subscribe(received => {
@@ -65,9 +65,9 @@ describe('Service Tests', () => {
               stackTrace: [],
               lockedMonitors: [],
               lockedSynchronizers: [],
-              lockInfo: null
-            }
-          ]
+              lockInfo: null,
+            },
+          ],
         };
 
         service.threadDump().subscribe(received => {

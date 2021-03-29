@@ -17,6 +17,7 @@
         "withIdStringDetails": "With Id String Details",
         "withUuid": "With UUID",
         "withUuidDetails": "With UUID Details",
+        "employeeSkillCertificateDetails": "Employee Skill Certificate Details",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

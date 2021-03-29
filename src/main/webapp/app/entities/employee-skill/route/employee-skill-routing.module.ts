@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { EmployeeSkillComponent } from '../list/employee-skill.component';
 import { EmployeeSkillDetailComponent } from '../detail/employee-skill-detail.component';
@@ -12,38 +13,52 @@ const employeeSkillRoute: Routes = [
     path: '',
     component: EmployeeSkillComponent,
     data: {
-      defaultSort: 'id,asc'
+      authorities: [Authority.USER],
+      defaultSort: '',
+      pageTitle: 'compositekeyApp.employeeSkill.home.title',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
-    path: ':name/view',
+    path: 'view',
     component: EmployeeSkillDetailComponent,
     resolve: {
-      employeeSkill: EmployeeSkillRoutingResolveService
+      employeeSkill: EmployeeSkillRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employeeSkill.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
     path: 'new',
     component: EmployeeSkillUpdateComponent,
     resolve: {
-      employeeSkill: EmployeeSkillRoutingResolveService
+      employeeSkill: EmployeeSkillRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employeeSkill.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
-    path: ':name/edit',
+    path: 'edit',
     component: EmployeeSkillUpdateComponent,
     resolve: {
-      employeeSkill: EmployeeSkillRoutingResolveService
+      employeeSkill: EmployeeSkillRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
-  }
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employeeSkill.home.title',
+    },
+    canActivate: [UserRouteAccessService],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(employeeSkillRoute)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class EmployeeSkillRoutingModule {}

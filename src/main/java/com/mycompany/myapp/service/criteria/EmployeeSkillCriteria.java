@@ -21,29 +21,30 @@ import tech.jhipster.service.filter.StringFilter;
  * fix type specific filters.
  */
 public class EmployeeSkillCriteria implements Serializable, Criteria {
+
     private static final long serialVersionUID = 1L;
 
     private StringFilter name;
 
     private IntegerFilter level;
 
-    private LongFilter employeeSkillCertificateId;
+    private EmployeeSkillCertificateCriteria employeeSkillCertificate;
 
-    private LongFilter taskId;
+    private TaskCriteria task;
 
-    private StringFilter employeeId;
+    private EmployeeCriteria employee;
 
-    private StringFilter teacherId;
+    private EmployeeCriteria teacher;
 
     public EmployeeSkillCriteria() {}
 
     public EmployeeSkillCriteria(EmployeeSkillCriteria other) {
         this.name = other.name == null ? null : other.name.copy();
         this.level = other.level == null ? null : other.level.copy();
-        this.employeeSkillCertificateId = other.employeeSkillCertificateId == null ? null : other.employeeSkillCertificateId.copy();
-        this.taskId = other.taskId == null ? null : other.taskId.copy();
-        this.employeeId = other.employeeId == null ? null : other.employeeId.copy();
-        this.teacherId = other.teacherId == null ? null : other.teacherId.copy();
+        this.employeeSkillCertificate = other.employeeSkillCertificate == null ? null : other.employeeSkillCertificate.copy();
+        this.task = other.task == null ? null : other.task.copy();
+        this.employee = other.employee == null ? null : other.employee.copy();
+        this.teacher = other.teacher == null ? null : other.teacher.copy();
     }
 
     @Override
@@ -81,64 +82,64 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
         this.level = level;
     }
 
-    public LongFilter getEmployeeSkillCertificateId() {
-        return employeeSkillCertificateId;
+    public EmployeeSkillCertificateCriteria getEmployeeSkillCertificate() {
+        return employeeSkillCertificate;
     }
 
-    public LongFilter employeeSkillCertificateId() {
-        if (employeeSkillCertificateId == null) {
-            employeeSkillCertificateId = new LongFilter();
+    public EmployeeSkillCertificateCriteria employeeSkillCertificate() {
+        if (employeeSkillCertificate == null) {
+            employeeSkillCertificate = new EmployeeSkillCertificateCriteria();
         }
-        return employeeSkillCertificateId;
+        return employeeSkillCertificate;
     }
 
-    public void setEmployeeSkillCertificateId(LongFilter employeeSkillCertificateId) {
-        this.employeeSkillCertificateId = employeeSkillCertificateId;
+    public void setEmployeeSkillCertificate(EmployeeSkillCertificateCriteria employeeSkillCertificate) {
+        this.employeeSkillCertificate = employeeSkillCertificate;
     }
 
-    public LongFilter getTaskId() {
-        return taskId;
+    public TaskCriteria getTask() {
+        return task;
     }
 
-    public LongFilter taskId() {
-        if (taskId == null) {
-            taskId = new LongFilter();
+    public TaskCriteria task() {
+        if (task == null) {
+            task = new TaskCriteria();
         }
-        return taskId;
+        return task;
     }
 
-    public void setTaskId(LongFilter taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskCriteria task) {
+        this.task = task;
     }
 
-    public StringFilter getEmployeeId() {
-        return employeeId;
+    public EmployeeCriteria getEmployee() {
+        return employee;
     }
 
-    public StringFilter employeeId() {
-        if (employeeId == null) {
-            employeeId = new StringFilter();
+    public EmployeeCriteria employee() {
+        if (employee == null) {
+            employee = new EmployeeCriteria();
         }
-        return employeeId;
+        return employee;
     }
 
-    public void setEmployeeId(StringFilter employeeId) {
-        this.employeeId = employeeId;
+    public void setEmployee(EmployeeCriteria employee) {
+        this.employee = employee;
     }
 
-    public StringFilter getTeacherId() {
-        return teacherId;
+    public EmployeeCriteria getTeacher() {
+        return teacher;
     }
 
-    public StringFilter teacherId() {
-        if (teacherId == null) {
-            teacherId = new StringFilter();
+    public EmployeeCriteria teacher() {
+        if (teacher == null) {
+            teacher = new EmployeeCriteria();
         }
-        return teacherId;
+        return teacher;
     }
 
-    public void setTeacherId(StringFilter teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacher(EmployeeCriteria teacher) {
+        this.teacher = teacher;
     }
 
     @Override
@@ -153,16 +154,16 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
         return (
             Objects.equals(name, that.name) &&
             Objects.equals(level, that.level) &&
-            Objects.equals(employeeSkillCertificateId, that.employeeSkillCertificateId) &&
-            Objects.equals(taskId, that.taskId) &&
-            Objects.equals(employeeId, that.employeeId) &&
-            Objects.equals(teacherId, that.teacherId)
+            Objects.equals(employeeSkillCertificate, that.employeeSkillCertificate) &&
+            Objects.equals(task, that.task) &&
+            Objects.equals(employee, that.employee) &&
+            Objects.equals(teacher, that.teacher)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, level, employeeSkillCertificateId, taskId, employeeId, teacherId);
+        return Objects.hash(name, level, employeeSkillCertificate, task, employee, teacher);
     }
 
     // prettier-ignore
@@ -171,10 +172,10 @@ public class EmployeeSkillCriteria implements Serializable, Criteria {
         return "EmployeeSkillCriteria{" +
             (name != null ? "name=" + name + ", " : "") +
             (level != null ? "level=" + level + ", " : "") +
-            (employeeSkillCertificateId != null ? "employeeSkillCertificateId=" + employeeSkillCertificateId + ", " : "") +
-            (taskId != null ? "taskId=" + taskId + ", " : "") +
-            (employeeId != null ? "employeeId=" + employeeId + ", " : "") +
-            (teacherId != null ? "teacherId=" + teacherId + ", " : "") +
+            (employeeSkillCertificate != null ? "employeeSkillCertificate=" + employeeSkillCertificate + ", " : "") +
+            (task != null ? "task=" + task + ", " : "") +
+            (employee != null ? "employee=" + employee + ", " : "") +
+            (teacher != null ? "teacher=" + teacher + ", " : "") +
             "}";
     }
 }

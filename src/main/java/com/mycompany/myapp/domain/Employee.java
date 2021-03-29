@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -16,9 +17,12 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "employee")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Employee implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
+    @NotNull
+    @Column(name = "username", nullable = false)
     private String username;
 
     @NotNull
@@ -45,17 +49,18 @@ public class Employee implements Serializable {
     private Employee manager;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getUsername() {
-        return username;
-    }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getUsername() {
+        return this.username;
     }
 
     public Employee username(String username) {
         this.username = username;
         return this;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFullname() {
@@ -193,14 +198,14 @@ public class Employee implements Serializable {
     @Override
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(username);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "Employee{" +
-            "username=" + getUsername() +
+            "username='" + getUsername() + "'" +
             ", fullname='" + getFullname() + "'" +
             "}";
     }

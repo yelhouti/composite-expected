@@ -19,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import tech.jhipster.config.JHipsterProperties;
 
 class JWTFilterTest {
+
     private TokenProvider tokenProvider;
 
     private JWTFilter jwtFilter;

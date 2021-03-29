@@ -7,7 +7,7 @@ import { Metrics, Thread } from './metrics.model';
 @Component({
   selector: 'jhi-metrics',
   templateUrl: './metrics.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsComponent implements OnInit {
   metrics?: Metrics;

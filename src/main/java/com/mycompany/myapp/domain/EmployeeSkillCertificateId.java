@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 
 @Embeddable
 public class EmployeeSkillCertificateId implements java.io.Serializable {
+
     @Column(name = "type_id")
     private Long typeId;
 

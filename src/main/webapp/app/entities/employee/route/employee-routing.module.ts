@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { EmployeeComponent } from '../list/employee.component';
 import { EmployeeDetailComponent } from '../detail/employee-detail.component';
@@ -12,38 +13,52 @@ const employeeRoute: Routes = [
     path: '',
     component: EmployeeComponent,
     data: {
-      defaultSort: 'id,asc'
+      authorities: [Authority.USER],
+      defaultSort: 'username,asc',
+      pageTitle: 'compositekeyApp.employee.home.title',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':username/view',
     component: EmployeeDetailComponent,
     resolve: {
-      employee: EmployeeRoutingResolveService
+      employee: EmployeeRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employee.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
     path: 'new',
     component: EmployeeUpdateComponent,
     resolve: {
-      employee: EmployeeRoutingResolveService
+      employee: EmployeeRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employee.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':username/edit',
     component: EmployeeUpdateComponent,
     resolve: {
-      employee: EmployeeRoutingResolveService
+      employee: EmployeeRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
-  }
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.employee.home.title',
+    },
+    canActivate: [UserRouteAccessService],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(employeeRoute)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class EmployeeRoutingModule {}

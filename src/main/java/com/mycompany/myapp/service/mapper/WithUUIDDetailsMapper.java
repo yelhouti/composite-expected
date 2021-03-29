@@ -2,8 +2,6 @@ package com.mycompany.myapp.service.mapper;
 
 import com.mycompany.myapp.domain.*;
 import com.mycompany.myapp.service.dto.WithUUIDDetailsDTO;
-import java.util.Objects;
-import java.util.UUID;
 import org.mapstruct.*;
 
 /**
@@ -12,9 +10,10 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = { WithUUIDMapper.class })
 public interface WithUUIDDetailsMapper extends EntityMapper<WithUUIDDetailsDTO, WithUUIDDetails> {
     @Mapping(target = "withUUID", source = "withUUID", qualifiedByName = "uuid")
-    WithUUIDDetailsDTO toDto(WithUUIDDetails s);
+    WithUUIDDetailsDTO toDto(WithUUIDDetails withUUIDDetails);
 
-    default String map(UUID value) {
-        return Objects.toString(value, null);
-    }
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "withUUID", ignore = true)
+    void partialUpdate(@MappingTarget WithUUIDDetails withUUIDDetails, WithUUIDDetailsDTO withUUIDDetailsDTO);
 }

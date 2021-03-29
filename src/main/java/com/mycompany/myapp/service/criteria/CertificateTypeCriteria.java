@@ -21,20 +21,21 @@ import tech.jhipster.service.filter.StringFilter;
  * fix type specific filters.
  */
 public class CertificateTypeCriteria implements Serializable, Criteria {
+
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
 
     private StringFilter name;
 
-    private LongFilter employeeSkillCertificateId;
+    private EmployeeSkillCertificateCriteria employeeSkillCertificate;
 
     public CertificateTypeCriteria() {}
 
     public CertificateTypeCriteria(CertificateTypeCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
-        this.employeeSkillCertificateId = other.employeeSkillCertificateId == null ? null : other.employeeSkillCertificateId.copy();
+        this.employeeSkillCertificate = other.employeeSkillCertificate == null ? null : other.employeeSkillCertificate.copy();
     }
 
     @Override
@@ -72,19 +73,19 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public LongFilter getEmployeeSkillCertificateId() {
-        return employeeSkillCertificateId;
+    public EmployeeSkillCertificateCriteria getEmployeeSkillCertificate() {
+        return employeeSkillCertificate;
     }
 
-    public LongFilter employeeSkillCertificateId() {
-        if (employeeSkillCertificateId == null) {
-            employeeSkillCertificateId = new LongFilter();
+    public EmployeeSkillCertificateCriteria employeeSkillCertificate() {
+        if (employeeSkillCertificate == null) {
+            employeeSkillCertificate = new EmployeeSkillCertificateCriteria();
         }
-        return employeeSkillCertificateId;
+        return employeeSkillCertificate;
     }
 
-    public void setEmployeeSkillCertificateId(LongFilter employeeSkillCertificateId) {
-        this.employeeSkillCertificateId = employeeSkillCertificateId;
+    public void setEmployeeSkillCertificate(EmployeeSkillCertificateCriteria employeeSkillCertificate) {
+        this.employeeSkillCertificate = employeeSkillCertificate;
     }
 
     @Override
@@ -99,13 +100,13 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
         return (
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
-            Objects.equals(employeeSkillCertificateId, that.employeeSkillCertificateId)
+            Objects.equals(employeeSkillCertificate, that.employeeSkillCertificate)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, employeeSkillCertificateId);
+        return Objects.hash(id, name, employeeSkillCertificate);
     }
 
     // prettier-ignore
@@ -114,7 +115,7 @@ public class CertificateTypeCriteria implements Serializable, Criteria {
         return "CertificateTypeCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
             (name != null ? "name=" + name + ", " : "") +
-            (employeeSkillCertificateId != null ? "employeeSkillCertificateId=" + employeeSkillCertificateId + ", " : "") +
+            (employeeSkillCertificate != null ? "employeeSkillCertificate=" + employeeSkillCertificate + ", " : "") +
             "}";
     }
 }

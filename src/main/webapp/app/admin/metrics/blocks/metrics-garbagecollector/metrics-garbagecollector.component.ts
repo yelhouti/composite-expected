@@ -4,7 +4,7 @@ import { GarbageCollector } from 'app/admin/metrics/metrics.model';
 
 @Component({
   selector: 'jhi-metrics-garbagecollector',
-  templateUrl: './metrics-garbagecollector.component.html'
+  templateUrl: './metrics-garbagecollector.component.html',
 })
 export class MetricsGarbageCollectorComponent {
   /**

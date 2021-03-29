@@ -29,6 +29,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class WithUUIDResource {
+
     private final Logger log = LoggerFactory.getLogger(WithUUIDResource.class);
 
     private static final String ENTITY_NAME = "withUUID";
@@ -75,31 +76,26 @@ public class WithUUIDResource {
     /**
      * {@code PUT  /with-uuids/:uuid} : Updates an existing withUUID.
      *
-     * @param uuid the id of the withUUIDDTO to save.
+     * @param id the id of the withUUIDDTO to save.
      * @param withUUIDDTO the withUUIDDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated withUUIDDTO,
      * or with status {@code 400 (Bad Request)} if the withUUIDDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the withUUIDDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/with-uuids/{uuid}")
-    public ResponseEntity<WithUUIDDTO> updateWithUUID(
-        @PathVariable(value = "uuid", required = false) final UUID uuid,
-        @Valid @RequestBody WithUUIDDTO withUUIDDTO
-    )
+    @PutMapping("/with-uuids/{id}")
+    public ResponseEntity<WithUUIDDTO> updateWithUUID(@PathVariable UUID id, @Valid @RequestBody WithUUIDDTO withUUIDDTO)
         throws URISyntaxException {
-        log.debug("REST request to update WithUUID : {}, {}", uuid, withUUIDDTO);
+        log.debug("REST request to update WithUUID : {}, {}", id, withUUIDDTO);
         if (withUUIDDTO.getUuid() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(uuid, withUUIDDTO.getUuid())) {
+        if (!Objects.equals(id, withUUIDDTO.getUuid())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
-        if (!withUUIDRepository.existsById(uuid)) {
+        if (!withUUIDRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
         WithUUIDDTO result = withUUIDService.save(withUUIDDTO);
         return ResponseEntity
             .ok()
@@ -108,8 +104,9 @@ public class WithUUIDResource {
     }
 
     /**
-     * {@code PATCH  /with-uuids} : Updates given fields of an existing withUUID.
+     * {@code PATCH  /with-uuids/:uuid} : Partial updates given fields of an existing withUUID, field will ignore if it is null
      *
+     * @param id the id of the withUUIDDTO to save.
      * @param withUUIDDTO the withUUIDDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated withUUIDDTO,
      * or with status {@code 400 (Bad Request)} if the withUUIDDTO is not valid,
@@ -117,11 +114,19 @@ public class WithUUIDResource {
      * or with status {@code 500 (Internal Server Error)} if the withUUIDDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/with-uuids", consumes = "application/merge-patch+json")
-    public ResponseEntity<WithUUIDDTO> partialUpdateWithUUID(@NotNull @RequestBody WithUUIDDTO withUUIDDTO) throws URISyntaxException {
-        log.debug("REST request to update WithUUID partially : {}", withUUIDDTO);
+    @PatchMapping(value = "/with-uuids/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<WithUUIDDTO> partialUpdateWithUUID(@PathVariable UUID id, @NotNull @RequestBody WithUUIDDTO withUUIDDTO)
+        throws URISyntaxException {
+        log.debug("REST request to partial update WithUUID partially : {}, {}", id, withUUIDDTO);
         if (withUUIDDTO.getUuid() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, withUUIDDTO.getUuid())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!withUUIDRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<WithUUIDDTO> result = withUUIDService.partialUpdate(withUUIDDTO);

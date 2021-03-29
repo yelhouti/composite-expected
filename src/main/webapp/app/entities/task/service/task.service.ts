@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as dayjs from 'dayjs';
-
-import { isPresent } from 'app/core/util/operators';
+import { DatePipe } from '@angular/common';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
@@ -17,7 +15,7 @@ export type EntityArrayResponseType = HttpResponse<ITask[]>;
 export class TaskService {
   public resourceUrl = this.applicationConfigService.getEndpointFor('api/tasks');
 
-  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService, protected datePipe: DatePipe) {}
 
   create(task: ITask): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(task);
@@ -29,7 +27,14 @@ export class TaskService {
   update(task: ITask): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(task);
     return this.http
-      .put<ITask>(`${this.resourceUrl}/${getTaskIdentifier(task) as number}`, copy, { observe: 'response' })
+      .put<ITask>(`${this.resourceUrl}/${getTaskIdentifier(task)!}`, copy, { observe: 'response' })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
+  partialUpdate(task: ITask): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(task);
+    return this.http
+      .patch<ITask>(`${this.resourceUrl}/${getTaskIdentifier(task)!}`, copy, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
@@ -50,37 +55,19 @@ export class TaskService {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  addTaskToCollectionIfMissing(taskCollection: ITask[], ...tasksToCheck: (ITask | null | undefined)[]): ITask[] {
-    const tasks: ITask[] = tasksToCheck.filter(isPresent);
-    if (tasks.length > 0) {
-      const taskCollectionIdentifiers = taskCollection.map(taskItem => getTaskIdentifier(taskItem)!);
-      const tasksToAdd = tasks.filter(taskItem => {
-        const taskIdentifier = getTaskIdentifier(taskItem);
-        if (taskIdentifier == null || taskCollectionIdentifiers.includes(taskIdentifier)) {
-          return false;
-        }
-        taskCollectionIdentifiers.push(taskIdentifier);
-        return true;
-      });
-      return [...tasksToAdd, ...taskCollection];
-    }
-    return taskCollection;
-  }
-
   protected convertDateFromClient(task: ITask): ITask {
-    const copy: ITask = Object.assign({}, task, {
-      endDate: task.endDate?.isValid() ? task.endDate.format(DATE_FORMAT) : undefined,
-      createdAt: task.createdAt?.isValid() ? task.createdAt.toJSON() : undefined,
-      modifiedAt: task.modifiedAt?.isValid() ? task.modifiedAt.toJSON() : undefined
+    return Object.assign({}, task, {
+      endDate: task.endDate != null ? this.datePipe.transform(task.endDate, DATE_FORMAT) : undefined,
+      createdAt: task.createdAt != null ? task.createdAt.toJSON() : undefined,
+      modifiedAt: task.modifiedAt != null ? task.modifiedAt.toJSON() : undefined,
     });
-    return copy;
   }
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.endDate = res.body.endDate ? dayjs(res.body.endDate) : undefined;
-      res.body.createdAt = res.body.createdAt ? dayjs(res.body.createdAt) : undefined;
-      res.body.modifiedAt = res.body.modifiedAt ? dayjs(res.body.modifiedAt) : undefined;
+      res.body.endDate = res.body.endDate ? new Date(res.body.endDate) : undefined;
+      res.body.createdAt = res.body.createdAt ? new Date(res.body.createdAt) : undefined;
+      res.body.modifiedAt = res.body.modifiedAt ? new Date(res.body.modifiedAt) : undefined;
     }
     return res;
   }
@@ -88,9 +75,9 @@ export class TaskService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((task: ITask) => {
-        task.endDate = task.endDate ? dayjs(task.endDate) : undefined;
-        task.createdAt = task.createdAt ? dayjs(task.createdAt) : undefined;
-        task.modifiedAt = task.modifiedAt ? dayjs(task.modifiedAt) : undefined;
+        task.endDate = task.endDate ? new Date(task.endDate) : undefined;
+        task.createdAt = task.createdAt ? new Date(task.createdAt) : undefined;
+        task.modifiedAt = task.modifiedAt ? new Date(task.modifiedAt) : undefined;
       });
     }
     return res;

@@ -1,110 +1,108 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpResponse, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpResponse, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { switchMap, tap, filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
+import {
+  lazyLoadEventToServerQueryParams,
+  lazyLoadEventToRouterQueryParams,
+  fillTableFromQueryParams,
+} from 'app/core/request/request-util';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { UserManagementService } from '../service/user-management.service';
-import { User } from '../user-management.model';
-import { UserManagementDeleteDialogComponent } from '../delete/user-management-delete-dialog.component';
+import { IUser } from '../user-management.model';
+import { Table } from 'primeng/table';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'jhi-user-mgmt',
-  templateUrl: './user-management.component.html'
+  templateUrl: './user-management.component.html',
 })
 export class UserManagementComponent implements OnInit {
   currentAccount: Account | null = null;
-  users: User[] | null = null;
-  isLoading = false;
-  totalItems = 0;
-  itemsPerPage = ITEMS_PER_PAGE;
-  page!: number;
-  predicate!: string;
-  ascending!: boolean;
+  users: IUser[] | null = null;
+  eventSubscriber?: Subscription;
+
+  totalItems?: number;
+  itemsPerPage!: number;
+  loading!: boolean;
+
+  @ViewChild('userTable', { static: true })
+  userTable!: Table;
+
+  private filtersDetails: { [_: string]: { type: string } } = {};
 
   constructor(
-    private userService: UserManagementService,
-    private accountService: AccountService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private modalService: NgbModal
-  ) {}
+    protected userService: UserManagementService,
+    protected messageService: MessageService,
+    protected accountService: AccountService,
+    protected activatedRoute: ActivatedRoute,
+    protected router: Router,
+    protected confirmationService: ConfirmationService,
+    protected translateService: TranslateService
+  ) {
+    this.itemsPerPage = ITEMS_PER_PAGE;
+    this.loading = true;
+  }
 
   ngOnInit(): void {
-    this.accountService.identity().subscribe(account => (this.currentAccount = account));
-    this.handleNavigation();
-  }
-
-  setActive(user: User, isActivated: boolean): void {
-    this.userService.update({ ...user, activated: isActivated }).subscribe(() => this.loadAll());
-  }
-
-  trackIdentity(index: number, item: User): number {
-    return item.id!;
-  }
-
-  deleteUser(user: User): void {
-    const modalRef = this.modalService.open(UserManagementDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.user = user;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.loadAll();
-      }
+    this.accountService.identity().subscribe((account: Account | null) => {
+      this.currentAccount = account;
     });
-  }
-
-  loadAll(): void {
-    this.isLoading = true;
-    this.userService
-      .query({
-        page: this.page - 1,
-        size: this.itemsPerPage,
-        sort: this.sort()
-      })
+    this.activatedRoute.queryParams
+      .pipe(
+        tap(queryParams => fillTableFromQueryParams(this.userTable, queryParams, this.filtersDetails)),
+        tap(() => (this.loading = true)),
+        switchMap(() => this.userService.query(lazyLoadEventToServerQueryParams(this.userTable.createLazyLoadMetadata()))),
+        filter((res: HttpResponse<IUser[]>) => res.ok)
+      )
       .subscribe(
-        (res: HttpResponse<User[]>) => {
-          this.isLoading = false;
-          this.onSuccess(res.body, res.headers);
+        (res: HttpResponse<IUser[]>) => {
+          this.paginateUsers(res.body!, res.headers);
+          this.loading = false;
         },
-        () => (this.isLoading = false)
+        (res: HttpErrorResponse) => {
+          this.onError(res.message);
+          this.loading = false;
+        }
       );
   }
 
-  transition(): void {
-    this.router.navigate(['./'], {
-      relativeTo: this.activatedRoute.parent,
-      queryParams: {
-        page: this.page,
-        sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-      }
+  onLazyLoadEvent(event: LazyLoadEvent): void {
+    const queryParams = lazyLoadEventToRouterQueryParams(event, this.filtersDetails);
+    this.router.navigate(['/admin/user-management'], { queryParams });
+  }
+
+  delete(login: string): void {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('entity.delete.title'),
+      message: this.translateService.instant('userManagement.delete.question', { login }),
+      accept: () => {
+        this.userService.delete(login).subscribe(() => {
+          this.router.navigate(['/user'], { queryParams: { r: Date.now() }, queryParamsHandling: 'merge' });
+        });
+      },
     });
   }
 
-  private handleNavigation(): void {
-    combineLatest([this.activatedRoute.data, this.activatedRoute.queryParamMap]).subscribe(([data, params]) => {
-      const page = params.get('page');
-      this.page = page !== null ? +page : 1;
-      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      this.predicate = sort[0];
-      this.ascending = sort[1] === 'asc';
-      this.loadAll();
-    });
+  trackId(index: number, item: IUser): string {
+    return item.login!;
   }
 
-  private sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
-    }
-    return result;
+  setActive(user: IUser, isActivated: boolean): void {
+    user.activated = isActivated;
+    this.userService.update(user).subscribe();
   }
 
-  private onSuccess(users: User[] | null, headers: HttpHeaders): void {
+  protected paginateUsers(data: IUser[], headers: HttpHeaders): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.users = users;
+    this.users = data;
+  }
+
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

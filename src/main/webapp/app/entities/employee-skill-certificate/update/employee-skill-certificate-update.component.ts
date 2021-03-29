@@ -1,49 +1,140 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 
-import { IEmployeeSkillCertificate, EmployeeSkillCertificate } from '../employee-skill-certificate.model';
+import { filter, takeUntil } from 'rxjs/operators';
+import { lazyLoadEventToServerQueryParams } from 'app/core/request/request-util';
+import { LazyLoadEvent } from 'primeng/api';
+
+import { IEmployeeSkillCertificate } from '../employee-skill-certificate.model';
 import { EmployeeSkillCertificateService } from '../service/employee-skill-certificate.service';
+import { MessageService } from 'primeng/api';
 import { ICertificateType } from 'app/entities/certificate-type/certificate-type.model';
 import { CertificateTypeService } from 'app/entities/certificate-type/service/certificate-type.service';
 import { IEmployeeSkill } from 'app/entities/employee-skill/employee-skill.model';
 import { EmployeeSkillService } from 'app/entities/employee-skill/service/employee-skill.service';
+import { IEmployee } from 'app/entities/employee/employee.model';
+import { EmployeeService } from 'app/entities/employee/service/employee.service';
 
 @Component({
   selector: 'jhi-employee-skill-certificate-update',
-  templateUrl: './employee-skill-certificate-update.component.html'
+  templateUrl: './employee-skill-certificate-update.component.html',
 })
-export class EmployeeSkillCertificateUpdateComponent implements OnInit {
+export class EmployeeSkillCertificateUpdateComponent implements OnInit, OnDestroy {
+  edit = false;
   isSaving = false;
-
-  certificateTypesSharedCollection: ICertificateType[] = [];
-  employeeSkillsSharedCollection: IEmployeeSkill[] = [];
+  typeOptions: ICertificateType[] | null = null;
+  typeFilterValue?: any;
+  skillEmployeeOptions: IEmployee[] | null = null;
+  skillEmployeeFilterValue?: any;
+  skillOptions: IEmployeeSkill[] | null = null;
+  skillFilterValue?: any;
 
   editForm = this.fb.group({
-    id: [],
     grade: [null, [Validators.required]],
     date: [null, [Validators.required]],
-    type: [null, Validators.required],
-    skill: [null, Validators.required]
+    type: [null, [Validators.required]],
+    skill: this.fb.group({
+      name: [null, [Validators.required]],
+      employee: [null, [Validators.required]],
+    }),
   });
 
+  onDestroySubject = new Subject<void>();
+
   constructor(
+    protected messageService: MessageService,
     protected employeeSkillCertificateService: EmployeeSkillCertificateService,
     protected certificateTypeService: CertificateTypeService,
+    protected employeeService: EmployeeService,
     protected employeeSkillService: EmployeeSkillService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
+    this.skillForm
+      .get('employee')!
+      .valueChanges.pipe(
+        takeUntil(this.onDestroySubject),
+        filter(() => !this.edit)
+      )
+      .subscribe(() => {
+        this.onSkillLazyLoadEvent({});
+        this.skillForm.get('name')!.reset();
+      });
+
     this.activatedRoute.data.subscribe(({ employeeSkillCertificate }) => {
       this.updateForm(employeeSkillCertificate);
-
-      this.loadRelationshipsOptions();
     });
+    this.loadAllTypes();
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroySubject.next(undefined);
+    this.onDestroySubject.complete();
+  }
+
+  get skillForm(): FormGroup {
+    return this.editForm.get('skill')! as FormGroup;
+  }
+
+  get employeeForm(): FormGroup {
+    return this.skillForm.get('employee')! as FormGroup;
+  }
+
+  loadAllTypes(): void {
+    this.certificateTypeService.query().subscribe(
+      (res: HttpResponse<ICertificateType[]>) => (this.typeOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  onSkillEmployeeLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService.query(lazyLoadEventToServerQueryParams(event, 'fullname.contains')).subscribe(
+      (res: HttpResponse<IEmployee[]>) => (this.skillEmployeeOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+  onSkillLazyLoadEvent(event: LazyLoadEvent): void {
+    if (this.skillForm.get('employee')!.value) {
+      this.employeeSkillService
+        .query({
+          ...lazyLoadEventToServerQueryParams(event, 'name.contains'),
+          'employee.username.equals': this.skillForm.get('employee')!.value.username,
+        })
+        .subscribe(
+          (res: HttpResponse<IEmployeeSkill[]>) => (this.skillOptions = res.body),
+          (res: HttpErrorResponse) => this.onError(res.message)
+        );
+    } else {
+      this.skillOptions = null;
+    }
+  }
+
+  updateForm(employeeSkillCertificate: IEmployeeSkillCertificate | null): void {
+    if (employeeSkillCertificate) {
+      this.edit = true;
+      this.editForm.reset({ ...employeeSkillCertificate }, { emitEvent: false, onlySelf: true });
+      this.typeFilterValue = employeeSkillCertificate.type?.name;
+      if (employeeSkillCertificate.skill?.employee) {
+        this.skillEmployeeOptions = [employeeSkillCertificate.skill.employee];
+        this.skillEmployeeFilterValue = employeeSkillCertificate.skill.employee.fullname;
+      }
+      if (employeeSkillCertificate.skill) {
+        this.skillOptions = [employeeSkillCertificate.skill];
+        this.skillFilterValue = employeeSkillCertificate.skill.name;
+      }
+    } else {
+      this.edit = false;
+      this.editForm.reset({
+        date: new Date(),
+      });
+    }
   }
 
   previousState(): void {
@@ -52,90 +143,31 @@ export class EmployeeSkillCertificateUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const employeeSkillCertificate = this.createFromForm();
-    if (employeeSkillCertificate.id !== undefined) {
+    const employeeSkillCertificate = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeSkillCertificateService.update(employeeSkillCertificate));
     } else {
       this.subscribeToSaveResponse(this.employeeSkillCertificateService.create(employeeSkillCertificate));
     }
   }
 
-  trackCertificateTypeById(index: number, item: ICertificateType): number {
-    return item.id!;
-  }
-
-  trackEmployeeSkillByName(index: number, item: IEmployeeSkill): string {
-    return item.name!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IEmployeeSkillCertificate>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(employeeSkillCertificate: IEmployeeSkillCertificate): void {
-    this.editForm.patchValue({
-      id: employeeSkillCertificate.id,
-      grade: employeeSkillCertificate.grade,
-      date: employeeSkillCertificate.date,
-      type: employeeSkillCertificate.type,
-      skill: employeeSkillCertificate.skill
-    });
-
-    this.certificateTypesSharedCollection = this.certificateTypeService.addCertificateTypeToCollectionIfMissing(
-      this.certificateTypesSharedCollection,
-      employeeSkillCertificate.type
-    );
-    this.employeeSkillsSharedCollection = this.employeeSkillService.addEmployeeSkillToCollectionIfMissing(
-      this.employeeSkillsSharedCollection,
-      employeeSkillCertificate.skill
-    );
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.certificateTypeService
-      .query()
-      .pipe(map((res: HttpResponse<ICertificateType[]>) => res.body ?? []))
-      .pipe(
-        map((certificateTypes: ICertificateType[]) =>
-          this.certificateTypeService.addCertificateTypeToCollectionIfMissing(certificateTypes, this.editForm.get('type')!.value)
-        )
-      )
-      .subscribe((certificateTypes: ICertificateType[]) => (this.certificateTypesSharedCollection = certificateTypes));
-
-    this.employeeSkillService
-      .query()
-      .pipe(map((res: HttpResponse<IEmployeeSkill[]>) => res.body ?? []))
-      .pipe(
-        map((employeeSkills: IEmployeeSkill[]) =>
-          this.employeeSkillService.addEmployeeSkillToCollectionIfMissing(employeeSkills, this.editForm.get('skill')!.value)
-        )
-      )
-      .subscribe((employeeSkills: IEmployeeSkill[]) => (this.employeeSkillsSharedCollection = employeeSkills));
-  }
-
-  protected createFromForm(): IEmployeeSkillCertificate {
-    return {
-      ...new EmployeeSkillCertificate(),
-      id: this.editForm.get(['id'])!.value,
-      grade: this.editForm.get(['grade'])!.value,
-      date: this.editForm.get(['date'])!.value,
-      type: this.editForm.get(['type'])!.value,
-      skill: this.editForm.get(['skill'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

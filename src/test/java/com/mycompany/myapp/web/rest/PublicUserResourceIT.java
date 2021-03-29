@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 @IntegrationTest
 class PublicUserResourceIT {
+
     private static final String DEFAULT_LOGIN = "johndoe";
 
     @Autowired

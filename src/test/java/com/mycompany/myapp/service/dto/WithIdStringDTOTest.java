@@ -16,9 +16,11 @@ class WithIdStringDTOTest {
         assertThat(withIdStringDTO1).isNotEqualTo(withIdStringDTO2);
         withIdStringDTO2.setId(withIdStringDTO1.getId());
         assertThat(withIdStringDTO1).isEqualTo(withIdStringDTO2);
-        withIdStringDTO2.setId("id2");
-        assertThat(withIdStringDTO1).isNotEqualTo(withIdStringDTO2);
-        withIdStringDTO1.setId(null);
-        assertThat(withIdStringDTO1).isNotEqualTo(withIdStringDTO2);
+        WithIdStringDTO withIdStringDTO3 = new WithIdStringDTO();
+        withIdStringDTO3.setId("id3");
+        assertThat(withIdStringDTO1).isNotEqualTo(withIdStringDTO3);
+        WithIdStringDTO withIdStringDTO4 = new WithIdStringDTO();
+        withIdStringDTO4.setId(null);
+        assertThat(withIdStringDTO1).isNotEqualTo(withIdStringDTO4);
     }
 }

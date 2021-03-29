@@ -5,7 +5,7 @@ import { IWithIdString } from '../with-id-string.model';
 
 @Component({
   selector: 'jhi-with-id-string-detail',
-  templateUrl: './with-id-string-detail.component.html'
+  templateUrl: './with-id-string-detail.component.html',
 })
 export class WithIdStringDetailComponent implements OnInit {
   withIdString: IWithIdString | null = null;

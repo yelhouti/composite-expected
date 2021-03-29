@@ -25,6 +25,7 @@
     <include file="config/liquibase/changelog/20210313071252_added_entity_WithIdStringDetails.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210313071352_added_entity_WithUUID.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210313071452_added_entity_WithUUIDDetails.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210331102929_added_entity_EmployeeSkillCertificateDetails.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20210313070552_added_entity_constraints_Employee.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210313070652_added_entity_constraints_EmployeeSkill.xml" relativeToChangelogFile="false"/>
@@ -33,6 +34,7 @@
     <include file="config/liquibase/changelog/20210313071052_added_entity_constraints_TaskComment.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210313071252_added_entity_constraints_WithIdStringDetails.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20210313071452_added_entity_constraints_WithUUIDDetails.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20210331102929_added_entity_constraints_EmployeeSkillCertificateDetails.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

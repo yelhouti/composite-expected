@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @WithMockUser
 class TaskCommentResourceIT {
+
     private static final String DEFAULT_VALUE = "AAAAAAAAAA";
     private static final String UPDATED_VALUE = "BBBBBBBBBB";
 
@@ -170,7 +171,7 @@ class TaskCommentResourceIT {
 
         // Get all the taskCommentList
         restTaskCommentMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(taskComment.getId().intValue())))
@@ -291,20 +292,15 @@ class TaskCommentResourceIT {
     @Test
     @Transactional
     void getAllTaskCommentsByTaskIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        Task task = taskComment.getTask();
         taskCommentRepository.saveAndFlush(taskComment);
-        Task task = TaskResourceIT.createEntity(em);
-        em.persist(task);
-        em.flush();
-        taskComment.setTask(task);
-        taskCommentRepository.saveAndFlush(taskComment);
-        Long taskId = task.getId();
 
-        // Get all the taskCommentList where task equals to taskId
-        defaultTaskCommentShouldBeFound("taskId.equals=" + taskId);
+        // Get all the taskCommentList where task.id equals to task.getId()
+        defaultTaskCommentShouldBeFound("task.id.equals=" + task.getId());
 
-        // Get all the taskCommentList where task equals to (taskId + 1)
-        defaultTaskCommentShouldNotBeFound("taskId.equals=" + (taskId + 1));
+        // Get all the taskCommentList where task.id equals to (task.getId() + 1)
+        defaultTaskCommentShouldNotBeFound("task.id.equals=" + (task.getId() + 1));
     }
 
     /**
@@ -312,7 +308,7 @@ class TaskCommentResourceIT {
      */
     private void defaultTaskCommentShouldBeFound(String filter) throws Exception {
         restTaskCommentMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(taskComment.getId().intValue())))
@@ -320,7 +316,7 @@ class TaskCommentResourceIT {
 
         // Check, that the count call also returns 1
         restTaskCommentMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -331,7 +327,7 @@ class TaskCommentResourceIT {
      */
     private void defaultTaskCommentShouldNotBeFound(String filter) throws Exception {
         restTaskCommentMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -339,7 +335,7 @@ class TaskCommentResourceIT {
 
         // Check, that the count call also returns 0
         restTaskCommentMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -369,7 +365,7 @@ class TaskCommentResourceIT {
 
         restTaskCommentMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, taskCommentDTO.getId())
+                put(ENTITY_API_URL_ID, taskComment.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
             )
@@ -394,7 +390,7 @@ class TaskCommentResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskCommentMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, taskCommentDTO.getId())
+                put(ENTITY_API_URL_ID, taskComment.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
             )
@@ -463,7 +459,7 @@ class TaskCommentResourceIT {
 
         restTaskCommentMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedTaskComment.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskComment))
             )
@@ -492,7 +488,7 @@ class TaskCommentResourceIT {
 
         restTaskCommentMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedTaskComment.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskComment))
             )
@@ -507,17 +503,69 @@ class TaskCommentResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateTaskCommentShouldThrown() throws Exception {
-        // Update the taskComment without id should throw
-        TaskComment partialUpdatedTaskComment = new TaskComment();
+    void patchNonExistingTaskComment() throws Exception {
+        int databaseSizeBeforeUpdate = taskCommentRepository.findAll().size();
+        taskComment.setId(count.incrementAndGet());
 
+        // Create the TaskComment
+        TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(taskComment);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskCommentMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTaskComment))
+                    .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
             )
             .andExpect(status().isBadRequest());
+
+        // Validate the TaskComment in the database
+        List<TaskComment> taskCommentList = taskCommentRepository.findAll();
+        assertThat(taskCommentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchTaskComment() throws Exception {
+        int databaseSizeBeforeUpdate = taskCommentRepository.findAll().size();
+        taskComment.setId(count.incrementAndGet());
+
+        // Create the TaskComment
+        TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(taskComment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restTaskCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the TaskComment in the database
+        List<TaskComment> taskCommentList = taskCommentRepository.findAll();
+        assertThat(taskCommentList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamTaskComment() throws Exception {
+        int databaseSizeBeforeUpdate = taskCommentRepository.findAll().size();
+        taskComment.setId(count.incrementAndGet());
+
+        // Create the TaskComment
+        TaskCommentDTO taskCommentDTO = taskCommentMapper.toDto(taskComment);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restTaskCommentMockMvc
+            .perform(
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(taskCommentDTO))
+            )
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the TaskComment in the database
+        List<TaskComment> taskCommentList = taskCommentRepository.findAll();
+        assertThat(taskCommentList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test

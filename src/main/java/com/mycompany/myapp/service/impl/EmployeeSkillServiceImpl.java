@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.EmployeeSkill;
+import com.mycompany.myapp.domain.EmployeeSkillId;
 import com.mycompany.myapp.repository.EmployeeSkillRepository;
 import com.mycompany.myapp.service.EmployeeSkillService;
 import com.mycompany.myapp.service.dto.EmployeeSkillDTO;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class EmployeeSkillServiceImpl implements EmployeeSkillService {
+
     private final Logger log = LoggerFactory.getLogger(EmployeeSkillServiceImpl.class);
 
     private final EmployeeSkillRepository employeeSkillRepository;
@@ -43,13 +45,10 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
         log.debug("Request to partially update EmployeeSkill : {}", employeeSkillDTO);
 
         return employeeSkillRepository
-            .findById(employeeSkillDTO.getName())
+            .findById(employeeSkillMapper.toEntity(employeeSkillDTO).getId())
             .map(
                 existingEmployeeSkill -> {
-                    if (employeeSkillDTO.getLevel() != null) {
-                        existingEmployeeSkill.setLevel(employeeSkillDTO.getLevel());
-                    }
-
+                    employeeSkillMapper.partialUpdate(existingEmployeeSkill, employeeSkillDTO);
                     return existingEmployeeSkill;
                 }
             )
@@ -70,13 +69,13 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<EmployeeSkillDTO> findOne(String id) {
+    public Optional<EmployeeSkillDTO> findOne(EmployeeSkillId id) {
         log.debug("Request to get EmployeeSkill : {}", id);
         return employeeSkillRepository.findOneWithEagerRelationships(id).map(employeeSkillMapper::toDto);
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(EmployeeSkillId id) {
         log.debug("Request to delete EmployeeSkill : {}", id);
         employeeSkillRepository.deleteById(id);
     }

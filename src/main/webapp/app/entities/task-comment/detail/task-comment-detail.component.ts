@@ -5,7 +5,7 @@ import { ITaskComment } from '../task-comment.model';
 
 @Component({
   selector: 'jhi-task-comment-detail',
-  templateUrl: './task-comment-detail.component.html'
+  templateUrl: './task-comment-detail.component.html',
 })
 export class TaskCommentDetailComponent implements OnInit {
   taskComment: ITaskComment | null = null;

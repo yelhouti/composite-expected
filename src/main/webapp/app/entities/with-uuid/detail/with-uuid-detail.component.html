@@ -1,14 +1,11 @@
 <div class="row justify-content-center">
   <div class="col-8">
     <div *ngIf="withUUID">
-      <h2 data-cy="withUUIDDetailsHeading"><span jhiTranslate="compositekeyApp.withUUID.detail.title">With UUID</span></h2>
+      <h2 data-cy="withUUIDDetailsHeading">
+        <span jhiTranslate="compositekeyApp.withUUID.detail.title">With UUID</span> {{ withUUID.uuid! }}
+      </h2>
 
       <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
       <dl class="row-md jh-entity-details">
         <dt><span jhiTranslate="compositekeyApp.withUUID.uuid">Uuid</span></dt>
         <dd>
@@ -20,13 +17,22 @@
         </dd>
       </dl>
 
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/with-uuid', withUUID.uuid, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="['/with-uuid', withUUID!.uuid, 'edit']"
+      ></button>
     </div>
   </div>
 </div>

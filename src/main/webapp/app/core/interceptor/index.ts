@@ -9,21 +9,21 @@ export const httpInterceptorProviders = [
   {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthInterceptor,
-    multi: true
+    multi: true,
   },
   {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthExpiredInterceptor,
-    multi: true
+    multi: true,
   },
   {
     provide: HTTP_INTERCEPTORS,
     useClass: ErrorHandlerInterceptor,
-    multi: true
+    multi: true,
   },
   {
     provide: HTTP_INTERCEPTORS,
     useClass: NotificationInterceptor,
-    multi: true
-  }
+    multi: true,
+  },
 ];

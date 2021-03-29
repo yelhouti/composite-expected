@@ -2,15 +2,10 @@
   <div class="col-8">
     <div *ngIf="certificateType">
       <h2 data-cy="certificateTypeDetailsHeading">
-        <span jhiTranslate="compositekeyApp.certificateType.detail.title">Certificate Type</span>
+        <span jhiTranslate="compositekeyApp.certificateType.detail.title">Certificate Type</span> {{ certificateType.id! }}
       </h2>
 
       <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
       <dl class="row-md jh-entity-details">
         <dt><span jhiTranslate="global.field.id">ID</span></dt>
         <dd>
@@ -22,13 +17,22 @@
         </dd>
       </dl>
 
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/certificate-type', certificateType.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="['/certificate-type', certificateType!.id, 'edit']"
+      ></button>
     </div>
   </div>
 </div>

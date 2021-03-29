@@ -12,7 +12,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
 
       expectedResult = null;
@@ -30,18 +30,18 @@ describe('Service Tests', () => {
           prefix: 'jhipster',
           properties: {
             clientApp: {
-              name: 'jhipsterApp'
-            }
-          }
+              name: 'jhipsterApp',
+            },
+          },
         };
         const configProps: ConfigProps = {
           contexts: {
             jhipster: {
               beans: {
-                'tech.jhipster.config.JHipsterProperties': bean
-              }
-            }
-          }
+                'tech.jhipster.config.JHipsterProperties': bean,
+              },
+            },
+          },
         };
         service.getBeans().subscribe(received => (expectedResult = received));
 
@@ -56,10 +56,10 @@ describe('Service Tests', () => {
             name: 'server.ports',
             properties: {
               'local.server.port': {
-                value: '8080'
-              }
-            }
-          }
+                value: '8080',
+              },
+            },
+          },
         ];
         const env: Env = { propertySources };
         service.getPropertySources().subscribe(received => (expectedResult = received));

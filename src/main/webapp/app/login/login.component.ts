@@ -6,7 +6,7 @@ import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-login',
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild('username', { static: false })
@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   loginForm = this.fb.group({
     username: [null, [Validators.required]],
     password: [null, [Validators.required]],
-    rememberMe: [false]
+    rememberMe: [false],
   });
 
   constructor(
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
       .login({
         username: this.loginForm.get('username')!.value,
         password: this.loginForm.get('password')!.value,
-        rememberMe: this.loginForm.get('rememberMe')!.value
+        rememberMe: this.loginForm.get('rememberMe')!.value,
       })
       .subscribe(
         () => {

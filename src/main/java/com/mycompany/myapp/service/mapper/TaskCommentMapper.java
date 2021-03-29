@@ -10,5 +10,5 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = { TaskMapper.class })
 public interface TaskCommentMapper extends EntityMapper<TaskCommentDTO, TaskComment> {
     @Mapping(target = "task", source = "task", qualifiedByName = "name")
-    TaskCommentDTO toDto(TaskComment s);
+    TaskCommentDTO toDto(TaskComment taskComment);
 }

@@ -4,7 +4,7 @@ application {
     applicationType monolith
     prodDatabaseType postgresql
     buildTool gradle
-    testFrameworks [protractor]
+    testFrameworks [cypress]
   }
   entities *
 }
@@ -24,7 +24,8 @@ entity EmployeeSkill{
 	level Integer required
 }
 
-relationship OneToMany{Employee{skill(name)} to EmployeeSkill{employee(fullname) required}
+relationship OneToMany{
+    @id Employee{skill(name)} to EmployeeSkill{employee(fullname) required}
 }
 
 entity CertificateType{
@@ -38,11 +39,19 @@ entity EmployeeSkillCertificate{
 }
 
 relationship OneToMany{
-	CertificateType to EmployeeSkillCertificate{type(name) required}
+	@id CertificateType to EmployeeSkillCertificate{type(name) required}
 }
 
 relationship OneToMany{
-	EmployeeSkill to EmployeeSkillCertificate{skill(name) required}
+	@id EmployeeSkill to EmployeeSkillCertificate{skill(name) required}
+}
+
+entity EmployeeSkillCertificateDetails(escd) {
+    detail String required
+}
+
+relationship OneToOne{
+	EmployeeSkillCertificateDetails to @id EmployeeSkillCertificate
 }
 
 entity Task {
@@ -115,4 +124,4 @@ relationship OneToOne {
 dto * with mapstruct
 service * with serviceImpl
 filter *
-paginate TaskComment, Employee, EmployeeSkill, EmployeeSkillCertificate with pagination
+paginate TaskComment, Employee, EmployeeSkill, EmployeeSkillCertificate, Task with pagination

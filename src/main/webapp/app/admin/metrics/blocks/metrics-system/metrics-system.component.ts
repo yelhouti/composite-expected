@@ -5,7 +5,7 @@ import { ProcessMetrics } from 'app/admin/metrics/metrics.model';
 @Component({
   selector: 'jhi-metrics-system',
   templateUrl: './metrics-system.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsSystemComponent {
   /**
@@ -25,7 +25,7 @@ export class MetricsSystemComponent {
       day: 86400000,
       hour: 3600000,
       minute: 60000,
-      second: 1000
+      second: 1000,
     };
     let timeString = '';
     for (const [key, value] of Object.entries(times)) {

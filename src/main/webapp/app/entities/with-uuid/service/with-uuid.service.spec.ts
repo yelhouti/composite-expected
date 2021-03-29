@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
 import { IWithUUID, WithUUID } from '../with-uuid.model';
 
 import { WithUUIDService } from './with-uuid.service';
@@ -14,7 +13,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(WithUUIDService);
@@ -22,7 +21,7 @@ describe('Service Tests', () => {
 
       elemDefault = {
         uuid: 'AAAAAAA',
-        name: 'AAAAAAA'
+        name: 'AAAAAAA',
       };
     });
 
@@ -40,7 +39,7 @@ describe('Service Tests', () => {
       it('should create a WithUUID', () => {
         const returnedFromService = Object.assign(
           {
-            id: 'ID'
+            id: 'ID',
           },
           elemDefault
         );
@@ -58,7 +57,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             uuid: 'BBBBBB',
-            name: 'BBBBBB'
+            name: 'BBBBBB',
           },
           elemDefault
         );
@@ -76,7 +75,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             uuid: 'BBBBBB',
-            name: 'BBBBBB'
+            name: 'BBBBBB',
           },
           elemDefault
         );
@@ -97,62 +96,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addWithUUIDToCollectionIfMissing', () => {
-        it('should add a WithUUID to an empty array', () => {
-          const withUUID: IWithUUID = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
-          expectedResult = service.addWithUUIDToCollectionIfMissing([], withUUID);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(withUUID);
-        });
-
-        it('should not add a WithUUID to an array that contains it', () => {
-          const withUUID: IWithUUID = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
-          const withUUIDCollection: IWithUUID[] = [
-            {
-              ...withUUID
-            },
-            { uuid: '1361f429-3817-4123-8ee3-fdf8943310b2' }
-          ];
-          expectedResult = service.addWithUUIDToCollectionIfMissing(withUUIDCollection, withUUID);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a WithUUID to an array that doesn't contain it", () => {
-          const withUUID: IWithUUID = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
-          const withUUIDCollection: IWithUUID[] = [{ uuid: '1361f429-3817-4123-8ee3-fdf8943310b2' }];
-          expectedResult = service.addWithUUIDToCollectionIfMissing(withUUIDCollection, withUUID);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(withUUID);
-        });
-
-        it('should add only unique WithUUID to an array', () => {
-          const withUUIDArray: IWithUUID[] = [
-            { uuid: '9fec3727-3421-4967-b213-ba36557ca194' },
-            { uuid: '1361f429-3817-4123-8ee3-fdf8943310b2' },
-            { uuid: '6799bb68-79fb-48aa-b9bd-74f4f4551464' }
-          ];
-          const withUUIDCollection: IWithUUID[] = [{ uuid: '9fec3727-3421-4967-b213-ba36557ca194' }];
-          expectedResult = service.addWithUUIDToCollectionIfMissing(withUUIDCollection, ...withUUIDArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const withUUID: IWithUUID = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
-          const withUUID2: IWithUUID = { uuid: '1361f429-3817-4123-8ee3-fdf8943310b2' };
-          expectedResult = service.addWithUUIDToCollectionIfMissing([], withUUID, withUUID2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(withUUID);
-          expect(expectedResult).toContain(withUUID2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const withUUID: IWithUUID = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
-          expectedResult = service.addWithUUIDToCollectionIfMissing([], null, withUUID, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(withUUID);
-        });
       });
     });
 

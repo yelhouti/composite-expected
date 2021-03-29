@@ -21,9 +21,9 @@ describe('Component Tests', () => {
           FormBuilder,
           {
             provide: ActivatedRoute,
-            useValue: { queryParams: of({ key: 'XYZPDQ' }) }
-          }
-        ]
+            useValue: { queryParams: of({ key: 'XYZPDQ' }) },
+          },
+        ],
       })
         .overrideTemplate(PasswordResetFinishComponent, '')
         .createComponent(PasswordResetFinishComponent);
@@ -42,7 +42,7 @@ describe('Component Tests', () => {
 
     it('sets focus after the view has been initialized', () => {
       const node = {
-        focus: jest.fn()
+        focus: jest.fn(),
       };
       comp.newPassword = new ElementRef(node);
 
@@ -54,7 +54,7 @@ describe('Component Tests', () => {
     it('should ensure the two passwords entered match', () => {
       comp.passwordForm.patchValue({
         newPassword: 'password',
-        confirmPassword: 'non-matching'
+        confirmPassword: 'non-matching',
       });
 
       comp.finishReset();
@@ -68,7 +68,7 @@ describe('Component Tests', () => {
         spyOn(service, 'save').and.returnValue(of({}));
         comp.passwordForm.patchValue({
           newPassword: 'password',
-          confirmPassword: 'password'
+          confirmPassword: 'password',
         });
 
         comp.finishReset();
@@ -85,7 +85,7 @@ describe('Component Tests', () => {
         spyOn(service, 'save').and.returnValue(throwError('ERROR'));
         comp.passwordForm.patchValue({
           newPassword: 'password',
-          confirmPassword: 'password'
+          confirmPassword: 'password',
         });
 
         comp.finishReset();

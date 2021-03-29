@@ -18,7 +18,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="employee_username" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="teacher_username" type="varchar(255)">
                 <constraints nullable="false" />
@@ -36,9 +36,10 @@
             <column name="employee_skill_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="employee_skill_employee_username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
-
-        <addPrimaryKey columnNames="employee_skill_name, task_id" tableName="rel_employee_skill__task"/>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->

@@ -5,7 +5,7 @@ import { IEmployeeSkillCertificate } from '../employee-skill-certificate.model';
 
 @Component({
   selector: 'jhi-employee-skill-certificate-detail',
-  templateUrl: './employee-skill-certificate-detail.component.html'
+  templateUrl: './employee-skill-certificate-detail.component.html',
 })
 export class EmployeeSkillCertificateDetailComponent implements OnInit {
   employeeSkillCertificate: IEmployeeSkillCertificate | null = null;

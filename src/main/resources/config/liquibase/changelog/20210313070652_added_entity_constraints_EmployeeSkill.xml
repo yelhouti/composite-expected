@@ -7,11 +7,11 @@
         Added the constraints for entity EmployeeSkill.
     -->
     <changeSet id="20210313070652-2" author="jhipster">
-        
-        <addForeignKeyConstraint baseColumnNames="employee_skill_name"
+
+        <addForeignKeyConstraint baseColumnNames="employee_skill_name, employee_skill_employee_username"
                                  baseTableName="rel_employee_skill__task"
                                  constraintName="fk_rel_employee_skill__task__employee_skill_id"
-                                 referencedColumnNames="name"
+                                 referencedColumnNames="name, employee_username"
                                  referencedTableName="employee_skill"/>
 
         <addForeignKeyConstraint baseColumnNames="task_id"
@@ -19,7 +19,7 @@
                                  constraintName="fk_rel_employee_skill__task__task_id"
                                  referencedColumnNames="id"
                                  referencedTableName="task"/>
-        
+
         <addForeignKeyConstraint baseColumnNames="employee_username"
                                  baseTableName="employee_skill"
                                  constraintName="fk_employee_skill__employee_id"
@@ -31,6 +31,5 @@
                                  constraintName="fk_employee_skill__teacher_id"
                                  referencedColumnNames="username"
                                  referencedTableName="employee"/>
-
     </changeSet>
 </databaseChangeLog>

@@ -1,43 +1,44 @@
 jest.mock('@angular/router');
+jest.mock('primeng/api');
+jest.mock('@ngx-translate/core');
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { of, BehaviorSubject } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Confirmation, ConfirmationService, MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
-
-import { TaskCommentService } from '../service/task-comment.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Table } from 'primeng/table';
+import { DatePipe } from '@angular/common';
 
 import { TaskCommentComponent } from './task-comment.component';
+import { TaskCommentService } from '../service/task-comment.service';
 
 describe('Component Tests', () => {
   describe('TaskComment Management Component', () => {
     let comp: TaskCommentComponent;
     let fixture: ComponentFixture<TaskCommentComponent>;
     let service: TaskCommentService;
+    let confirmationService: ConfirmationService;
+
+    let activatedRoute: ActivatedRoute;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         declarations: [TaskCommentComponent],
         providers: [
+          ConfirmationService,
+          MessageService,
+          TranslateService,
           Router,
           {
             provide: ActivatedRoute,
-            useValue: {
-              data: of({
-                defaultSort: 'id,asc'
-              }),
-              queryParamMap: of(
-                jest.requireActual('@angular/router').convertToParamMap({
-                  page: '1',
-                  size: '1',
-                  sort: 'id,desc'
-                })
-              )
-            }
-          }
-        ]
+            useValue: { data: of(), queryParams: new BehaviorSubject({}) },
+          },
+          DatePipe,
+        ],
       })
         .overrideTemplate(TaskCommentComponent, '')
         .compileComponents();
@@ -45,56 +46,65 @@ describe('Component Tests', () => {
       fixture = TestBed.createComponent(TaskCommentComponent);
       comp = fixture.componentInstance;
       service = TestBed.inject(TaskCommentService);
+      confirmationService = fixture.debugElement.injector.get(ConfirmationService);
+      activatedRoute = fixture.debugElement.injector.get(ActivatedRoute);
 
-      const headers = new HttpHeaders().append('link', 'link;link');
+      comp.taskCommentTable = { filters: {}, createLazyLoadMetadata: () => undefined } as Table;
+    });
+
+    it('Should call load all on init', fakeAsync(() => {
+      // GIVEN
       spyOn(service, 'query').and.returnValue(
         of(
           new HttpResponse({
             body: [{ id: 123 }],
-            headers
           })
         )
       );
-    });
 
-    it('Should call load all on init', () => {
       // WHEN
-      comp.ngOnInit();
+      fixture.detectChanges();
 
       // THEN
       expect(service.query).toHaveBeenCalled();
       expect(comp.taskComments?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
-    });
+    }));
 
-    it('should load a page', () => {
-      // WHEN
-      comp.loadPage(1);
-
-      // THEN
-      expect(service.query).toHaveBeenCalled();
-      expect(comp.taskComments?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
-    });
-
-    it('should calculate the sort attribute for an id', () => {
-      // WHEN
-      comp.ngOnInit();
-
-      // THEN
-      expect(service.query).toHaveBeenCalledWith(expect.objectContaining({ sort: ['id,desc'] }));
-    });
-
-    it('should calculate the sort attribute for a non-id attribute', () => {
-      // INIT
-      comp.ngOnInit();
-
+    it('should load a page', fakeAsync(() => {
       // GIVEN
-      comp.predicate = 'name';
+      spyOn(service, 'query').and.returnValue(
+        of(
+          new HttpResponse({
+            body: [{ id: 123 }],
+          })
+        )
+      );
 
       // WHEN
-      comp.loadPage(1);
+      fixture.detectChanges();
+      tick(100);
+      (activatedRoute.queryParams as BehaviorSubject<any>).next({ first: 3 });
 
       // THEN
-      expect(service.query).toHaveBeenLastCalledWith(expect.objectContaining({ sort: ['name,desc', 'id'] }));
-    });
+      expect(service.query).toHaveBeenCalled();
+      expect(comp.taskComments?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
+    }));
+
+    it('should call delete service using confirmDialog', fakeAsync(() => {
+      // GIVEN
+      spyOn(service, 'delete').and.returnValue(of({}));
+      spyOn(confirmationService, 'confirm').and.callFake((confirmation: Confirmation) => {
+        if (confirmation.accept) {
+          confirmation.accept();
+        }
+      });
+
+      // WHEN
+      comp.delete(123);
+
+      // THEN
+      expect(confirmationService.confirm).toHaveBeenCalled();
+      expect(service.delete).toHaveBeenCalledWith(123);
+    }));
   });
 });

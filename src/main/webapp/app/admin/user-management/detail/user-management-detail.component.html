@@ -48,9 +48,14 @@
         </dd>
       </dl>
 
-      <button type="submit" routerLink="../../" class="btn btn-info">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        routerLink="../../"
+        icon="pi pi-arrow-left"
+        class="p-button-secondary"
+        [label]="'entity.action.cancel' | translate"
+      ></button>
     </div>
   </div>
 </div>

@@ -25,7 +25,7 @@ describe('Component Tests', () => {
       langKey: 'en',
       login: 'john',
       authorities: [],
-      imageUrl: ''
+      imageUrl: '',
     };
 
     beforeEach(
@@ -33,7 +33,7 @@ describe('Component Tests', () => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
           declarations: [SettingsComponent],
-          providers: [FormBuilder, TranslateService, AccountService]
+          providers: [FormBuilder, TranslateService, AccountService],
         })
           .overrideTemplate(SettingsComponent, '')
           .compileComponents();
@@ -55,7 +55,7 @@ describe('Component Tests', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@mail.com',
-        langKey: 'en'
+        langKey: 'en',
       };
 
       // WHEN

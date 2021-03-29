@@ -11,7 +11,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = { UserMapper.class })
 public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     @Mapping(target = "user", source = "user", qualifiedByName = "login")
-    TaskDTO toDto(Task s);
+    TaskDTO toDto(Task task);
+
+    @Mapping(target = "employeeSkills", ignore = true)
+    @Mapping(target = "removeEmployeeSkill", ignore = true)
+    Task toEntity(TaskDTO taskDTO);
 
     @Named("nameSet")
     @BeanMapping(ignoreByDefault = true)

@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as dayjs from 'dayjs';
-
-import { isPresent } from 'app/core/util/operators';
+import { DatePipe } from '@angular/common';
 import { DATE_FORMAT } from 'app/config/input.constants';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
@@ -17,7 +15,7 @@ export type EntityArrayResponseType = HttpResponse<IEmployeeSkillCertificate[]>;
 export class EmployeeSkillCertificateService {
   public resourceUrl = this.applicationConfigService.getEndpointFor('api/employee-skill-certificates');
 
-  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService) {}
+  constructor(protected http: HttpClient, private applicationConfigService: ApplicationConfigService, protected datePipe: DatePipe) {}
 
   create(employeeSkillCertificate: IEmployeeSkillCertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(employeeSkillCertificate);
@@ -29,17 +27,27 @@ export class EmployeeSkillCertificateService {
   update(employeeSkillCertificate: IEmployeeSkillCertificate): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(employeeSkillCertificate);
     return this.http
-      .put<IEmployeeSkillCertificate>(
-        `${this.resourceUrl}/${getEmployeeSkillCertificateIdentifier(employeeSkillCertificate) as number}`,
-        copy,
-        { observe: 'response' }
-      )
+      .put<IEmployeeSkillCertificate>(`${this.resourceUrl}/${getEmployeeSkillCertificateIdentifier(employeeSkillCertificate)!}`, copy, {
+        observe: 'response',
+      })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
-  find(id: number): Observable<EntityResponseType> {
+  partialUpdate(employeeSkillCertificate: IEmployeeSkillCertificate): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(employeeSkillCertificate);
     return this.http
-      .get<IEmployeeSkillCertificate>(`${this.resourceUrl}/${id}`, { observe: 'response' })
+      .patch<IEmployeeSkillCertificate>(`${this.resourceUrl}/${getEmployeeSkillCertificateIdentifier(employeeSkillCertificate)!}`, copy, {
+        observe: 'response',
+      })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
+  find(typeId: number, skillName: string, skillEmployeeUsername: string): Observable<EntityResponseType> {
+    return this.http
+      .get<IEmployeeSkillCertificate>(
+        `${this.resourceUrl}/typeId=${typeId};skillName=${skillName};skillEmployeeUsername=${skillEmployeeUsername}`,
+        { observe: 'response' }
+      )
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
@@ -50,45 +58,21 @@ export class EmployeeSkillCertificateService {
       .pipe(map((res: EntityArrayResponseType) => this.convertDateArrayFromServer(res)));
   }
 
-  delete(id: number): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  addEmployeeSkillCertificateToCollectionIfMissing(
-    employeeSkillCertificateCollection: IEmployeeSkillCertificate[],
-    ...employeeSkillCertificatesToCheck: (IEmployeeSkillCertificate | null | undefined)[]
-  ): IEmployeeSkillCertificate[] {
-    const employeeSkillCertificates: IEmployeeSkillCertificate[] = employeeSkillCertificatesToCheck.filter(isPresent);
-    if (employeeSkillCertificates.length > 0) {
-      const employeeSkillCertificateCollectionIdentifiers = employeeSkillCertificateCollection.map(
-        employeeSkillCertificateItem => getEmployeeSkillCertificateIdentifier(employeeSkillCertificateItem)!
-      );
-      const employeeSkillCertificatesToAdd = employeeSkillCertificates.filter(employeeSkillCertificateItem => {
-        const employeeSkillCertificateIdentifier = getEmployeeSkillCertificateIdentifier(employeeSkillCertificateItem);
-        if (
-          employeeSkillCertificateIdentifier == null ||
-          employeeSkillCertificateCollectionIdentifiers.includes(employeeSkillCertificateIdentifier)
-        ) {
-          return false;
-        }
-        employeeSkillCertificateCollectionIdentifiers.push(employeeSkillCertificateIdentifier);
-        return true;
-      });
-      return [...employeeSkillCertificatesToAdd, ...employeeSkillCertificateCollection];
-    }
-    return employeeSkillCertificateCollection;
+  delete(typeId: number, skillName: string, skillEmployeeUsername: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/typeId=${typeId};skillName=${skillName};skillEmployeeUsername=${skillEmployeeUsername}`, {
+      observe: 'response',
+    });
   }
 
   protected convertDateFromClient(employeeSkillCertificate: IEmployeeSkillCertificate): IEmployeeSkillCertificate {
-    const copy: IEmployeeSkillCertificate = Object.assign({}, employeeSkillCertificate, {
-      date: employeeSkillCertificate.date?.isValid() ? employeeSkillCertificate.date.format(DATE_FORMAT) : undefined
+    return Object.assign({}, employeeSkillCertificate, {
+      date: employeeSkillCertificate.date != null ? this.datePipe.transform(employeeSkillCertificate.date, DATE_FORMAT) : undefined,
     });
-    return copy;
   }
 
   protected convertDateFromServer(res: EntityResponseType): EntityResponseType {
     if (res.body) {
-      res.body.date = res.body.date ? dayjs(res.body.date) : undefined;
+      res.body.date = res.body.date ? new Date(res.body.date) : undefined;
     }
     return res;
   }
@@ -96,7 +80,7 @@ export class EmployeeSkillCertificateService {
   protected convertDateArrayFromServer(res: EntityArrayResponseType): EntityArrayResponseType {
     if (res.body) {
       res.body.forEach((employeeSkillCertificate: IEmployeeSkillCertificate) => {
-        employeeSkillCertificate.date = employeeSkillCertificate.date ? dayjs(employeeSkillCertificate.date) : undefined;
+        employeeSkillCertificate.date = employeeSkillCertificate.date ? new Date(employeeSkillCertificate.date) : undefined;
       });
     }
     return res;

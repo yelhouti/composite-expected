@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsService {
+
     private final Logger log = LoggerFactory.getLogger(WithIdStringDetailsServiceImpl.class);
 
     private final WithIdStringDetailsRepository withIdStringDetailsRepository;
@@ -43,8 +44,8 @@ public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsServic
     public WithIdStringDetailsDTO save(WithIdStringDetailsDTO withIdStringDetailsDTO) {
         log.debug("Request to save WithIdStringDetails : {}", withIdStringDetailsDTO);
         WithIdStringDetails withIdStringDetails = withIdStringDetailsMapper.toEntity(withIdStringDetailsDTO);
-        String withIdStringId = withIdStringDetailsDTO.getWithIdString().getId();
-        withIdStringRepository.findById(withIdStringId).ifPresent(withIdStringDetails::withIdString);
+        String id = withIdStringDetails.getWithIdString().getId();
+        withIdStringRepository.findById(id).ifPresent(withIdStringDetails::withIdString);
         withIdStringDetails = withIdStringDetailsRepository.save(withIdStringDetails);
         return withIdStringDetailsMapper.toDto(withIdStringDetails);
     }
@@ -54,13 +55,10 @@ public class WithIdStringDetailsServiceImpl implements WithIdStringDetailsServic
         log.debug("Request to partially update WithIdStringDetails : {}", withIdStringDetailsDTO);
 
         return withIdStringDetailsRepository
-            .findById(withIdStringDetailsDTO.getId())
+            .findById(withIdStringDetailsMapper.toEntity(withIdStringDetailsDTO).getId())
             .map(
                 existingWithIdStringDetails -> {
-                    if (withIdStringDetailsDTO.getDetails() != null) {
-                        existingWithIdStringDetails.setDetails(withIdStringDetailsDTO.getDetails());
-                    }
-
+                    withIdStringDetailsMapper.partialUpdate(existingWithIdStringDetails, withIdStringDetailsDTO);
                     return existingWithIdStringDetails;
                 }
             )

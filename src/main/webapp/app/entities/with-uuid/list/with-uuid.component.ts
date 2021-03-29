@@ -1,51 +1,76 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { FilterMetadata, MessageService } from 'primeng/api';
 import { IWithUUID } from '../with-uuid.model';
 import { WithUUIDService } from '../service/with-uuid.service';
-import { WithUUIDDeleteDialogComponent } from '../delete/with-uuid-delete-dialog.component';
+import { ConfirmationService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'jhi-with-uuid',
-  templateUrl: './with-uuid.component.html'
+  templateUrl: './with-uuid.component.html',
 })
 export class WithUUIDComponent implements OnInit {
   withUUIDS?: IWithUUID[];
-  isLoading = false;
+  eventSubscriber?: Subscription;
 
-  constructor(protected withUUIDService: WithUUIDService, protected modalService: NgbModal) {}
+  @ViewChild('withUUIDTable', { static: true })
+  withUUIDTable!: Table;
 
-  loadAll(): void {
-    this.isLoading = true;
+  private filtersDetails: { [_: string]: { type: string } } = {
+    name: { type: 'string' },
+  };
 
-    this.withUUIDService.query().subscribe(
-      (res: HttpResponse<IWithUUID[]>) => {
-        this.isLoading = false;
-        this.withUUIDS = res.body ?? [];
-      },
-      () => {
-        this.isLoading = false;
-      }
-    );
-  }
+  constructor(
+    protected withUUIDService: WithUUIDService,
+    protected messageService: MessageService,
+    protected confirmationService: ConfirmationService,
+    protected translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.loadAll();
   }
 
-  trackUuid(index: number, item: IWithUUID): string {
+  get filters(): { [s: string]: FilterMetadata } {
+    return this.withUUIDTable.filters as { [s: string]: FilterMetadata };
+  }
+
+  loadAll(): void {
+    this.withUUIDService
+      .query()
+      .pipe(
+        filter((res: HttpResponse<IWithUUID[]>) => res.ok),
+        map((res: HttpResponse<IWithUUID[]>) => res.body!)
+      )
+      .subscribe(
+        (withUUIDS: IWithUUID[]) => {
+          this.withUUIDS = withUUIDS;
+        },
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
+  }
+
+  delete(uuid: string): void {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('entity.delete.title'),
+      message: this.translateService.instant('compositekeyApp.withUUID.delete.question', { id: `${uuid}` }),
+      accept: () => {
+        this.withUUIDService.delete(uuid).subscribe(() => {
+          this.loadAll();
+        });
+      },
+    });
+  }
+
+  trackId(index: number, item: IWithUUID): string {
     return item.uuid!;
   }
 
-  delete(withUUID: IWithUUID): void {
-    const modalRef = this.modalService.open(WithUUIDDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.withUUID = withUUID;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.loadAll();
-      }
-    });
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

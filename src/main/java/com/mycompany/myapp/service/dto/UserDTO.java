@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.User;
  * A DTO representing a user, with only the public attributes.
  */
 public class UserDTO {
+
     private Long id;
 
     private String login;

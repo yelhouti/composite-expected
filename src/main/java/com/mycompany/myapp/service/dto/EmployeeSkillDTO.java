@@ -10,6 +10,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.EmployeeSkill} entity.
  */
 public class EmployeeSkillDTO implements Serializable {
+
     @NotNull
     private String name;
 
@@ -72,15 +73,15 @@ public class EmployeeSkillDTO implements Serializable {
         }
 
         EmployeeSkillDTO employeeSkillDTO = (EmployeeSkillDTO) o;
-        if (this.name == null) {
+        if (this.name == null && this.employee == null) {
             return false;
         }
-        return Objects.equals(this.name, employeeSkillDTO.name);
+        return Objects.equals(this.name, employeeSkillDTO.name) && Objects.equals(this.employee, employeeSkillDTO.employee);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.name);
+        return Objects.hash(this.name, this.employee);
     }
 
     // prettier-ignore

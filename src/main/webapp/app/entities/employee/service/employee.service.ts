@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IEmployee, getEmployeeIdentifier } from '../employee.model';
@@ -21,11 +19,15 @@ export class EmployeeService {
   }
 
   update(employee: IEmployee): Observable<EntityResponseType> {
-    return this.http.put<IEmployee>(`${this.resourceUrl}/${getEmployeeIdentifier(employee) as string}`, employee, { observe: 'response' });
+    return this.http.put<IEmployee>(`${this.resourceUrl}/${getEmployeeIdentifier(employee)!}`, employee, { observe: 'response' });
   }
 
-  find(id: string): Observable<EntityResponseType> {
-    return this.http.get<IEmployee>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  partialUpdate(employee: IEmployee): Observable<EntityResponseType> {
+    return this.http.patch<IEmployee>(`${this.resourceUrl}/${getEmployeeIdentifier(employee)!}`, employee, { observe: 'response' });
+  }
+
+  find(username: string): Observable<EntityResponseType> {
+    return this.http.get<IEmployee>(`${this.resourceUrl}/${username}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {
@@ -33,24 +35,7 @@ export class EmployeeService {
     return this.http.get<IEmployee[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
-  delete(id: string): Observable<HttpResponse<{}>> {
-    return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  addEmployeeToCollectionIfMissing(employeeCollection: IEmployee[], ...employeesToCheck: (IEmployee | null | undefined)[]): IEmployee[] {
-    const employees: IEmployee[] = employeesToCheck.filter(isPresent);
-    if (employees.length > 0) {
-      const employeeCollectionIdentifiers = employeeCollection.map(employeeItem => getEmployeeIdentifier(employeeItem)!);
-      const employeesToAdd = employees.filter(employeeItem => {
-        const employeeIdentifier = getEmployeeIdentifier(employeeItem);
-        if (employeeIdentifier == null || employeeCollectionIdentifiers.includes(employeeIdentifier)) {
-          return false;
-        }
-        employeeCollectionIdentifiers.push(employeeIdentifier);
-        return true;
-      });
-      return [...employeesToAdd, ...employeeCollection];
-    }
-    return employeeCollection;
+  delete(username: string): Observable<HttpResponse<{}>> {
+    return this.http.delete(`${this.resourceUrl}/${username}`, { observe: 'response' });
   }
 }

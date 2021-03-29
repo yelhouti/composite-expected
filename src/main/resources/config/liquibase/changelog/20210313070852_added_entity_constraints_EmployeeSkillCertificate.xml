@@ -7,18 +7,17 @@
         Added the constraints for entity EmployeeSkillCertificate.
     -->
     <changeSet id="20210313070852-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="type_id"
                                  baseTableName="employee_skill_certificate"
                                  constraintName="fk_employee_skill_certificate__type_id"
                                  referencedColumnNames="id"
                                  referencedTableName="certificate_type"/>
 
-        <addForeignKeyConstraint baseColumnNames="skill_name"
+        <addForeignKeyConstraint baseColumnNames="skill_name,skill_employee_username"
                                  baseTableName="employee_skill_certificate"
                                  constraintName="fk_employee_skill_certificate__skill_id"
-                                 referencedColumnNames="name"
+                                 referencedColumnNames="name,employee_username"
                                  referencedTableName="employee_skill"/>
-
     </changeSet>
 </databaseChangeLog>

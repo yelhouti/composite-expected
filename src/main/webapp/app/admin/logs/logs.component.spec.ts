@@ -17,7 +17,7 @@ describe('Component Tests', () => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
           declarations: [LogsComponent],
-          providers: [LogsService]
+          providers: [LogsService],
         })
           .overrideTemplate(LogsComponent, '')
           .compileComponents();
@@ -44,9 +44,9 @@ describe('Component Tests', () => {
           of({
             loggers: {
               main: {
-                effectiveLevel: 'WARN'
-              }
-            }
+                effectiveLevel: 'WARN',
+              },
+            },
           })
         );
 
@@ -68,9 +68,9 @@ describe('Component Tests', () => {
           of({
             loggers: {
               main: {
-                effectiveLevel: 'ERROR'
-              }
-            }
+                effectiveLevel: 'ERROR',
+              },
+            },
           })
         );
 

@@ -9,6 +9,10 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring", uses = {})
 public interface CertificateTypeMapper extends EntityMapper<CertificateTypeDTO, CertificateType> {
+    @Mapping(target = "employeeSkillCertificates", ignore = true)
+    @Mapping(target = "removeEmployeeSkillCertificate", ignore = true)
+    CertificateType toEntity(CertificateTypeDTO certificateTypeDTO);
+
     @Named("name")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

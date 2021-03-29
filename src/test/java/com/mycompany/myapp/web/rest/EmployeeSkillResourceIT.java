@@ -10,6 +10,7 @@ import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.Employee;
 import com.mycompany.myapp.domain.EmployeeSkill;
 import com.mycompany.myapp.domain.EmployeeSkillCertificate;
+import com.mycompany.myapp.domain.EmployeeSkillId;
 import com.mycompany.myapp.domain.Task;
 import com.mycompany.myapp.repository.EmployeeSkillRepository;
 import com.mycompany.myapp.service.EmployeeSkillService;
@@ -42,12 +43,16 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @WithMockUser
 class EmployeeSkillResourceIT {
+
+    private static final String DEFAULT_NAME = "AAAAAAAAAA";
+    private static final String UPDATED_NAME = "BBBBBBBBBB";
+
     private static final Integer DEFAULT_LEVEL = 1;
     private static final Integer UPDATED_LEVEL = 2;
     private static final Integer SMALLER_LEVEL = 1 - 1;
 
     private static final String ENTITY_API_URL = "/api/employee-skills";
-    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{name}";
+    private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     @Autowired
     private EmployeeSkillRepository employeeSkillRepository;
@@ -76,7 +81,7 @@ class EmployeeSkillResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static EmployeeSkill createEntity(EntityManager em) {
-        EmployeeSkill employeeSkill = new EmployeeSkill().level(DEFAULT_LEVEL);
+        EmployeeSkill employeeSkill = new EmployeeSkill().name(DEFAULT_NAME).level(DEFAULT_LEVEL);
         // Add required entity
         Employee employee;
         if (TestUtil.findAll(em, Employee.class).isEmpty()) {
@@ -89,6 +94,7 @@ class EmployeeSkillResourceIT {
         employeeSkill.setEmployee(employee);
         // Add required entity
         employeeSkill.setTeacher(employee);
+        employeeSkill.setId(new EmployeeSkillId(employeeSkill.getName(), employeeSkill.getEmployee().getUsername()));
         return employeeSkill;
     }
 
@@ -99,7 +105,7 @@ class EmployeeSkillResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static EmployeeSkill createUpdatedEntity(EntityManager em) {
-        EmployeeSkill employeeSkill = new EmployeeSkill().level(UPDATED_LEVEL);
+        EmployeeSkill employeeSkill = new EmployeeSkill().name(UPDATED_NAME).level(UPDATED_LEVEL);
         // Add required entity
         Employee employee;
         if (TestUtil.findAll(em, Employee.class).isEmpty()) {
@@ -112,6 +118,7 @@ class EmployeeSkillResourceIT {
         employeeSkill.setEmployee(employee);
         // Add required entity
         employeeSkill.setTeacher(employee);
+        employeeSkill.setId(new EmployeeSkillId(employeeSkill.getName(), employeeSkill.getEmployee().getUsername()));
         return employeeSkill;
     }
 
@@ -136,6 +143,7 @@ class EmployeeSkillResourceIT {
         List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
         assertThat(employeeSkillList).hasSize(databaseSizeBeforeCreate + 1);
         EmployeeSkill testEmployeeSkill = employeeSkillList.get(employeeSkillList.size() - 1);
+        assertThat(testEmployeeSkill.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testEmployeeSkill.getLevel()).isEqualTo(DEFAULT_LEVEL);
     }
 
@@ -143,7 +151,7 @@ class EmployeeSkillResourceIT {
     @Transactional
     void createEmployeeSkillWithExistingId() throws Exception {
         // Create the EmployeeSkill with an existing ID
-        employeeSkill.setName("existing_id");
+        employeeSkillRepository.saveAndFlush(employeeSkill);
         EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
 
         int databaseSizeBeforeCreate = employeeSkillRepository.findAll().size();
@@ -158,6 +166,26 @@ class EmployeeSkillResourceIT {
         // Validate the EmployeeSkill in the database
         List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
         assertThat(employeeSkillList).hasSize(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    void checkNameIsRequired() throws Exception {
+        int databaseSizeBeforeTest = employeeSkillRepository.findAll().size();
+        // set the field null
+        employeeSkill.setName(null);
+
+        // Create the EmployeeSkill, which fails.
+        EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
+
+        restEmployeeSkillMockMvc
+            .perform(
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
+        assertThat(employeeSkillList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
@@ -188,10 +216,10 @@ class EmployeeSkillResourceIT {
 
         // Get all the employeeSkillList
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=name,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(employeeSkill.getName())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].level").value(hasItem(DEFAULT_LEVEL)));
     }
 
@@ -221,23 +249,94 @@ class EmployeeSkillResourceIT {
 
         // Get the employeeSkill
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL_ID, employeeSkill.getName()))
+            .perform(
+                get(
+                    ENTITY_API_URL_ID,
+                    "name=" + employeeSkill.getId().getName() + ";" + "employeeUsername=" + employeeSkill.getId().getEmployeeUsername()
+                )
+            )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.name").value(employeeSkill.getName()))
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.level").value(DEFAULT_LEVEL));
     }
 
     @Test
     @Transactional
-    void getEmployeeSkillsByIdFiltering() throws Exception {
+    void getAllEmployeeSkillsByNameIsEqualToSomething() throws Exception {
         // Initialize the database
         employeeSkillRepository.saveAndFlush(employeeSkill);
 
-        String id = employeeSkill.getName();
+        // Get all the employeeSkillList where name equals to DEFAULT_NAME
+        defaultEmployeeSkillShouldBeFound("name.equals=" + DEFAULT_NAME);
 
-        defaultEmployeeSkillShouldBeFound("name.equals=" + id);
-        defaultEmployeeSkillShouldNotBeFound("name.notEquals=" + id);
+        // Get all the employeeSkillList where name equals to UPDATED_NAME
+        defaultEmployeeSkillShouldNotBeFound("name.equals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeeSkillsByNameIsNotEqualToSomething() throws Exception {
+        // Initialize the database
+        employeeSkillRepository.saveAndFlush(employeeSkill);
+
+        // Get all the employeeSkillList where name not equals to DEFAULT_NAME
+        defaultEmployeeSkillShouldNotBeFound("name.notEquals=" + DEFAULT_NAME);
+
+        // Get all the employeeSkillList where name not equals to UPDATED_NAME
+        defaultEmployeeSkillShouldBeFound("name.notEquals=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeeSkillsByNameIsInShouldWork() throws Exception {
+        // Initialize the database
+        employeeSkillRepository.saveAndFlush(employeeSkill);
+
+        // Get all the employeeSkillList where name in DEFAULT_NAME or UPDATED_NAME
+        defaultEmployeeSkillShouldBeFound("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME);
+
+        // Get all the employeeSkillList where name equals to UPDATED_NAME
+        defaultEmployeeSkillShouldNotBeFound("name.in=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeeSkillsByNameIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        employeeSkillRepository.saveAndFlush(employeeSkill);
+
+        // Get all the employeeSkillList where name is not null
+        defaultEmployeeSkillShouldBeFound("name.specified=true");
+
+        // Get all the employeeSkillList where name is null
+        defaultEmployeeSkillShouldNotBeFound("name.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeeSkillsByNameContainsSomething() throws Exception {
+        // Initialize the database
+        employeeSkillRepository.saveAndFlush(employeeSkill);
+
+        // Get all the employeeSkillList where name contains DEFAULT_NAME
+        defaultEmployeeSkillShouldBeFound("name.contains=" + DEFAULT_NAME);
+
+        // Get all the employeeSkillList where name contains UPDATED_NAME
+        defaultEmployeeSkillShouldNotBeFound("name.contains=" + UPDATED_NAME);
+    }
+
+    @Test
+    @Transactional
+    void getAllEmployeeSkillsByNameNotContainsSomething() throws Exception {
+        // Initialize the database
+        employeeSkillRepository.saveAndFlush(employeeSkill);
+
+        // Get all the employeeSkillList where name does not contain DEFAULT_NAME
+        defaultEmployeeSkillShouldNotBeFound("name.doesNotContain=" + DEFAULT_NAME);
+
+        // Get all the employeeSkillList where name does not contain UPDATED_NAME
+        defaultEmployeeSkillShouldBeFound("name.doesNotContain=" + UPDATED_NAME);
     }
 
     @Test
@@ -354,13 +453,14 @@ class EmployeeSkillResourceIT {
         em.flush();
         employeeSkill.addEmployeeSkillCertificate(employeeSkillCertificate);
         employeeSkillRepository.saveAndFlush(employeeSkill);
-        Long employeeSkillCertificateId = employeeSkillCertificate.getId();
 
-        // Get all the employeeSkillList where employeeSkillCertificate equals to employeeSkillCertificateId
-        defaultEmployeeSkillShouldBeFound("employeeSkillCertificateId.equals=" + employeeSkillCertificateId);
+        // Get all the employeeSkillList where employeeSkillCertificate.type.id equals to employeeSkillCertificate.getId().getTypeId()
+        defaultEmployeeSkillShouldBeFound("employeeSkillCertificate.type.id.equals=" + employeeSkillCertificate.getId().getTypeId());
 
-        // Get all the employeeSkillList where employeeSkillCertificate equals to (employeeSkillCertificateId + 1)
-        defaultEmployeeSkillShouldNotBeFound("employeeSkillCertificateId.equals=" + (employeeSkillCertificateId + 1));
+        // Get all the employeeSkillList where employeeSkillCertificate.type.id equals to (employeeSkillCertificate.getId().getTypeId() + 1)
+        defaultEmployeeSkillShouldNotBeFound(
+            "employeeSkillCertificate.type.id.equals=" + (employeeSkillCertificate.getId().getTypeId() + 1)
+        );
     }
 
     @Test
@@ -373,51 +473,40 @@ class EmployeeSkillResourceIT {
         em.flush();
         employeeSkill.addTask(task);
         employeeSkillRepository.saveAndFlush(employeeSkill);
-        Long taskId = task.getId();
 
-        // Get all the employeeSkillList where task equals to taskId
-        defaultEmployeeSkillShouldBeFound("taskId.equals=" + taskId);
+        // Get all the employeeSkillList where task.id equals to task.getId()
+        defaultEmployeeSkillShouldBeFound("task.id.equals=" + task.getId());
 
-        // Get all the employeeSkillList where task equals to (taskId + 1)
-        defaultEmployeeSkillShouldNotBeFound("taskId.equals=" + (taskId + 1));
+        // Get all the employeeSkillList where task.id equals to (task.getId() + 1)
+        defaultEmployeeSkillShouldNotBeFound("task.id.equals=" + (task.getId() + 1));
     }
 
     @Test
     @Transactional
     void getAllEmployeeSkillsByEmployeeIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        Employee employee = employeeSkill.getEmployee();
         employeeSkillRepository.saveAndFlush(employeeSkill);
-        Employee employee = EmployeeResourceIT.createEntity(em);
-        em.persist(employee);
-        em.flush();
-        employeeSkill.setEmployee(employee);
-        employeeSkillRepository.saveAndFlush(employeeSkill);
-        String employeeId = employee.getUsername();
 
-        // Get all the employeeSkillList where employee equals to employeeId
-        defaultEmployeeSkillShouldBeFound("employeeId.equals=" + employeeId);
+        // Get all the employeeSkillList where employee.username equals to employee.getUsername()
+        defaultEmployeeSkillShouldBeFound("employee.username.equals=" + employee.getUsername());
 
-        // Get all the employeeSkillList where employee equals to "invalid-id"
-        defaultEmployeeSkillShouldNotBeFound("employeeId.equals=" + "invalid-id");
+        // Get all the employeeSkillList where employee.username equals to "invalid-id"
+        defaultEmployeeSkillShouldNotBeFound("employee.username.equals=" + "invalid-id");
     }
 
     @Test
     @Transactional
     void getAllEmployeeSkillsByTeacherIsEqualToSomething() throws Exception {
-        // Initialize the database
+        // Get already existing entity
+        Employee teacher = employeeSkill.getTeacher();
         employeeSkillRepository.saveAndFlush(employeeSkill);
-        Employee teacher = EmployeeResourceIT.createEntity(em);
-        em.persist(teacher);
-        em.flush();
-        employeeSkill.setTeacher(teacher);
-        employeeSkillRepository.saveAndFlush(employeeSkill);
-        String teacherId = teacher.getUsername();
 
-        // Get all the employeeSkillList where teacher equals to teacherId
-        defaultEmployeeSkillShouldBeFound("teacherId.equals=" + teacherId);
+        // Get all the employeeSkillList where teacher.username equals to teacher.getUsername()
+        defaultEmployeeSkillShouldBeFound("teacher.username.equals=" + teacher.getUsername());
 
-        // Get all the employeeSkillList where teacher equals to "invalid-id"
-        defaultEmployeeSkillShouldNotBeFound("teacherId.equals=" + "invalid-id");
+        // Get all the employeeSkillList where teacher.username equals to "invalid-id"
+        defaultEmployeeSkillShouldNotBeFound("teacher.username.equals=" + "invalid-id");
     }
 
     /**
@@ -425,15 +514,15 @@ class EmployeeSkillResourceIT {
      */
     private void defaultEmployeeSkillShouldBeFound(String filter) throws Exception {
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=name,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(employeeSkill.getName())))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].level").value(hasItem(DEFAULT_LEVEL)));
 
         // Check, that the count call also returns 1
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=name,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -444,7 +533,7 @@ class EmployeeSkillResourceIT {
      */
     private void defaultEmployeeSkillShouldNotBeFound(String filter) throws Exception {
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=name,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -452,7 +541,7 @@ class EmployeeSkillResourceIT {
 
         // Check, that the count call also returns 0
         restEmployeeSkillMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=name,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -462,7 +551,14 @@ class EmployeeSkillResourceIT {
     @Transactional
     void getNonExistingEmployeeSkill() throws Exception {
         // Get the employeeSkill
-        restEmployeeSkillMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restEmployeeSkillMockMvc
+            .perform(
+                get(
+                    ENTITY_API_URL_ID,
+                    "name=" + employeeSkill.getId().getName() + ";" + "employeeUsername=" + employeeSkill.getId().getEmployeeUsername()
+                )
+            )
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -474,7 +570,7 @@ class EmployeeSkillResourceIT {
         int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
 
         // Update the employeeSkill
-        EmployeeSkill updatedEmployeeSkill = employeeSkillRepository.findById(employeeSkill.getName()).get();
+        EmployeeSkill updatedEmployeeSkill = employeeSkillRepository.findById(employeeSkill.getId()).get();
         // Disconnect from session so that the updates on updatedEmployeeSkill are not directly saved in db
         em.detach(updatedEmployeeSkill);
         updatedEmployeeSkill.level(UPDATED_LEVEL);
@@ -482,7 +578,10 @@ class EmployeeSkillResourceIT {
 
         restEmployeeSkillMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, employeeSkillDTO.getName())
+                put(
+                    ENTITY_API_URL_ID,
+                    "name=" + employeeSkill.getId().getName() + ";" + "employeeUsername=" + employeeSkill.getId().getEmployeeUsername()
+                )
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
             )
@@ -499,7 +598,7 @@ class EmployeeSkillResourceIT {
     @Transactional
     void putNonExistingEmployeeSkill() throws Exception {
         int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
-        employeeSkill.setName(UUID.randomUUID().toString());
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
 
         // Create the EmployeeSkill
         EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
@@ -507,7 +606,10 @@ class EmployeeSkillResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restEmployeeSkillMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, employeeSkillDTO.getName())
+                put(
+                    ENTITY_API_URL_ID,
+                    "name=" + employeeSkill.getId().getName() + ";" + "employeeUsername=" + employeeSkill.getId().getEmployeeUsername()
+                )
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
             )
@@ -522,7 +624,7 @@ class EmployeeSkillResourceIT {
     @Transactional
     void putWithIdMismatchEmployeeSkill() throws Exception {
         int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
-        employeeSkill.setName(UUID.randomUUID().toString());
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
 
         // Create the EmployeeSkill
         EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
@@ -530,7 +632,7 @@ class EmployeeSkillResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restEmployeeSkillMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, UUID.randomUUID().toString())
+                put(ENTITY_API_URL_ID, "name=" + UUID.randomUUID().toString() + ";" + "employeeUsername=" + UUID.randomUUID().toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
             )
@@ -545,7 +647,7 @@ class EmployeeSkillResourceIT {
     @Transactional
     void putWithMissingIdPathParamEmployeeSkill() throws Exception {
         int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
-        employeeSkill.setName(UUID.randomUUID().toString());
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
 
         // Create the EmployeeSkill
         EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
@@ -572,11 +674,20 @@ class EmployeeSkillResourceIT {
 
         // Update the employeeSkill using partial update
         EmployeeSkill partialUpdatedEmployeeSkill = new EmployeeSkill();
+        partialUpdatedEmployeeSkill.setId(employeeSkill.getId());
         partialUpdatedEmployeeSkill.setName(employeeSkill.getName());
+        partialUpdatedEmployeeSkill.setEmployee(employeeSkill.getEmployee());
 
         restEmployeeSkillMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(
+                    ENTITY_API_URL_ID,
+                    "name=" +
+                    partialUpdatedEmployeeSkill.getId().getName() +
+                    ";" +
+                    "employeeUsername=" +
+                    partialUpdatedEmployeeSkill.getId().getEmployeeUsername()
+                )
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedEmployeeSkill))
             )
@@ -599,13 +710,22 @@ class EmployeeSkillResourceIT {
 
         // Update the employeeSkill using partial update
         EmployeeSkill partialUpdatedEmployeeSkill = new EmployeeSkill();
+        partialUpdatedEmployeeSkill.setId(employeeSkill.getId());
         partialUpdatedEmployeeSkill.setName(employeeSkill.getName());
+        partialUpdatedEmployeeSkill.setEmployee(employeeSkill.getEmployee());
 
         partialUpdatedEmployeeSkill.level(UPDATED_LEVEL);
 
         restEmployeeSkillMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(
+                    ENTITY_API_URL_ID,
+                    "name=" +
+                    partialUpdatedEmployeeSkill.getId().getName() +
+                    ";" +
+                    "employeeUsername=" +
+                    partialUpdatedEmployeeSkill.getId().getEmployeeUsername()
+                )
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedEmployeeSkill))
             )
@@ -620,17 +740,71 @@ class EmployeeSkillResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateEmployeeSkillShouldThrown() throws Exception {
-        // Update the employeeSkill without id should throw
-        EmployeeSkill partialUpdatedEmployeeSkill = new EmployeeSkill();
+    void patchNonExistingEmployeeSkill() throws Exception {
+        int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
 
+        // Create the EmployeeSkill
+        EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restEmployeeSkillMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, "name=" + UUID.randomUUID().toString() + ";" + "employeeUsername=" + UUID.randomUUID().toString())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the EmployeeSkill in the database
+        List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
+        assertThat(employeeSkillList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchEmployeeSkill() throws Exception {
+        int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+
+        // Create the EmployeeSkill
+        EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restEmployeeSkillMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, "name=" + UUID.randomUUID().toString() + ";" + "employeeUsername=" + UUID.randomUUID().toString())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the EmployeeSkill in the database
+        List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
+        assertThat(employeeSkillList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamEmployeeSkill() throws Exception {
+        int databaseSizeBeforeUpdate = employeeSkillRepository.findAll().size();
+        employeeSkill.setId(new EmployeeSkillId(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+
+        // Create the EmployeeSkill
+        EmployeeSkillDTO employeeSkillDTO = employeeSkillMapper.toDto(employeeSkill);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restEmployeeSkillMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedEmployeeSkill))
+                    .content(TestUtil.convertObjectToJsonBytes(employeeSkillDTO))
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the EmployeeSkill in the database
+        List<EmployeeSkill> employeeSkillList = employeeSkillRepository.findAll();
+        assertThat(employeeSkillList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
@@ -643,7 +817,13 @@ class EmployeeSkillResourceIT {
 
         // Delete the employeeSkill
         restEmployeeSkillMockMvc
-            .perform(delete(ENTITY_API_URL_ID, employeeSkill.getName()).accept(MediaType.APPLICATION_JSON))
+            .perform(
+                delete(
+                    ENTITY_API_URL_ID,
+                    "name=" + employeeSkill.getId().getName() + ";" + "employeeUsername=" + employeeSkill.getId().getEmployeeUsername()
+                )
+                    .accept(MediaType.APPLICATION_JSON)
+            )
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -11,9 +11,6 @@
     -->
     <changeSet id="20210313070852-1" author="jhipster">
         <createTable tableName="employee_skill_certificate">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
             <column name="grade" type="integer">
                 <constraints nullable="false" />
             </column>
@@ -21,10 +18,13 @@
                 <constraints nullable="false" />
             </column>
             <column name="type_id" type="bigint">
-                <constraints nullable="false" />
+                <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="skill_name" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="skill_employee_username" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -45,11 +45,11 @@
                   file="config/liquibase/fake-data/employee_skill_certificate.csv"
                   separator=";"
                   tableName="employee_skill_certificate">
-            <column name="id" type="numeric"/>
             <column name="grade" type="numeric"/>
             <column name="date" type="date"/>
             <column name="type_id" type="numeric"/>
             <column name="skill_name" type="string"/>
+            <column name="skill_employee_username" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

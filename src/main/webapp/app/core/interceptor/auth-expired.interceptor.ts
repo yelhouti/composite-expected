@@ -26,7 +26,7 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
             this.loginService.logout();
             this.router.navigate(['/login']);
           }
-        }
+        },
       })
     );
   }

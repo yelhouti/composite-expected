@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IWithIdString, WithIdString } from '../with-id-string.model';
+import { IWithIdString } from '../with-id-string.model';
 import { WithIdStringService } from '../service/with-id-string.service';
 
 import { WithIdStringRoutingResolveService } from './with-id-string-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: WithIdStringRoutingResolveService;
     let service: WithIdStringService;
-    let resultWithIdString: IWithIdString | undefined;
+    let resultWithIdString: IWithIdString | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(WithIdStringRoutingResolveService);
       service = TestBed.inject(WithIdStringService);
-      resultWithIdString = undefined;
+      resultWithIdString = null;
     });
 
     describe('resolve', () => {
       it('should return IWithIdString returned by find', () => {
         // GIVEN
-        service.find = jest.fn(id => of(new HttpResponse({ body: { id } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { id: 'ABC' } })));
         mockActivatedRouteSnapshot.params = { id: 'ABC' };
 
         // WHEN
@@ -47,7 +47,7 @@ describe('Service Tests', () => {
         expect(resultWithIdString).toEqual({ id: 'ABC' });
       });
 
-      it('should return new IWithIdString if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultWithIdString).toEqual(new WithIdString());
+        expect(resultWithIdString).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('ABC');
-        expect(resultWithIdString).toEqual(undefined);
+        expect(resultWithIdString).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

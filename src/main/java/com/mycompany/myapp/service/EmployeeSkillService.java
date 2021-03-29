@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.EmployeeSkillId;
 import com.mycompany.myapp.service.dto.EmployeeSkillDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -47,12 +48,12 @@ public interface EmployeeSkillService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<EmployeeSkillDTO> findOne(String id);
+    Optional<EmployeeSkillDTO> findOne(EmployeeSkillId id);
 
     /**
      * Delete the "id" employeeSkill.
      *
      * @param id the id of the entity.
      */
-    void delete(String id);
+    void delete(EmployeeSkillId id);
 }

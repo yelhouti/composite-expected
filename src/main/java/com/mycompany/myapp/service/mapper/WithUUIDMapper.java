@@ -9,8 +9,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring", uses = {})
 public interface WithUUIDMapper extends EntityMapper<WithUUIDDTO, WithUUID> {
+    @Mapping(target = "withUUIDDetails", ignore = true)
+    WithUUID toEntity(WithUUIDDTO withUUIDDTO);
+
     @Named("uuid")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "uuid", source = "uuid")
-    WithUUIDDTO toDtoId(WithUUID withUUID);
+    WithUUIDDTO toDtoUuid(WithUUID withUUID);
 }

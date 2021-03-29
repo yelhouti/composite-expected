@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IWithIdStringDetails, WithIdStringDetails } from '../with-id-string-details.model';
+import { IWithIdStringDetails } from '../with-id-string-details.model';
 import { WithIdStringDetailsService } from '../service/with-id-string-details.service';
 
 import { WithIdStringDetailsRoutingResolveService } from './with-id-string-details-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: WithIdStringDetailsRoutingResolveService;
     let service: WithIdStringDetailsService;
-    let resultWithIdStringDetails: IWithIdStringDetails | undefined;
+    let resultWithIdStringDetails: IWithIdStringDetails | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(WithIdStringDetailsRoutingResolveService);
       service = TestBed.inject(WithIdStringDetailsService);
-      resultWithIdStringDetails = undefined;
+      resultWithIdStringDetails = null;
     });
 
     describe('resolve', () => {
       it('should return IWithIdStringDetails returned by find', () => {
         // GIVEN
-        service.find = jest.fn(id => of(new HttpResponse({ body: { id } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { withIdString: { id: 'ABC' } } })));
         mockActivatedRouteSnapshot.params = { id: 'ABC' };
 
         // WHEN
@@ -44,10 +44,10 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('ABC');
-        expect(resultWithIdStringDetails).toEqual({ id: 'ABC' });
+        expect(resultWithIdStringDetails).toEqual({ withIdString: { id: 'ABC' } });
       });
 
-      it('should return new IWithIdStringDetails if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultWithIdStringDetails).toEqual(new WithIdStringDetails());
+        expect(resultWithIdStringDetails).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('ABC');
-        expect(resultWithIdStringDetails).toEqual(undefined);
+        expect(resultWithIdStringDetails).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

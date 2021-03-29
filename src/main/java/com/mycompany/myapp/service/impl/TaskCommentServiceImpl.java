@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class TaskCommentServiceImpl implements TaskCommentService {
+
     private final Logger log = LoggerFactory.getLogger(TaskCommentServiceImpl.class);
 
     private final TaskCommentRepository taskCommentRepository;
@@ -43,13 +44,10 @@ public class TaskCommentServiceImpl implements TaskCommentService {
         log.debug("Request to partially update TaskComment : {}", taskCommentDTO);
 
         return taskCommentRepository
-            .findById(taskCommentDTO.getId())
+            .findById(taskCommentMapper.toEntity(taskCommentDTO).getId())
             .map(
                 existingTaskComment -> {
-                    if (taskCommentDTO.getValue() != null) {
-                        existingTaskComment.setValue(taskCommentDTO.getValue());
-                    }
-
+                    taskCommentMapper.partialUpdate(existingTaskComment, taskCommentDTO);
                     return existingTaskComment;
                 }
             )

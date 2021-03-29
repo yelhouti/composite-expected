@@ -5,7 +5,7 @@ import { IEmployeeSkill } from '../employee-skill.model';
 
 @Component({
   selector: 'jhi-employee-skill-detail',
-  templateUrl: './employee-skill-detail.component.html'
+  templateUrl: './employee-skill-detail.component.html',
 })
 export class EmployeeSkillDetailComponent implements OnInit {
   employeeSkill: IEmployeeSkill | null = null;

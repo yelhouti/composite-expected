@@ -10,7 +10,7 @@ describe('Component Tests', () => {
     beforeEach(
       waitForAsync(() => {
         TestBed.configureTestingModule({
-          declarations: [PasswordStrengthBarComponent]
+          declarations: [PasswordStrengthBarComponent],
         })
           .overrideTemplate(PasswordStrengthBarComponent, '')
           .compileComponents();

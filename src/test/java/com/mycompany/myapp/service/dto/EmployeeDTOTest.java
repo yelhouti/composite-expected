@@ -16,9 +16,11 @@ class EmployeeDTOTest {
         assertThat(employeeDTO1).isNotEqualTo(employeeDTO2);
         employeeDTO2.setUsername(employeeDTO1.getUsername());
         assertThat(employeeDTO1).isEqualTo(employeeDTO2);
-        employeeDTO2.setUsername("id2");
-        assertThat(employeeDTO1).isNotEqualTo(employeeDTO2);
-        employeeDTO1.setUsername(null);
-        assertThat(employeeDTO1).isNotEqualTo(employeeDTO2);
+        EmployeeDTO employeeDTO3 = new EmployeeDTO();
+        employeeDTO3.setUsername("id3");
+        assertThat(employeeDTO1).isNotEqualTo(employeeDTO3);
+        EmployeeDTO employeeDTO4 = new EmployeeDTO();
+        employeeDTO4.setUsername(null);
+        assertThat(employeeDTO1).isNotEqualTo(employeeDTO4);
     }
 }

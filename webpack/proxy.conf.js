@@ -11,12 +11,12 @@ function setupProxy() {
         '/v3/api-docs',
         '/h2-console',
         '/auth',
-        '/health'
+        '/health',
       ],
       target: `http${tls ? 's' : ''}://localhost:8080`,
       secure: false,
-      changeOrigin: tls
-    }
+      changeOrigin: tls,
+    },
   ];
   return conf;
 }

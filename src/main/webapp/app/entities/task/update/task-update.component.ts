@@ -1,29 +1,28 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { TaskType, TASK_TYPE_ARRAY } from 'app/entities/enumerations/task-type.model';
 
-import * as dayjs from 'dayjs';
-import { DATE_TIME_FORMAT } from 'app/config/input.constants';
-
-import { ITask, Task } from '../task.model';
+import { ITask } from '../task.model';
 import { TaskService } from '../service/task.service';
-import { AlertError } from 'app/shared/alert/alert-error.model';
-import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
-import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
+import { MessageService } from 'primeng/api';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/user.service';
 
 @Component({
   selector: 'jhi-task-update',
-  templateUrl: './task-update.component.html'
+  templateUrl: './task-update.component.html',
 })
 export class TaskUpdateComponent implements OnInit {
   isSaving = false;
-
-  usersSharedCollection: IUser[] = [];
+  userOptions: IUser[] | null = null;
+  userFilterValue?: any;
+  typeOptions = TASK_TYPE_ARRAY.map((s: TaskType) => ({ label: s.toString(), value: s }));
+  attachmentFile?: File;
+  pictureFile?: File;
 
   editForm = this.fb.group({
     id: [],
@@ -38,58 +37,77 @@ export class TaskUpdateComponent implements OnInit {
     attachmentContentType: [],
     picture: [null, [Validators.required]],
     pictureContentType: [],
-    user: [null, Validators.required]
+    user: [null, [Validators.required]],
   });
 
   constructor(
     protected dataUtils: DataUtils,
-    protected eventManager: EventManager,
+    protected messageService: MessageService,
     protected taskService: TaskService,
     protected userService: UserService,
-    protected elementRef: ElementRef,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ task }) => {
-      if (task.id === undefined) {
-        const today = dayjs().startOf('day');
-        task.createdAt = today;
-        task.modifiedAt = today;
-      }
-
       this.updateForm(task);
+    });
+    this.loadAllUsers();
+  }
 
-      this.loadRelationshipsOptions();
+  loadAllUsers(): void {
+    this.userService.query().subscribe(
+      (res: HttpResponse<IUser[]>) => (this.userOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  updateForm(task: ITask | null): void {
+    if (task) {
+      this.editForm.reset({ ...task }, { emitEvent: false, onlySelf: true });
+      if (task.attachment) {
+        fetch(`data:${task.attachmentContentType!};base64,${task.attachment}`)
+          .then((res: any) => res.blob() as string)
+          .then(blob => {
+            this.attachmentFile = new File([blob], '', { type: task.attachmentContentType! });
+          });
+      }
+      if (task.picture) {
+        fetch(`data:${task.pictureContentType!};base64,${task.picture}`)
+          .then((res: any) => res.blob() as string)
+          .then(blob => {
+            this.pictureFile = new File([blob], '', { type: task.pictureContentType! });
+          });
+      }
+      this.userFilterValue = task.user?.login;
+    } else {
+      this.editForm.reset({
+        endDate: new Date(),
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+        done: false,
+      });
+    }
+  }
+
+  onFileSelect(event: { event: Event; files: File[] }, field: string): void {
+    const file = event.files[0];
+    this.dataUtils.toBase64(file, (base64Data: string) => {
+      this.editForm.patchValue({
+        [field]: base64Data,
+        [field + 'ContentType']: file.type,
+      });
     });
   }
 
-  byteSize(base64String: string): string {
-    return this.dataUtils.byteSize(base64String);
-  }
-
-  openFile(base64String: string, contentType: string | null | undefined): void {
-    this.dataUtils.openFile(base64String, contentType);
-  }
-
-  setFileData(event: Event, field: string, isImage: boolean): void {
-    this.dataUtils.loadFileToForm(event, this.editForm, field, isImage).subscribe({
-      error: (err: FileLoadError) =>
-        this.eventManager.broadcast(
-          new EventWithContent<AlertError>('compositekeyApp.error', { ...err, key: 'error.file.' + err.key })
-        )
-    });
-  }
-
-  clearInputImage(field: string, fieldContentType: string, idInput: string): void {
+  onFileRemove(event: { event: Event; files: File[] }, field: string): void {
     this.editForm.patchValue({
       [field]: null,
-      [fieldContentType]: null
+      [field + 'ContentType']: null,
     });
-    if (idInput && this.elementRef.nativeElement.querySelector('#' + idInput)) {
-      this.elementRef.nativeElement.querySelector('#' + idInput).value = null;
-    }
   }
 
   previousState(): void {
@@ -98,81 +116,31 @@ export class TaskUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const task = this.createFromForm();
-    if (task.id !== undefined) {
+    const task = this.editForm.value;
+    if (task.id !== null) {
       this.subscribeToSaveResponse(this.taskService.update(task));
     } else {
       this.subscribeToSaveResponse(this.taskService.create(task));
     }
   }
 
-  trackUserById(index: number, item: IUser): number {
-    return item.id!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(task: ITask): void {
-    this.editForm.patchValue({
-      id: task.id,
-      name: task.name,
-      type: task.type,
-      endDate: task.endDate,
-      createdAt: task.createdAt ? task.createdAt.format(DATE_TIME_FORMAT) : null,
-      modifiedAt: task.modifiedAt ? task.modifiedAt.format(DATE_TIME_FORMAT) : null,
-      done: task.done,
-      description: task.description,
-      attachment: task.attachment,
-      attachmentContentType: task.attachmentContentType,
-      picture: task.picture,
-      pictureContentType: task.pictureContentType,
-      user: task.user
-    });
-
-    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing(this.usersSharedCollection, task.user);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing(users, this.editForm.get('user')!.value)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
-  }
-
-  protected createFromForm(): ITask {
-    return {
-      ...new Task(),
-      id: this.editForm.get(['id'])!.value,
-      name: this.editForm.get(['name'])!.value,
-      type: this.editForm.get(['type'])!.value,
-      endDate: this.editForm.get(['endDate'])!.value,
-      createdAt: this.editForm.get(['createdAt'])!.value ? dayjs(this.editForm.get(['createdAt'])!.value, DATE_TIME_FORMAT) : undefined,
-      modifiedAt: this.editForm.get(['modifiedAt'])!.value ? dayjs(this.editForm.get(['modifiedAt'])!.value, DATE_TIME_FORMAT) : undefined,
-      done: this.editForm.get(['done'])!.value,
-      description: this.editForm.get(['description'])!.value,
-      attachmentContentType: this.editForm.get(['attachmentContentType'])!.value,
-      attachment: this.editForm.get(['attachment'])!.value,
-      pictureContentType: this.editForm.get(['pictureContentType'])!.value,
-      picture: this.editForm.get(['picture'])!.value,
-      user: this.editForm.get(['user'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

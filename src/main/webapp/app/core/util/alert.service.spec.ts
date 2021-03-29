@@ -1,6 +1,5 @@
 import { inject, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService, MissingTranslationHandler } from '@ngx-translate/core';
-import { missingTranslationHandler } from '../../config/translation.config';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { Alert, AlertService } from './alert.service';
 
@@ -10,17 +9,8 @@ describe('Alert service test', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [
-          TranslateModule.forRoot({
-            missingTranslationHandler: {
-              provide: MissingTranslationHandler,
-              useFactory: missingTranslationHandler
-            }
-          })
-        ]
+        imports: [TranslateModule.forRoot()],
       });
-      const translateService = TestBed.inject(TranslateService);
-      translateService.setDefaultLang('en');
       jest.useFakeTimers();
       extAlerts = [];
     });
@@ -32,7 +22,7 @@ describe('Alert service test', () => {
           message: 'Hello Jhipster',
           timeout: 3000,
           toast: true,
-          position: 'top left'
+          position: 'top left',
         })
       ).toEqual(
         jasmine.objectContaining({
@@ -41,7 +31,7 @@ describe('Alert service test', () => {
           id: 0,
           timeout: 3000,
           toast: true,
-          position: 'top left'
+          position: 'top left',
         } as Alert)
       );
 
@@ -53,7 +43,7 @@ describe('Alert service test', () => {
           id: 0,
           timeout: 3000,
           toast: true,
-          position: 'top left'
+          position: 'top left',
         } as Alert)
       );
     }));
@@ -68,7 +58,7 @@ describe('Alert service test', () => {
               message: 'Hello Jhipster',
               timeout: 3000,
               toast: true,
-              position: 'top left'
+              position: 'top left',
             },
             extAlerts
           )
@@ -79,7 +69,7 @@ describe('Alert service test', () => {
             id: 0,
             timeout: 3000,
             toast: true,
-            position: 'top left'
+            position: 'top left',
           } as Alert)
         );
 
@@ -91,7 +81,7 @@ describe('Alert service test', () => {
             id: 0,
             timeout: 3000,
             toast: true,
-            position: 'top left'
+            position: 'top left',
           } as Alert)
         );
       }
@@ -103,7 +93,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'success',
           message: 'Hello Jhipster success',
-          id: 1
+          id: 1,
         } as Alert)
       );
 
@@ -112,7 +102,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'success',
           message: 'Hello Jhipster success',
-          id: 1
+          id: 1,
         } as Alert)
       );
     }));
@@ -125,7 +115,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'success',
           message: 'Hello Jhipster success',
-          id: 2
+          id: 2,
         } as Alert)
       );
 
@@ -136,7 +126,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'info',
           message: 'Hello Jhipster info 2',
-          id: 1
+          id: 1,
         } as Alert)
       );
       alert2.close?.(service.get());
@@ -145,7 +135,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'success',
           message: 'Hello Jhipster success',
-          id: 2
+          id: 2,
         } as Alert)
       );
       alert0.close?.(service.get());
@@ -179,7 +169,7 @@ describe('Alert service test', () => {
             message: 'Hello Jhipster',
             timeout: 3000,
             toast: true,
-            position: 'top left'
+            position: 'top left',
           },
           []
         )
@@ -190,7 +180,7 @@ describe('Alert service test', () => {
           id: 0,
           timeout: 3000,
           toast: true,
-          position: 'top left'
+          position: 'top left',
         } as Alert)
       );
 
@@ -201,7 +191,7 @@ describe('Alert service test', () => {
       expect(service.addAlert({ type: 'success', message: 'Hello Jhipster' })).toEqual(
         jasmine.objectContaining({
           type: 'success',
-          message: 'Hello Jhipster'
+          message: 'Hello Jhipster',
         } as Alert)
       );
     }));
@@ -211,7 +201,7 @@ describe('Alert service test', () => {
         jasmine.objectContaining({
           type: 'success',
           message: 'Hello Jhipster',
-          position: 'bottom left'
+          position: 'bottom left',
         } as Alert)
       );
     }));
@@ -220,7 +210,7 @@ describe('Alert service test', () => {
       expect(service.addAlert({ type: 'danger', message: 'Hello Jhipster' })).toEqual(
         jasmine.objectContaining({
           type: 'danger',
-          message: 'Hello Jhipster'
+          message: 'Hello Jhipster',
         } as Alert)
       );
     }));
@@ -229,7 +219,7 @@ describe('Alert service test', () => {
       expect(service.addAlert({ type: 'warning', message: 'Hello Jhipster' })).toEqual(
         jasmine.objectContaining({
           type: 'warning',
-          message: 'Hello Jhipster'
+          message: 'Hello Jhipster',
         } as Alert)
       );
     }));
@@ -238,48 +228,9 @@ describe('Alert service test', () => {
       expect(service.addAlert({ type: 'info', message: 'Hello Jhipster' })).toEqual(
         jasmine.objectContaining({
           type: 'info',
-          message: 'Hello Jhipster'
+          message: 'Hello Jhipster',
         } as Alert)
       );
     }));
-
-    it('should produce a info message with translated message if key exists', inject(
-      [AlertService, TranslateService],
-      (service: AlertService, translateService: TranslateService) => {
-        translateService.setTranslation('en', {
-          'hello.jhipster': 'Translated message'
-        });
-        expect(service.addAlert({ type: 'info', message: 'Hello Jhipster', translationKey: 'hello.jhipster' })).toEqual(
-          jasmine.objectContaining({
-            type: 'info',
-            message: 'Translated message'
-          } as Alert)
-        );
-      }
-    ));
-
-    it('should produce a info message with provided message if key does not exists', inject(
-      [AlertService, TranslateService],
-      (service: AlertService) => {
-        expect(service.addAlert({ type: 'info', message: 'Hello Jhipster', translationKey: 'hello.jhipster' })).toEqual(
-          jasmine.objectContaining({
-            type: 'info',
-            message: 'Hello Jhipster'
-          } as Alert)
-        );
-      }
-    ));
-
-    it('should produce a info message with provided key if transltion key does not exist in translations and message is not provided', inject(
-      [AlertService, TranslateService],
-      (service: AlertService) => {
-        expect(service.addAlert({ type: 'info', translationKey: 'hello.jhipster' })).toEqual(
-          jasmine.objectContaining({
-            type: 'info',
-            message: 'hello.jhipster'
-          } as Alert)
-        );
-      }
-    ));
   });
 });

@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IEmployee, Employee } from '../employee.model';
+import { IEmployee } from '../employee.model';
 import { EmployeeService } from '../service/employee.service';
 
 import { EmployeeRoutingResolveService } from './employee-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: EmployeeRoutingResolveService;
     let service: EmployeeService;
-    let resultEmployee: IEmployee | undefined;
+    let resultEmployee: IEmployee | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(EmployeeRoutingResolveService);
       service = TestBed.inject(EmployeeService);
-      resultEmployee = undefined;
+      resultEmployee = null;
     });
 
     describe('resolve', () => {
       it('should return IEmployee returned by find', () => {
         // GIVEN
-        service.find = jest.fn(username => of(new HttpResponse({ body: { username } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { username: 'ABC' } })));
         mockActivatedRouteSnapshot.params = { username: 'ABC' };
 
         // WHEN
@@ -47,7 +47,7 @@ describe('Service Tests', () => {
         expect(resultEmployee).toEqual({ username: 'ABC' });
       });
 
-      it('should return new IEmployee if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultEmployee).toEqual(new Employee());
+        expect(resultEmployee).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('ABC');
-        expect(resultEmployee).toEqual(undefined);
+        expect(resultEmployee).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

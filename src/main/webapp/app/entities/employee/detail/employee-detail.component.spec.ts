@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ employee: { username: 'ABC' } }) }
-          }
-        ]
+            useValue: { data: of({ employee: { username: 'ABC' } }) },
+          },
+        ],
       })
         .overrideTemplate(EmployeeDetailComponent, '')
         .compileComponents();

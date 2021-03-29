@@ -3,7 +3,7 @@ import { Component, ElementRef, Input, Renderer2 } from '@angular/core';
 @Component({
   selector: 'jhi-password-strength-bar',
   templateUrl: './password-strength-bar.component.html',
-  styleUrls: ['./password-strength-bar.component.scss']
+  styleUrls: ['./password-strength-bar.component.scss'],
 })
 export class PasswordStrengthBarComponent {
   colors = ['#F00', '#F90', '#FF0', '#9F0', '#0F0'];
@@ -37,16 +37,16 @@ export class PasswordStrengthBarComponent {
 
   getColor(s: number): { idx: number; color: string } {
     let idx = 0;
-    if (s <= 10) {
-      idx = 0;
-    } else if (s <= 20) {
-      idx = 1;
-    } else if (s <= 30) {
-      idx = 2;
-    } else if (s <= 40) {
-      idx = 3;
-    } else {
-      idx = 4;
+    if (s > 10) {
+      if (s <= 20) {
+        idx = 1;
+      } else if (s <= 30) {
+        idx = 2;
+      } else if (s <= 40) {
+        idx = 3;
+      } else {
+        idx = 4;
+      }
     }
     return { idx: idx + 1, color: this.colors[idx] };
   }

@@ -4,18 +4,18 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IWithUUID, WithUUID } from '../with-uuid.model';
+import { IWithUUID } from '../with-uuid.model';
 import { WithUUIDService } from '../service/with-uuid.service';
 
 @Injectable({ providedIn: 'root' })
-export class WithUUIDRoutingResolveService implements Resolve<IWithUUID> {
-  constructor(protected service: WithUUIDService, protected router: Router) {}
+export class WithUUIDRoutingResolveService implements Resolve<IWithUUID | null> {
+  constructor(private service: WithUUIDService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IWithUUID> | Observable<never> {
-    const id = route.params['uuid'];
-    if (id) {
-      return this.service.find(id).pipe(
-        mergeMap((withUUID: HttpResponse<WithUUID>) => {
+  resolve(route: ActivatedRouteSnapshot): Observable<IWithUUID | null> | Observable<never> {
+    const uuid = route.params['uuid'] ? route.params['uuid'] : null;
+    if (uuid) {
+      return this.service.find(uuid).pipe(
+        mergeMap((withUUID: HttpResponse<IWithUUID>) => {
           if (withUUID.body) {
             return of(withUUID.body);
           } else {
@@ -25,6 +25,6 @@ export class WithUUIDRoutingResolveService implements Resolve<IWithUUID> {
         })
       );
     }
-    return of(new WithUUID());
+    return of(null);
   }
 }

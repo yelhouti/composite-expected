@@ -4,18 +4,19 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IEmployeeSkill, EmployeeSkill } from '../employee-skill.model';
+import { IEmployeeSkill } from '../employee-skill.model';
 import { EmployeeSkillService } from '../service/employee-skill.service';
 
 @Injectable({ providedIn: 'root' })
-export class EmployeeSkillRoutingResolveService implements Resolve<IEmployeeSkill> {
-  constructor(protected service: EmployeeSkillService, protected router: Router) {}
+export class EmployeeSkillRoutingResolveService implements Resolve<IEmployeeSkill | null> {
+  constructor(private service: EmployeeSkillService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IEmployeeSkill> | Observable<never> {
-    const id = route.params['name'];
-    if (id) {
-      return this.service.find(id).pipe(
-        mergeMap((employeeSkill: HttpResponse<EmployeeSkill>) => {
+  resolve(route: ActivatedRouteSnapshot): Observable<IEmployeeSkill | null> | Observable<never> {
+    const name = route.params['name'] ? route.params['name'] : null;
+    const employeeUsername = route.params['employeeUsername'] ? route.params['employeeUsername'] : null;
+    if (name && employeeUsername) {
+      return this.service.find(name, employeeUsername).pipe(
+        mergeMap((employeeSkill: HttpResponse<IEmployeeSkill>) => {
           if (employeeSkill.body) {
             return of(employeeSkill.body);
           } else {
@@ -25,6 +26,6 @@ export class EmployeeSkillRoutingResolveService implements Resolve<IEmployeeSkil
         })
       );
     }
-    return of(new EmployeeSkill());
+    return of(null);
   }
 }

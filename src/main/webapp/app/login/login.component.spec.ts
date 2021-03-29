@@ -31,10 +31,10 @@ describe('Component Tests', () => {
             {
               provide: LoginService,
               useValue: {
-                login: jest.fn(() => of({}))
-              }
-            }
-          ]
+                login: jest.fn(() => of({})),
+              },
+            },
+          ],
         })
           .overrideTemplate(LoginComponent, '')
           .compileComponents();
@@ -92,13 +92,13 @@ describe('Component Tests', () => {
         const credentials = {
           username: 'admin',
           password: 'admin',
-          rememberMe: true
+          rememberMe: true,
         };
 
         comp.loginForm.patchValue({
           username: 'admin',
           password: 'admin',
-          rememberMe: true
+          rememberMe: true,
         });
 
         // WHEN/

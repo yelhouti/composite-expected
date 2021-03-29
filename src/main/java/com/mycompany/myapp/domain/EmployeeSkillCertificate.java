@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -15,12 +16,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "employee_skill_certificate")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EmployeeSkillCertificate implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
+    @EmbeddedId
+    EmployeeSkillCertificateId id;
 
     @NotNull
     @Column(name = "grade", nullable = false)
@@ -30,26 +30,42 @@ public class EmployeeSkillCertificate implements Serializable {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @JsonIgnoreProperties(value = { "employeeSkillCertificate" }, allowSetters = true)
+    @OneToOne(mappedBy = "employeeSkillCertificate")
+    private EmployeeSkillCertificateDetails employeeSkillCertificateDetails;
+
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "employeeSkillCertificates" }, allowSetters = true)
+    @JoinColumn(insertable = false, updatable = false)
     private CertificateType type;
 
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "employeeSkillCertificates", "tasks", "employee", "teacher" }, allowSetters = true)
+    @JoinColumns(
+        {
+            @JoinColumn(name = "skill_name", referencedColumnName = "name", insertable = false, updatable = false),
+            @JoinColumn(
+                name = "skill_employee_username",
+                referencedColumnName = "employee_username",
+                insertable = false,
+                updatable = false
+            ),
+        }
+    )
     private EmployeeSkill skill;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public Long getId() {
+    public EmployeeSkillCertificateId getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(EmployeeSkillCertificateId id) {
         this.id = id;
     }
 
-    public EmployeeSkillCertificate id(Long id) {
+    public EmployeeSkillCertificate id(EmployeeSkillCertificateId id) {
         this.id = id;
         return this;
     }
@@ -78,6 +94,25 @@ public class EmployeeSkillCertificate implements Serializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public EmployeeSkillCertificateDetails getEmployeeSkillCertificateDetails() {
+        return this.employeeSkillCertificateDetails;
+    }
+
+    public EmployeeSkillCertificate employeeSkillCertificateDetails(EmployeeSkillCertificateDetails employeeSkillCertificateDetails) {
+        this.setEmployeeSkillCertificateDetails(employeeSkillCertificateDetails);
+        return this;
+    }
+
+    public void setEmployeeSkillCertificateDetails(EmployeeSkillCertificateDetails employeeSkillCertificateDetails) {
+        if (this.employeeSkillCertificateDetails != null) {
+            this.employeeSkillCertificateDetails.setEmployeeSkillCertificate(null);
+        }
+        if (employeeSkillCertificateDetails != null) {
+            employeeSkillCertificateDetails.setEmployeeSkillCertificate(this);
+        }
+        this.employeeSkillCertificateDetails = employeeSkillCertificateDetails;
     }
 
     public CertificateType getType() {
@@ -122,7 +157,7 @@ public class EmployeeSkillCertificate implements Serializable {
     @Override
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore

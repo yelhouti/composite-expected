@@ -8,6 +8,7 @@ import java.util.UUID;
  * A DTO for the {@link com.mycompany.myapp.domain.WithUUIDDetails} entity.
  */
 public class WithUUIDDetailsDTO implements Serializable {
+
     private UUID uuid;
 
     private String details;

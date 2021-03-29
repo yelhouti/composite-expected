@@ -1,11 +1,11 @@
-id;grade;date;type_id;skill_id
-1;94448;2021-03-12;1;Kenya
-2;71328;2021-03-13;2;streamline
-3;3662;2021-03-12;3;transparent niches
-4;94063;2021-03-13;4;driver Ball
-5;12209;2021-03-12;5;Vista Ergonomic
-6;54605;2021-03-13;6;Guinea-Bissau
-7;58089;2021-03-12;7;haptic Metrics
-8;72489;2021-03-12;8;Berkshire open-source
-9;73922;2021-03-12;9;back-end
-10;46508;2021-03-12;10;extranet
+grade;date;type_id;skill_name;skill_employee_username
+94448;2021-03-12;1;Kenya;calculate networks
+71328;2021-03-13;2;streamline;Tuna Bedfordshire
+3662;2021-03-12;3;transparent niches;Handmade Assistant
+94063;2021-03-13;4;driver Ball;Sleek
+12209;2021-03-12;5;Vista Ergonomic;reinvent orchestrate
+54605;2021-03-13;6;Guinea-Bissau;mobile Granite
+58089;2021-03-12;7;haptic Metrics;pink
+72489;2021-03-12;8;Berkshire open-source;deposit Soap Marketing
+73922;2021-03-12;9;back-end;Kiribati Group
+46508;2021-03-12;10;extranet;Cambridgeshire Automated

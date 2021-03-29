@@ -9,6 +9,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.WithUUID} entity.
  */
 public class WithUUIDDTO implements Serializable {
+
     private UUID uuid;
 
     @NotNull

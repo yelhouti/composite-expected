@@ -26,6 +26,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class WithIdStringResource {
+
     private final Logger log = LoggerFactory.getLogger(WithIdStringResource.class);
 
     private static final String ENTITY_NAME = "withIdString";
@@ -59,8 +60,8 @@ public class WithIdStringResource {
     @PostMapping("/with-id-strings")
     public ResponseEntity<WithIdStringDTO> createWithIdString(@RequestBody WithIdStringDTO withIdStringDTO) throws URISyntaxException {
         log.debug("REST request to save WithIdString : {}", withIdStringDTO);
-        if (withIdStringDTO.getId() != null) {
-            throw new BadRequestAlertException("A new withIdString cannot already have an ID", ENTITY_NAME, "idexists");
+        if (withIdStringRepository.existsById(withIdStringDTO.getId())) {
+            throw new BadRequestAlertException("This withIdString already exists", ENTITY_NAME, "idexists");
         }
         WithIdStringDTO result = withIdStringService.save(withIdStringDTO);
         return ResponseEntity
@@ -80,12 +81,40 @@ public class WithIdStringResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/with-id-strings/{id}")
-    public ResponseEntity<WithIdStringDTO> updateWithIdString(
-        @PathVariable(value = "id", required = false) final String id,
-        @RequestBody WithIdStringDTO withIdStringDTO
-    )
+    public ResponseEntity<WithIdStringDTO> updateWithIdString(@PathVariable String id, @RequestBody WithIdStringDTO withIdStringDTO)
         throws URISyntaxException {
         log.debug("REST request to update WithIdString : {}, {}", id, withIdStringDTO);
+        if (withIdStringDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, withIdStringDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+        if (!withIdStringRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        WithIdStringDTO result = withIdStringService.save(withIdStringDTO);
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId()))
+            .body(result);
+    }
+
+    /**
+     * {@code PATCH  /with-id-strings/:id} : Partial updates given fields of an existing withIdString, field will ignore if it is null
+     *
+     * @param id the id of the withIdStringDTO to save.
+     * @param withIdStringDTO the withIdStringDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated withIdStringDTO,
+     * or with status {@code 400 (Bad Request)} if the withIdStringDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the withIdStringDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the withIdStringDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/with-id-strings/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<WithIdStringDTO> partialUpdateWithIdString(@PathVariable String id, @RequestBody WithIdStringDTO withIdStringDTO)
+        throws URISyntaxException {
+        log.debug("REST request to partial update WithIdString partially : {}, {}", id, withIdStringDTO);
         if (withIdStringDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -95,31 +124,6 @@ public class WithIdStringResource {
 
         if (!withIdStringRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        WithIdStringDTO result = withIdStringService.save(withIdStringDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, withIdStringDTO.getId()))
-            .body(result);
-    }
-
-    /**
-     * {@code PATCH  /with-id-strings} : Updates given fields of an existing withIdString.
-     *
-     * @param withIdStringDTO the withIdStringDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated withIdStringDTO,
-     * or with status {@code 400 (Bad Request)} if the withIdStringDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the withIdStringDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the withIdStringDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/with-id-strings", consumes = "application/merge-patch+json")
-    public ResponseEntity<WithIdStringDTO> partialUpdateWithIdString(@RequestBody WithIdStringDTO withIdStringDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update WithIdString partially : {}", withIdStringDTO);
-        if (withIdStringDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
         Optional<WithIdStringDTO> result = withIdStringService.partialUpdate(withIdStringDTO);

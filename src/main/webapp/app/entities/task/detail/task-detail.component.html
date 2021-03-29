@@ -1,14 +1,9 @@
 <div class="row justify-content-center">
   <div class="col-8">
     <div *ngIf="task">
-      <h2 data-cy="taskDetailsHeading"><span jhiTranslate="compositekeyApp.task.detail.title">Task</span></h2>
+      <h2 data-cy="taskDetailsHeading"><span jhiTranslate="compositekeyApp.task.detail.title">Task</span> {{ task.id! }}</h2>
 
       <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
       <dl class="row-md jh-entity-details">
         <dt><span jhiTranslate="global.field.id">ID</span></dt>
         <dd>
@@ -24,15 +19,15 @@
         </dd>
         <dt><span jhiTranslate="compositekeyApp.task.endDate">End Date</span></dt>
         <dd>
-          <span>{{ task.endDate | formatMediumDate }}</span>
+          {{ task.endDate | date: 'mediumDate' }}
         </dd>
         <dt><span jhiTranslate="compositekeyApp.task.createdAt">Created At</span></dt>
         <dd>
-          <span>{{ task.createdAt | formatMediumDatetime }}</span>
+          {{ task.createdAt | date: 'medium' }}
         </dd>
         <dt><span jhiTranslate="compositekeyApp.task.modifiedAt">Modified At</span></dt>
         <dd>
-          <span>{{ task.modifiedAt | formatMediumDatetime }}</span>
+          {{ task.modifiedAt | date: 'medium' }}
         </dd>
         <dt><span jhiTranslate="compositekeyApp.task.done">Done</span></dt>
         <dd>
@@ -60,17 +55,28 @@
         </dd>
         <dt><span jhiTranslate="compositekeyApp.task.user">User</span></dt>
         <dd>
-          <span>{{ task.user?.login }}</span>
+          <div *ngIf="task.user">
+            {{ task!.user!.login }}
+          </div>
         </dd>
       </dl>
 
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/task', task.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="['/task', task!.id, 'edit']"
+      ></button>
     </div>
   </div>
 </div>

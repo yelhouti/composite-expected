@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ withIdString: { id: 'ABC' } }) }
-          }
-        ]
+            useValue: { data: of({ withIdString: { id: 'ABC' } }) },
+          },
+        ],
       })
         .overrideTemplate(WithIdStringDetailComponent, '')
         .compileComponents();

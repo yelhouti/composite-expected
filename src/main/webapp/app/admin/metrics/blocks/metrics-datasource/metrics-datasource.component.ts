@@ -5,7 +5,7 @@ import { Databases } from 'app/admin/metrics/metrics.model';
 @Component({
   selector: 'jhi-metrics-datasource',
   templateUrl: './metrics-datasource.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsDatasourceComponent {
   /**

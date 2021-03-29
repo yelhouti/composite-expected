@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
+
     private final Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
     private final EmployeeRepository employeeRepository;
@@ -43,13 +44,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.debug("Request to partially update Employee : {}", employeeDTO);
 
         return employeeRepository
-            .findById(employeeDTO.getUsername())
+            .findById(employeeMapper.toEntity(employeeDTO).getUsername())
             .map(
                 existingEmployee -> {
-                    if (employeeDTO.getFullname() != null) {
-                        existingEmployee.setFullname(employeeDTO.getFullname());
-                    }
-
+                    employeeMapper.partialUpdate(existingEmployee, employeeDTO);
                     return existingEmployee;
                 }
             )

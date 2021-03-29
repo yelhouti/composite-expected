@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ withIdStringDetails: { id: 'ABC' } }) }
-          }
-        ]
+            useValue: { data: of({ withIdStringDetails: { withIdString: { id: 'ABC' } } }) },
+          },
+        ],
       })
         .overrideTemplate(WithIdStringDetailsDetailComponent, '')
         .compileComponents();
@@ -31,7 +31,7 @@ describe('Component Tests', () => {
         comp.ngOnInit();
 
         // THEN
-        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ id: 'ABC' }));
+        expect(comp.withIdStringDetails).toEqual(jasmine.objectContaining({ withIdString: { id: 'ABC' } }));
       });
     });
   });

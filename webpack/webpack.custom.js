@@ -16,12 +16,12 @@ module.exports = (config, options) => {
   if (config.mode === 'development') {
     config.plugins.push(
       new ESLintPlugin({
-        extensions: ['js', 'ts']
+        extensions: ['js', 'ts'],
       }),
       new FriendlyErrorsWebpackPlugin(),
       new WebpackNotifierPlugin({
         title: 'Compositekey',
-        contentImage: path.join(__dirname, 'logo-jhipster.png')
+        contentImage: path.join(__dirname, 'logo-jhipster.png'),
       }),
       new BrowserSyncPlugin(
         {
@@ -31,14 +31,14 @@ module.exports = (config, options) => {
           proxy: {
             target: `http${tls ? 's' : ''}://localhost:4200`,
             proxyOptions: {
-              changeOrigin: false //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
-            }
+              changeOrigin: false, //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
+            },
           },
           socket: {
             clients: {
-              heartbeatTimeout: 60000
-            }
-          }
+              heartbeatTimeout: 60000,
+            },
+          },
           /*
           ghostMode: { // uncomment this part to disable BrowserSync ghostMode; https://github.com/jhipster/generator-jhipster/issues/11116
             clicks: false,
@@ -49,7 +49,7 @@ module.exports = (config, options) => {
           */
         },
         {
-          reload: false
+          reload: false,
         }
       )
     );
@@ -57,7 +57,7 @@ module.exports = (config, options) => {
     if (!process.env.JHI_DISABLE_WEBPACK_LOGS) {
       config.plugins.push(
         new SimpleProgressWebpackPlugin({
-          format: 'compact'
+          format: 'compact',
         })
       );
     }
@@ -69,11 +69,11 @@ module.exports = (config, options) => {
         analyzerMode: 'static',
         openAnalyzer: false,
         // Webpack statistics in target folder
-        reportFilename: '../stats.html'
+        reportFilename: '../stats.html',
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
-        debug: false
+        debug: false,
       })
     );
   }
@@ -97,16 +97,16 @@ module.exports = (config, options) => {
         // If this URL is left empty (""), then it will be relative to the current context.
         // If you use an API server, in `prod` mode, you will need to enable CORS
         // (see the `jhipster.cors` common JHipster property in the `application-*.yml` configurations)
-        SERVER_API_URL: `''`
-      }
+        SERVER_API_URL: `''`,
+      },
     }),
     new MergeJsonWebpackPlugin({
       output: {
         groupBy: [
-          { pattern: './src/main/webapp/i18n/en/*.json', fileName: './i18n/en.json' }
+          { pattern: './src/main/webapp/i18n/en/*.json', fileName: './i18n/en.json' },
           // jhipster-needle-i18n-language-webpack - JHipster will add/remove languages in this array
-        ]
-      }
+        ],
+      },
     })
   );
 

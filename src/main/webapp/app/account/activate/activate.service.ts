@@ -10,7 +10,7 @@ export class ActivateService {
 
   get(key: string): Observable<{}> {
     return this.http.get(this.applicationConfigService.getEndpointFor('api/activate'), {
-      params: new HttpParams().set('key', key)
+      params: new HttpParams().set('key', key),
     });
   }
 }

@@ -1,117 +1,149 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Subscription } from 'rxjs';
+import { filter, tap, switchMap } from 'rxjs/operators';
+import { FilterMetadata, MessageService } from 'primeng/api';
 import { IEmployeeSkillCertificate } from '../employee-skill-certificate.model';
+import { EmployeeSkillCertificateService } from '../service/employee-skill-certificate.service';
 
 import { ITEMS_PER_PAGE } from 'app/config/pagination.constants';
-import { EmployeeSkillCertificateService } from '../service/employee-skill-certificate.service';
-import { EmployeeSkillCertificateDeleteDialogComponent } from '../delete/employee-skill-certificate-delete-dialog.component';
+import {
+  lazyLoadEventToServerQueryParams,
+  lazyLoadEventToRouterQueryParams,
+  fillTableFromQueryParams,
+} from 'app/core/request/request-util';
+import { ConfirmationService, LazyLoadEvent } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { ICertificateType } from 'app/entities/certificate-type/certificate-type.model';
+import { CertificateTypeService } from 'app/entities/certificate-type/service/certificate-type.service';
+import { IEmployeeSkill } from 'app/entities/employee-skill/employee-skill.model';
+import { EmployeeSkillService } from 'app/entities/employee-skill/service/employee-skill.service';
+import { IEmployee } from 'app/entities/employee/employee.model';
+import { EmployeeService } from 'app/entities/employee/service/employee.service';
+import { Table } from 'primeng/table';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'jhi-employee-skill-certificate',
-  templateUrl: './employee-skill-certificate.component.html'
+  templateUrl: './employee-skill-certificate.component.html',
 })
 export class EmployeeSkillCertificateComponent implements OnInit {
   employeeSkillCertificates?: IEmployeeSkillCertificate[];
-  isLoading = false;
-  totalItems = 0;
-  itemsPerPage = ITEMS_PER_PAGE;
-  page?: number;
-  predicate!: string;
-  ascending!: boolean;
-  ngbPaginationPage = 1;
+  eventSubscriber?: Subscription;
+  typeOptions: ICertificateType[] | null = null;
+  typeSelectedOptions: ICertificateType[] | null = null;
+  skillEmployeeOptions: IEmployee[] | null = null;
+  skillEmployeeSelectedOptions: IEmployee[] | null = null;
+  skillOptions: IEmployeeSkill[] | null = null;
+  skillSelectedOptions: IEmployeeSkill[] | null = null;
+
+  totalItems?: number;
+  itemsPerPage!: number;
+  loading!: boolean;
+
+  @ViewChild('employeeSkillCertificateTable', { static: true })
+  employeeSkillCertificateTable!: Table;
+
+  private filtersDetails: { [_: string]: { type: string } } = {
+    grade: { type: 'number' },
+    date: { type: 'date' },
+    ['type.id']: { type: 'number' },
+    ['skill.employee.username']: { type: 'string' },
+    ['skill.name']: { type: 'string' },
+  };
 
   constructor(
     protected employeeSkillCertificateService: EmployeeSkillCertificateService,
+    protected certificateTypeService: CertificateTypeService,
+    protected employeeService: EmployeeService,
+    protected employeeSkillService: EmployeeSkillService,
+    protected messageService: MessageService,
     protected activatedRoute: ActivatedRoute,
     protected router: Router,
-    protected modalService: NgbModal
-  ) {}
+    protected confirmationService: ConfirmationService,
+    protected translateService: TranslateService,
+    protected datePipe: DatePipe
+  ) {
+    this.itemsPerPage = ITEMS_PER_PAGE;
+    this.loading = true;
+  }
 
-  loadPage(page?: number, dontNavigate?: boolean): void {
-    this.isLoading = true;
-    const pageToLoad: number = page ?? this.page ?? 1;
-
-    this.employeeSkillCertificateService
-      .query({
-        page: pageToLoad - 1,
-        size: this.itemsPerPage,
-        sort: this.sort()
-      })
+  ngOnInit(): void {
+    this.loadAllTypes();
+    this.activatedRoute.queryParams
+      .pipe(
+        tap(queryParams => fillTableFromQueryParams(this.employeeSkillCertificateTable, queryParams, this.filtersDetails)),
+        tap(() => (this.loading = true)),
+        switchMap(() =>
+          this.employeeSkillCertificateService.query(
+            lazyLoadEventToServerQueryParams(this.employeeSkillCertificateTable.createLazyLoadMetadata(), undefined, this.filtersDetails)
+          )
+        ),
+        // TODO add catchError inside switchMap in blueprint
+        filter((res: HttpResponse<IEmployeeSkillCertificate[]>) => res.ok)
+      )
       .subscribe(
         (res: HttpResponse<IEmployeeSkillCertificate[]>) => {
-          this.isLoading = false;
-          this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate);
+          this.paginateEmployeeSkillCertificates(res.body!, res.headers);
+          this.loading = false;
         },
-        () => {
-          this.isLoading = false;
-          this.onError();
+        (err: HttpErrorResponse) => {
+          this.onError(err.message);
+          console.error(err);
+          this.loading = false;
         }
       );
   }
 
-  ngOnInit(): void {
-    this.handleNavigation();
+  get filters(): { [s: string]: FilterMetadata } {
+    return this.employeeSkillCertificateTable.filters as { [s: string]: FilterMetadata };
   }
 
-  trackId(index: number, item: IEmployeeSkillCertificate): number {
-    return item.id!;
+  onLazyLoadEvent(event: LazyLoadEvent): void {
+    const queryParams = lazyLoadEventToRouterQueryParams(event, this.filtersDetails);
+    this.router.navigate(['/employee-skill-certificate'], { queryParams });
   }
 
-  delete(employeeSkillCertificate: IEmployeeSkillCertificate): void {
-    const modalRef = this.modalService.open(EmployeeSkillCertificateDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.employeeSkillCertificate = employeeSkillCertificate;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.loadPage();
-      }
+  delete(typeId: number, skillName: string, skillEmployeeUsername: string): void {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('entity.delete.title'),
+      message: this.translateService.instant('compositekeyApp.employeeSkillCertificate.delete.question', {
+        id: `${typeId} , ${skillName} , ${skillEmployeeUsername}`,
+      }),
+      accept: () => {
+        this.employeeSkillCertificateService.delete(typeId, skillName, skillEmployeeUsername).subscribe(() => {
+          this.router.navigate(['/employee-skill-certificate'], { queryParams: { r: Date.now() }, queryParamsHandling: 'merge' });
+        });
+      },
     });
   }
 
-  protected sort(): string[] {
-    const result = [this.predicate + ',' + (this.ascending ? 'asc' : 'desc')];
-    if (this.predicate !== 'id') {
-      result.push('id');
-    }
-    return result;
+  loadAllTypes(): void {
+    this.certificateTypeService.query().subscribe((res: HttpResponse<ICertificateType[]>) => (this.typeOptions = res.body));
   }
 
-  protected handleNavigation(): void {
-    combineLatest([this.activatedRoute.data, this.activatedRoute.queryParamMap]).subscribe(([data, params]) => {
-      const page = params.get('page');
-      const pageNumber = page !== null ? +page : 1;
-      const sort = (params.get('sort') ?? data['defaultSort']).split(',');
-      const predicate = sort[0];
-      const ascending = sort[1] === 'asc';
-      if (pageNumber !== this.page || predicate !== this.predicate || ascending !== this.ascending) {
-        this.predicate = predicate;
-        this.ascending = ascending;
-        this.loadPage(pageNumber, true);
-      }
-    });
+  onSkillEmployeeLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService
+      .query(lazyLoadEventToServerQueryParams(event, 'employee.fullname.contains'))
+      .subscribe(res => (this.skillEmployeeOptions = res.body));
+  }
+  onSkillLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeSkillService
+      .query(lazyLoadEventToServerQueryParams(event, 'name.contains'))
+      .subscribe(res => (this.skillOptions = res.body));
   }
 
-  protected onSuccess(data: IEmployeeSkillCertificate[] | null, headers: HttpHeaders, page: number, navigate: boolean): void {
+  trackId(index: number, item: IEmployeeSkillCertificate): string {
+    return `${item.type!.id!},${item.skill!.name!},${item.skill!.employee!.username!}`;
+  }
+
+  protected paginateEmployeeSkillCertificates(data: IEmployeeSkillCertificate[], headers: HttpHeaders): void {
     this.totalItems = Number(headers.get('X-Total-Count'));
-    this.page = page;
-    if (navigate) {
-      this.router.navigate(['/employee-skill-certificate'], {
-        queryParams: {
-          page: this.page,
-          size: this.itemsPerPage,
-          sort: this.predicate + ',' + (this.ascending ? 'asc' : 'desc')
-        }
-      });
-    }
-    this.employeeSkillCertificates = data ?? [];
-    this.ngbPaginationPage = this.page;
+    this.employeeSkillCertificates = data;
   }
 
-  protected onError(): void {
-    this.ngbPaginationPage = this.page ?? 1;
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

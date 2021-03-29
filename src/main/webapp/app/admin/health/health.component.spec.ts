@@ -17,7 +17,7 @@ describe('Component Tests', () => {
       waitForAsync(() => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
-          declarations: [HealthComponent]
+          declarations: [HealthComponent],
         })
           .overrideTemplate(HealthComponent, '')
           .compileComponents();

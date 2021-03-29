@@ -21,20 +21,21 @@ import tech.jhipster.service.filter.StringFilter;
  * fix type specific filters.
  */
 public class WithIdStringCriteria implements Serializable, Criteria {
+
     private static final long serialVersionUID = 1L;
 
     private StringFilter id;
 
     private StringFilter name;
 
-    private StringFilter withIdStringDetailsId;
+    private WithIdStringDetailsCriteria withIdStringDetails;
 
     public WithIdStringCriteria() {}
 
     public WithIdStringCriteria(WithIdStringCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
-        this.withIdStringDetailsId = other.withIdStringDetailsId == null ? null : other.withIdStringDetailsId.copy();
+        this.withIdStringDetails = other.withIdStringDetails == null ? null : other.withIdStringDetails.copy();
     }
 
     @Override
@@ -72,19 +73,19 @@ public class WithIdStringCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public StringFilter getWithIdStringDetailsId() {
-        return withIdStringDetailsId;
+    public WithIdStringDetailsCriteria getWithIdStringDetails() {
+        return withIdStringDetails;
     }
 
-    public StringFilter withIdStringDetailsId() {
-        if (withIdStringDetailsId == null) {
-            withIdStringDetailsId = new StringFilter();
+    public WithIdStringDetailsCriteria withIdStringDetails() {
+        if (withIdStringDetails == null) {
+            withIdStringDetails = new WithIdStringDetailsCriteria();
         }
-        return withIdStringDetailsId;
+        return withIdStringDetails;
     }
 
-    public void setWithIdStringDetailsId(StringFilter withIdStringDetailsId) {
-        this.withIdStringDetailsId = withIdStringDetailsId;
+    public void setWithIdStringDetails(WithIdStringDetailsCriteria withIdStringDetails) {
+        this.withIdStringDetails = withIdStringDetails;
     }
 
     @Override
@@ -97,15 +98,13 @@ public class WithIdStringCriteria implements Serializable, Criteria {
         }
         final WithIdStringCriteria that = (WithIdStringCriteria) o;
         return (
-            Objects.equals(id, that.id) &&
-            Objects.equals(name, that.name) &&
-            Objects.equals(withIdStringDetailsId, that.withIdStringDetailsId)
+            Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(withIdStringDetails, that.withIdStringDetails)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, withIdStringDetailsId);
+        return Objects.hash(id, name, withIdStringDetails);
     }
 
     // prettier-ignore
@@ -114,7 +113,7 @@ public class WithIdStringCriteria implements Serializable, Criteria {
         return "WithIdStringCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
             (name != null ? "name=" + name + ", " : "") +
-            (withIdStringDetailsId != null ? "withIdStringDetailsId=" + withIdStringDetailsId + ", " : "") +
+            (withIdStringDetails != null ? "withIdStringDetails=" + withIdStringDetails + ", " : "") +
             "}";
     }
 }

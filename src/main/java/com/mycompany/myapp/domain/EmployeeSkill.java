@@ -3,6 +3,7 @@ package com.mycompany.myapp.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -16,9 +17,14 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "employee_skill")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EmployeeSkill implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    @Id
+    @EmbeddedId
+    EmployeeSkillId id;
+
+    @NotNull
+    @Column(name = "name", nullable = false, insertable = false, updatable = false)
     private String name;
 
     @NotNull
@@ -27,15 +33,18 @@ public class EmployeeSkill implements Serializable {
 
     @OneToMany(mappedBy = "skill")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "type", "skill" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "employeeSkillCertificateDetails", "type", "skill" }, allowSetters = true)
     private Set<EmployeeSkillCertificate> employeeSkillCertificates = new HashSet<>();
 
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JoinTable(
         name = "rel_employee_skill__task",
-        joinColumns = @JoinColumn(name = "employee_skill_name"),
-        inverseJoinColumns = @JoinColumn(name = "task_id")
+        joinColumns = {
+            @JoinColumn(name = "employee_skill_name", referencedColumnName = "name"),
+            @JoinColumn(name = "employee_skill_employee_username", referencedColumnName = "employee_username"),
+        },
+        inverseJoinColumns = @JoinColumn(name = "task_id", referencedColumnName = "id")
     )
     @JsonIgnoreProperties(value = { "user", "employeeSkills" }, allowSetters = true)
     private Set<Task> tasks = new HashSet<>();
@@ -43,6 +52,7 @@ public class EmployeeSkill implements Serializable {
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "teamMembers", "skills", "taughtSkills", "manager" }, allowSetters = true)
+    @JoinColumn(insertable = false, updatable = false)
     private Employee employee;
 
     @ManyToOne(optional = false)
@@ -51,17 +61,30 @@ public class EmployeeSkill implements Serializable {
     private Employee teacher;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getName() {
-        return name;
+    public EmployeeSkillId getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(EmployeeSkillId id) {
+        this.id = id;
+    }
+
+    public EmployeeSkill id(EmployeeSkillId id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public EmployeeSkill name(String name) {
         this.name = name;
         return this;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getLevel() {
@@ -169,20 +192,21 @@ public class EmployeeSkill implements Serializable {
         if (!(o instanceof EmployeeSkill)) {
             return false;
         }
-        return name != null && name.equals(((EmployeeSkill) o).name);
+        return id != null && id.equals(((EmployeeSkill) o).id);
     }
 
     @Override
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
         return "EmployeeSkill{" +
-            "name=" + getName() +
+            "id=" + getId() +
+            ", name='" + getName() + "'" +
             ", level=" + getLevel() +
             "}";
     }

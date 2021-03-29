@@ -5,7 +5,7 @@ import { User } from '../user-management.model';
 
 @Component({
   selector: 'jhi-user-mgmt-detail',
-  templateUrl: './user-management-detail.component.html'
+  templateUrl: './user-management-detail.component.html',
 })
 export class UserManagementDetailComponent implements OnInit {
   user: User | null = null;

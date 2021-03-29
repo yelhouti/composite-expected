@@ -6,24 +6,24 @@ describe('Parse links service test', () => {
   describe('Parse Links Service Test', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [ParseLinks]
+        providers: [ParseLinks],
       });
     });
 
     it('should throw an error when passed an empty string', inject([ParseLinks], (service: ParseLinks) => {
-      expect(function() {
+      expect(function () {
         service.parse('');
       }).toThrow(new Error('input must not be of zero length'));
     }));
 
     it('should throw an error when passed without comma', inject([ParseLinks], (service: ParseLinks) => {
-      expect(function() {
+      expect(function () {
         service.parse('test');
       }).toThrow(new Error('section could not be split on ";"'));
     }));
 
     it('should throw an error when passed without semicolon', inject([ParseLinks], (service: ParseLinks) => {
-      expect(function() {
+      expect(function () {
         service.parse('test,test2');
       }).toThrow(new Error('section could not be split on ";"'));
     }));

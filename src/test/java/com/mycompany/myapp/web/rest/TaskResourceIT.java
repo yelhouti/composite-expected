@@ -42,6 +42,7 @@ import org.springframework.util.Base64Utils;
 @AutoConfigureMockMvc
 @WithMockUser
 class TaskResourceIT {
+
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
@@ -298,7 +299,7 @@ class TaskResourceIT {
 
         // Get all the taskList
         restTaskMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
@@ -802,25 +803,6 @@ class TaskResourceIT {
 
     @Test
     @Transactional
-    void getAllTasksByUserIsEqualToSomething() throws Exception {
-        // Initialize the database
-        taskRepository.saveAndFlush(task);
-        User user = UserResourceIT.createEntity(em);
-        em.persist(user);
-        em.flush();
-        task.setUser(user);
-        taskRepository.saveAndFlush(task);
-        Long userId = user.getId();
-
-        // Get all the taskList where user equals to userId
-        defaultTaskShouldBeFound("userId.equals=" + userId);
-
-        // Get all the taskList where user equals to (userId + 1)
-        defaultTaskShouldNotBeFound("userId.equals=" + (userId + 1));
-    }
-
-    @Test
-    @Transactional
     void getAllTasksByEmployeeSkillIsEqualToSomething() throws Exception {
         // Initialize the database
         taskRepository.saveAndFlush(task);
@@ -829,13 +811,12 @@ class TaskResourceIT {
         em.flush();
         task.addEmployeeSkill(employeeSkill);
         taskRepository.saveAndFlush(task);
-        String employeeSkillId = employeeSkill.getName();
 
-        // Get all the taskList where employeeSkill equals to employeeSkillId
-        defaultTaskShouldBeFound("employeeSkillId.equals=" + employeeSkillId);
+        // Get all the taskList where employeeSkill.name equals to employeeSkill.getId().getName()
+        defaultTaskShouldBeFound("employeeSkill.name.equals=" + employeeSkill.getId().getName());
 
-        // Get all the taskList where employeeSkill equals to "invalid-id"
-        defaultTaskShouldNotBeFound("employeeSkillId.equals=" + "invalid-id");
+        // Get all the taskList where employeeSkill.name equals to "invalid-id"
+        defaultTaskShouldNotBeFound("employeeSkill.name.equals=" + "invalid-id");
     }
 
     /**
@@ -843,7 +824,7 @@ class TaskResourceIT {
      */
     private void defaultTaskShouldBeFound(String filter) throws Exception {
         restTaskMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
@@ -861,7 +842,7 @@ class TaskResourceIT {
 
         // Check, that the count call also returns 1
         restTaskMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -872,7 +853,7 @@ class TaskResourceIT {
      */
     private void defaultTaskShouldNotBeFound(String filter) throws Exception {
         restTaskMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -880,7 +861,7 @@ class TaskResourceIT {
 
         // Check, that the count call also returns 0
         restTaskMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -921,7 +902,7 @@ class TaskResourceIT {
 
         restTaskMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, taskDTO.getId())
+                put(ENTITY_API_URL_ID, task.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
@@ -956,7 +937,7 @@ class TaskResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, taskDTO.getId())
+                put(ENTITY_API_URL_ID, task.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
@@ -1031,7 +1012,7 @@ class TaskResourceIT {
 
         restTaskMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedTask.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTask))
             )
@@ -1081,7 +1062,7 @@ class TaskResourceIT {
 
         restTaskMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedTask.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTask))
             )
@@ -1106,17 +1087,67 @@ class TaskResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateTaskShouldThrown() throws Exception {
-        // Update the task without id should throw
-        Task partialUpdatedTask = new Task();
+    void patchNonExistingTask() throws Exception {
+        int databaseSizeBeforeUpdate = taskRepository.findAll().size();
+        task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTask))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
+
+        // Validate the Task in the database
+        List<Task> taskList = taskRepository.findAll();
+        assertThat(taskList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchTask() throws Exception {
+        int databaseSizeBeforeUpdate = taskRepository.findAll().size();
+        task.setId(count.incrementAndGet());
+
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restTaskMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the Task in the database
+        List<Task> taskList = taskRepository.findAll();
+        assertThat(taskList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamTask() throws Exception {
+        int databaseSizeBeforeUpdate = taskRepository.findAll().size();
+        task.setId(count.incrementAndGet());
+
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restTaskMockMvc
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(taskDTO)))
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the Task in the database
+        List<Task> taskList = taskRepository.findAll();
+        assertThat(taskList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test

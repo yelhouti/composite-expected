@@ -3,29 +3,38 @@ import { HttpResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
 
-import { IWithUUID, WithUUID } from '../with-uuid.model';
+import { IWithUUID } from '../with-uuid.model';
 import { WithUUIDService } from '../service/with-uuid.service';
 
 @Component({
   selector: 'jhi-with-uuid-update',
-  templateUrl: './with-uuid-update.component.html'
+  templateUrl: './with-uuid-update.component.html',
 })
 export class WithUUIDUpdateComponent implements OnInit {
   isSaving = false;
 
   editForm = this.fb.group({
     uuid: [],
-    name: [null, [Validators.required]]
+    name: [null, [Validators.required]],
   });
 
-  constructor(protected withUUIDService: WithUUIDService, protected activatedRoute: ActivatedRoute, protected fb: FormBuilder) {}
+  constructor(protected withUUIDService: WithUUIDService, protected activatedRoute: ActivatedRoute, private fb: FormBuilder) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ withUUID }) => {
       this.updateForm(withUUID);
     });
+  }
+
+  updateForm(withUUID: IWithUUID | null): void {
+    if (withUUID) {
+      this.editForm.reset({ ...withUUID }, { emitEvent: false, onlySelf: true });
+    } else {
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -34,8 +43,8 @@ export class WithUUIDUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const withUUID = this.createFromForm();
-    if (withUUID.uuid !== undefined) {
+    const withUUID = this.editForm.value;
+    if (withUUID.uuid !== null) {
       this.subscribeToSaveResponse(this.withUUIDService.update(withUUID));
     } else {
       this.subscribeToSaveResponse(this.withUUIDService.create(withUUID));
@@ -43,36 +52,18 @@ export class WithUUIDUpdateComponent implements OnInit {
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IWithUUID>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
-  }
-
-  protected updateForm(withUUID: IWithUUID): void {
-    this.editForm.patchValue({
-      uuid: withUUID.uuid,
-      name: withUUID.name
-    });
-  }
-
-  protected createFromForm(): IWithUUID {
-    return {
-      ...new WithUUID(),
-      uuid: this.editForm.get(['uuid'])!.value,
-      name: this.editForm.get(['name'])!.value
-    };
   }
 }

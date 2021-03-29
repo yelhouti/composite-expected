@@ -1,11 +1,16 @@
 jest.mock('@angular/router');
+jest.mock('@ngx-translate/core');
+jest.mock('primeng/api');
 jest.mock('app/core/auth/account.service');
 
-import { ComponentFixture, TestBed, waitForAsync, inject, fakeAsync, tick } from '@angular/core/testing';
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { of, BehaviorSubject } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Table } from 'primeng/table';
+import { ConfirmationService, Confirmation, MessageService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
 
 import { UserManagementService } from '../service/user-management.service';
 import { User } from '../user-management.model';
@@ -18,91 +23,93 @@ describe('Component Tests', () => {
     let comp: UserManagementComponent;
     let fixture: ComponentFixture<UserManagementComponent>;
     let service: UserManagementService;
-    let mockAccountService: AccountService;
-    const data = of({
-      defaultSort: 'id,asc'
-    });
-    const queryParamMap = of(
-      jest.requireActual('@angular/router').convertToParamMap({
-        page: '1',
-        size: '1',
-        sort: 'id,desc'
-      })
-    );
-
-    beforeEach(
-      waitForAsync(() => {
-        TestBed.configureTestingModule({
-          imports: [HttpClientTestingModule],
-          declarations: [UserManagementComponent],
-          providers: [Router, { provide: ActivatedRoute, useValue: { data, queryParamMap } }, AccountService]
-        })
-          .overrideTemplate(UserManagementComponent, '')
-          .compileComponents();
-      })
-    );
+    let confirmationService: ConfirmationService;
+    let activatedRoute: ActivatedRoute;
+    let accountService: AccountService;
 
     beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        declarations: [UserManagementComponent],
+        providers: [
+          Router,
+          ConfirmationService,
+          {
+            provide: ActivatedRoute,
+            useValue: { data: of(), queryParams: new BehaviorSubject({}) },
+          },
+          AccountService,
+          MessageService,
+          TranslateService,
+        ],
+      })
+        .overrideTemplate(UserManagementComponent, '')
+        .compileComponents();
+
       fixture = TestBed.createComponent(UserManagementComponent);
       comp = fixture.componentInstance;
       service = TestBed.inject(UserManagementService);
-      mockAccountService = TestBed.inject(AccountService);
-      mockAccountService.identity = jest.fn(() => of(null));
+      confirmationService = fixture.debugElement.injector.get(ConfirmationService);
+      activatedRoute = fixture.debugElement.injector.get(ActivatedRoute);
+      accountService = TestBed.inject(AccountService);
+      accountService.identity = jest.fn(() => of(null));
+
+      comp.userTable = { filters: {}, createLazyLoadMetadata: () => undefined } as Table;
     });
 
-    describe('OnInit', () => {
-      it('Should call load all on init', inject(
-        [],
-        fakeAsync(() => {
-          // GIVEN
-          const headers = new HttpHeaders().append('link', 'link;link');
-          spyOn(service, 'query').and.returnValue(
-            of(
-              new HttpResponse({
-                body: [new User(123)],
-                headers
-              })
-            )
-          );
+    it('Should call load all on init', fakeAsync(() => {
+      // GIVEN
+      spyOn(service, 'query').and.returnValue(
+        of(
+          new HttpResponse({
+            body: [new User(123)],
+          })
+        )
+      );
 
-          // WHEN
-          comp.ngOnInit();
-          tick(); // simulate async
+      // WHEN
+      fixture.detectChanges();
 
-          // THEN
-          expect(service.query).toHaveBeenCalled();
-          expect(comp.users?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
-        })
-      ));
-    });
+      // THEN
+      expect(service.query).toHaveBeenCalled();
+      expect(comp.users![0]).toEqual(jasmine.objectContaining({ id: 123 }));
+    }));
 
-    describe('setActive', () => {
-      it('Should update user and call load all', inject(
-        [],
-        fakeAsync(() => {
-          // GIVEN
-          const headers = new HttpHeaders().append('link', 'link;link');
-          const user = new User(123);
-          spyOn(service, 'query').and.returnValue(
-            of(
-              new HttpResponse({
-                body: [user],
-                headers
-              })
-            )
-          );
-          spyOn(service, 'update').and.returnValue(of(new HttpResponse({ status: 200 })));
+    it('should load a page', fakeAsync(() => {
+      // GIVEN
+      spyOn(service, 'query').and.returnValue(
+        of(
+          new HttpResponse({
+            body: [new User(123)],
+          })
+        )
+      );
 
-          // WHEN
-          comp.setActive(user, true);
-          tick(); // simulate async
+      // WHEN
+      fixture.detectChanges();
+      tick(100);
+      (activatedRoute.queryParams as BehaviorSubject<any>).next({ first: 3 });
 
-          // THEN
-          expect(service.update).toHaveBeenCalledWith({ ...user, activated: true });
-          expect(service.query).toHaveBeenCalled();
-          expect(comp.users?.[0]).toEqual(jasmine.objectContaining({ id: 123 }));
-        })
-      ));
-    });
+      // THEN
+      expect(service.query).toHaveBeenCalled();
+      expect(comp.users![0]).toEqual(jasmine.objectContaining({ id: 123 }));
+    }));
+
+    it('should call delete service using confirmDialog', fakeAsync(() => {
+      // GIVEN
+      spyOn(service, 'delete').and.returnValue(of({}));
+      spyOn(confirmationService, 'confirm').and.callFake((confirmation: Confirmation) => {
+        if (confirmation.accept) {
+          confirmation.accept();
+        }
+      });
+
+      // WHEN
+      comp.delete('AAAAAAA');
+
+      // THEN
+      expect(confirmationService.confirm).toHaveBeenCalled();
+      expect(service.delete).toHaveBeenCalledWith('AAAAAAA');
+    }));
   });
 });

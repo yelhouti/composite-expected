@@ -1,14 +1,11 @@
 <div class="row justify-content-center">
   <div class="col-8">
     <div *ngIf="withIdString">
-      <h2 data-cy="withIdStringDetailsHeading"><span jhiTranslate="compositekeyApp.withIdString.detail.title">With Id String</span></h2>
+      <h2 data-cy="withIdStringDetailsHeading">
+        <span jhiTranslate="compositekeyApp.withIdString.detail.title">With Id String</span> {{ withIdString.id! }}
+      </h2>
 
       <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
       <dl class="row-md jh-entity-details">
         <dt><span jhiTranslate="compositekeyApp.withIdString.id">Id</span></dt>
         <dd>
@@ -20,13 +17,22 @@
         </dd>
       </dl>
 
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/with-id-string', withIdString.id, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="['/with-id-string', withIdString!.id, 'edit']"
+      ></button>
     </div>
   </div>
 </div>

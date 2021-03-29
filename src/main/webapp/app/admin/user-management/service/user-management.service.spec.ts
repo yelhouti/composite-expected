@@ -14,7 +14,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
 
       service = TestBed.inject(UserManagementService);
@@ -54,13 +54,13 @@ describe('Service Tests', () => {
         let expectedResult = 0;
 
         service.find('user').subscribe({
-          error: (error: HttpErrorResponse) => (expectedResult = error.status)
+          error: (error: HttpErrorResponse) => (expectedResult = error.status),
         });
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush('Invalid request parameters', {
           status: 404,
-          statusText: 'Bad Request'
+          statusText: 'Bad Request',
         });
         expect(expectedResult).toEqual(404);
       });

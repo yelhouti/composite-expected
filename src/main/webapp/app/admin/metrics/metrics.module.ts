@@ -26,7 +26,7 @@ import { MetricsSystemComponent } from './blocks/metrics-system/metrics-system.c
     MetricsGarbageCollectorComponent,
     MetricsModalThreadsComponent,
     MetricsRequestComponent,
-    MetricsSystemComponent
-  ]
+    MetricsSystemComponent,
+  ],
 })
 export class MetricsModule {}

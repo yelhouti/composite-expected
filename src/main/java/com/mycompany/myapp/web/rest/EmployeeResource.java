@@ -33,6 +33,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class EmployeeResource {
+
     private final Logger log = LoggerFactory.getLogger(EmployeeResource.class);
 
     private static final String ENTITY_NAME = "employee";
@@ -66,8 +67,8 @@ public class EmployeeResource {
     @PostMapping("/employees")
     public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
         log.debug("REST request to save Employee : {}", employeeDTO);
-        if (employeeDTO.getUsername() != null) {
-            throw new BadRequestAlertException("A new employee cannot already have an ID", ENTITY_NAME, "idexists");
+        if (employeeRepository.existsById(employeeDTO.getUsername())) {
+            throw new BadRequestAlertException("This employee already exists", ENTITY_NAME, "idexists");
         }
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
@@ -79,31 +80,26 @@ public class EmployeeResource {
     /**
      * {@code PUT  /employees/:username} : Updates an existing employee.
      *
-     * @param username the id of the employeeDTO to save.
+     * @param id the id of the employeeDTO to save.
      * @param employeeDTO the employeeDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated employeeDTO,
      * or with status {@code 400 (Bad Request)} if the employeeDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the employeeDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/employees/{username}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(
-        @PathVariable(value = "username", required = false) final String username,
-        @Valid @RequestBody EmployeeDTO employeeDTO
-    )
+    @PutMapping("/employees/{id}")
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable String id, @Valid @RequestBody EmployeeDTO employeeDTO)
         throws URISyntaxException {
-        log.debug("REST request to update Employee : {}, {}", username, employeeDTO);
+        log.debug("REST request to update Employee : {}, {}", id, employeeDTO);
         if (employeeDTO.getUsername() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(username, employeeDTO.getUsername())) {
+        if (!Objects.equals(id, employeeDTO.getUsername())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
-        if (!employeeRepository.existsById(username)) {
+        if (!employeeRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
-
         EmployeeDTO result = employeeService.save(employeeDTO);
         return ResponseEntity
             .ok()
@@ -112,8 +108,9 @@ public class EmployeeResource {
     }
 
     /**
-     * {@code PATCH  /employees} : Updates given fields of an existing employee.
+     * {@code PATCH  /employees/:username} : Partial updates given fields of an existing employee, field will ignore if it is null
      *
+     * @param id the id of the employeeDTO to save.
      * @param employeeDTO the employeeDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated employeeDTO,
      * or with status {@code 400 (Bad Request)} if the employeeDTO is not valid,
@@ -121,11 +118,19 @@ public class EmployeeResource {
      * or with status {@code 500 (Internal Server Error)} if the employeeDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/employees", consumes = "application/merge-patch+json")
-    public ResponseEntity<EmployeeDTO> partialUpdateEmployee(@NotNull @RequestBody EmployeeDTO employeeDTO) throws URISyntaxException {
-        log.debug("REST request to update Employee partially : {}", employeeDTO);
+    @PatchMapping(value = "/employees/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<EmployeeDTO> partialUpdateEmployee(@PathVariable String id, @NotNull @RequestBody EmployeeDTO employeeDTO)
+        throws URISyntaxException {
+        log.debug("REST request to partial update Employee partially : {}, {}", id, employeeDTO);
         if (employeeDTO.getUsername() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, employeeDTO.getUsername())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+
+        if (!employeeRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
         Optional<EmployeeDTO> result = employeeService.partialUpdate(employeeDTO);

@@ -11,14 +11,34 @@ class EmployeeSkillCertificateDTOTest {
     void dtoEqualsVerifier() throws Exception {
         TestUtil.equalsVerifier(EmployeeSkillCertificateDTO.class);
         EmployeeSkillCertificateDTO employeeSkillCertificateDTO1 = new EmployeeSkillCertificateDTO();
-        employeeSkillCertificateDTO1.setId(1L);
+        CertificateTypeDTO certificateTypeDTO1 = new CertificateTypeDTO();
+        certificateTypeDTO1.setId(1L);
+        employeeSkillCertificateDTO1.setType(certificateTypeDTO1);
+        EmployeeSkillDTO employeeSkillDTO1 = new EmployeeSkillDTO();
+        employeeSkillDTO1.setName("id1");
+        EmployeeDTO employeeDTO1 = new EmployeeDTO();
+        employeeDTO1.setUsername("id1");
+        employeeSkillDTO1.setEmployee(employeeDTO1);
+        employeeSkillCertificateDTO1.setSkill(employeeSkillDTO1);
         EmployeeSkillCertificateDTO employeeSkillCertificateDTO2 = new EmployeeSkillCertificateDTO();
         assertThat(employeeSkillCertificateDTO1).isNotEqualTo(employeeSkillCertificateDTO2);
-        employeeSkillCertificateDTO2.setId(employeeSkillCertificateDTO1.getId());
+        employeeSkillCertificateDTO2.setType(certificateTypeDTO1);
+        employeeSkillCertificateDTO2.setSkill(employeeSkillDTO1);
         assertThat(employeeSkillCertificateDTO1).isEqualTo(employeeSkillCertificateDTO2);
-        employeeSkillCertificateDTO2.setId(2L);
-        assertThat(employeeSkillCertificateDTO1).isNotEqualTo(employeeSkillCertificateDTO2);
-        employeeSkillCertificateDTO1.setId(null);
-        assertThat(employeeSkillCertificateDTO1).isNotEqualTo(employeeSkillCertificateDTO2);
+        EmployeeSkillCertificateDTO employeeSkillCertificateDTO3 = new EmployeeSkillCertificateDTO();
+        CertificateTypeDTO certificateTypeDTO3 = new CertificateTypeDTO();
+        certificateTypeDTO3.setId(3L);
+        employeeSkillCertificateDTO3.setType(certificateTypeDTO3);
+        EmployeeSkillDTO employeeSkillDTO3 = new EmployeeSkillDTO();
+        employeeSkillDTO3.setName("id3");
+        EmployeeDTO employeeDTO3 = new EmployeeDTO();
+        employeeDTO3.setUsername("id3");
+        employeeSkillDTO3.setEmployee(employeeDTO3);
+        employeeSkillCertificateDTO3.setSkill(employeeSkillDTO3);
+        assertThat(employeeSkillCertificateDTO1).isNotEqualTo(employeeSkillCertificateDTO3);
+        EmployeeSkillCertificateDTO employeeSkillCertificateDTO4 = new EmployeeSkillCertificateDTO();
+        employeeSkillCertificateDTO4.setType(null);
+        employeeSkillCertificateDTO4.setSkill(null);
+        assertThat(employeeSkillCertificateDTO1).isNotEqualTo(employeeSkillCertificateDTO4);
     }
 }

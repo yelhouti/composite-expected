@@ -1,16 +1,17 @@
-import { Component, OnInit, RendererFactory2, Renderer2 } from '@angular/core';
+import { Component, HostBinding, OnInit, RendererFactory2, Renderer2 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRouteSnapshot, NavigationEnd, NavigationError } from '@angular/router';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
-import * as dayjs from 'dayjs';
 
 import { AccountService } from 'app/core/auth/account.service';
 
 @Component({
   selector: 'jhi-main',
-  templateUrl: './main.component.html'
+  templateUrl: './main.component.html',
 })
 export class MainComponent implements OnInit {
+  @HostBinding('@.disabled')
+  public animationsDisabled = localStorage.getItem('animationsDisabled');
   private renderer: Renderer2;
 
   constructor(
@@ -38,7 +39,7 @@ export class MainComponent implements OnInit {
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
       this.updateTitle();
-      dayjs.locale(langChangeEvent.lang);
+
       this.renderer.setAttribute(document.querySelector('html'), 'lang', langChangeEvent.lang);
     });
   }

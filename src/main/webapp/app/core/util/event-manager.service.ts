@@ -10,7 +10,7 @@ export class EventWithContent<T> {
  * An utility class to manage RX events
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EventManager {
   observable: Observable<EventWithContent<unknown> | string>;
@@ -40,7 +40,7 @@ export class EventManager {
     if (typeof eventNames === 'string') {
       eventNames = [eventNames];
     }
-    const subscriber: Subscription = this.observable
+    return this.observable
       .pipe(
         filter((event: EventWithContent<unknown> | string) => {
           for (const eventName of eventNames) {
@@ -52,7 +52,6 @@ export class EventManager {
         })
       )
       .subscribe(callback);
-    return subscriber;
   }
 
   /**

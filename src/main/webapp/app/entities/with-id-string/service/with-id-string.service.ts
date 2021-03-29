@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { IWithIdString, getWithIdStringIdentifier } from '../with-id-string.model';
@@ -21,8 +19,14 @@ export class WithIdStringService {
   }
 
   update(withIdString: IWithIdString): Observable<EntityResponseType> {
-    return this.http.put<IWithIdString>(`${this.resourceUrl}/${getWithIdStringIdentifier(withIdString) as string}`, withIdString, {
-      observe: 'response'
+    return this.http.put<IWithIdString>(`${this.resourceUrl}/${getWithIdStringIdentifier(withIdString)!}`, withIdString, {
+      observe: 'response',
+    });
+  }
+
+  partialUpdate(withIdString: IWithIdString): Observable<EntityResponseType> {
+    return this.http.patch<IWithIdString>(`${this.resourceUrl}/${getWithIdStringIdentifier(withIdString)!}`, withIdString, {
+      observe: 'response',
     });
   }
 
@@ -37,27 +41,5 @@ export class WithIdStringService {
 
   delete(id: string): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  addWithIdStringToCollectionIfMissing(
-    withIdStringCollection: IWithIdString[],
-    ...withIdStringsToCheck: (IWithIdString | null | undefined)[]
-  ): IWithIdString[] {
-    const withIdStrings: IWithIdString[] = withIdStringsToCheck.filter(isPresent);
-    if (withIdStrings.length > 0) {
-      const withIdStringCollectionIdentifiers = withIdStringCollection.map(
-        withIdStringItem => getWithIdStringIdentifier(withIdStringItem)!
-      );
-      const withIdStringsToAdd = withIdStrings.filter(withIdStringItem => {
-        const withIdStringIdentifier = getWithIdStringIdentifier(withIdStringItem);
-        if (withIdStringIdentifier == null || withIdStringCollectionIdentifiers.includes(withIdStringIdentifier)) {
-          return false;
-        }
-        withIdStringCollectionIdentifiers.push(withIdStringIdentifier);
-        return true;
-      });
-      return [...withIdStringsToAdd, ...withIdStringCollection];
-    }
-    return withIdStringCollection;
   }
 }

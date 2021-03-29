@@ -8,6 +8,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.CertificateType} entity.
  */
 public class CertificateTypeDTO implements Serializable {
+
     private Long id;
 
     @NotNull

@@ -13,9 +13,11 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "with_id_string_details")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class WithIdStringDetails implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name = "id")
     private String id;
 
     @Column(name = "details")
@@ -24,21 +26,22 @@ public class WithIdStringDetails implements Serializable {
     @JsonIgnoreProperties(value = { "withIdStringDetails" }, allowSetters = true)
     @OneToOne
     @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     private WithIdString withIdString;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getId() {
+        return this.id;
     }
 
     public WithIdStringDetails id(String id) {
         this.id = id;
         return this;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDetails() {
@@ -90,7 +93,7 @@ public class WithIdStringDetails implements Serializable {
     @Override
     public String toString() {
         return "WithIdStringDetails{" +
-            "id=" + getId() +
+            "id='" + getId() + "'" +
             ", details='" + getDetails() + "'" +
             "}";
     }

@@ -16,7 +16,7 @@
     <script src="./axios.min.js"></script>
 
     <script type="text/javascript">
-      const AlwaysEnableTryItOutPlugin = function(system) {
+      const AlwaysEnableTryItOutPlugin = function (system) {
         const OperationContainer = system.getComponents('OperationContainer');
         return {
           components: {
@@ -26,18 +26,18 @@
                 super(...args);
                 this.state.tryItOutEnabled = true;
               }
-            }
-          }
+            },
+          },
         };
       };
-      window.onload = function() {
+      window.onload = function () {
         var urls = [];
-        axios.get('/swagger-resources').then(function(response) {
-          response.data.forEach(function(resource) {
+        axios.get('/swagger-resources').then(function (response) {
+          response.data.forEach(function (resource) {
             urls.push({ name: resource.name, url: resource.location });
           });
 
-          urls.sort(function(a, b) {
+          urls.sort(function (a, b) {
             var x = a.name.toLowerCase(),
               y = b.name.toLowerCase();
             if (x.includes('(default)')) return -1;
@@ -57,9 +57,10 @@
             withCredentials: true,
             presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
             plugins: [SwaggerUIBundle.plugins.DownloadUrl, AlwaysEnableTryItOutPlugin],
-            requestInterceptor: function(req) {
-              var authToken = localStorage.getItem('jhi-authenticationtoken') || sessionStorage.getItem('jhi-authenticationToken');
+            requestInterceptor: function (req) {
+              var authToken = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
               if (authToken) {
+                authToken = JSON.parse(authToken);
                 req.headers['Authorization'] = 'Bearer ' + authToken;
               }
               // Remove the sample Swagger UI request body if present
@@ -70,7 +71,7 @@
                 req.body = undefined;
               }
               return req;
-            }
+            },
           });
 
           window.ui = ui;

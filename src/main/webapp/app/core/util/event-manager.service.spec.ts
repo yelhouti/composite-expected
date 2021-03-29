@@ -8,7 +8,7 @@ describe('Event Manager test', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [EventManager]
+        providers: [EventManager],
       });
       recievedEvent = null;
     });

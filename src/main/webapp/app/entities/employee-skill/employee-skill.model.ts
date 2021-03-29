@@ -23,5 +23,7 @@ export class EmployeeSkill implements IEmployeeSkill {
 }
 
 export function getEmployeeSkillIdentifier(employeeSkill: IEmployeeSkill): string | undefined {
-  return employeeSkill.name;
+  return !employeeSkill.name || !employeeSkill.employee?.username
+    ? undefined
+    : `name=${employeeSkill.name};employeeUsername=${employeeSkill.employee.username}`;
 }

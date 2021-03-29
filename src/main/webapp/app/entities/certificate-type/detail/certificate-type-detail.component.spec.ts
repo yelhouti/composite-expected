@@ -15,9 +15,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ certificateType: { id: 123 } }) }
-          }
-        ]
+            useValue: { data: of({ certificateType: { id: 123 } }) },
+          },
+        ],
       })
         .overrideTemplate(CertificateTypeDetailComponent, '')
         .compileComponents();

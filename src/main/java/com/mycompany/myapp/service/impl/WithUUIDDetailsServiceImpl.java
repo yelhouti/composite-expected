@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WithUUIDDetailsServiceImpl implements WithUUIDDetailsService {
+
     private final Logger log = LoggerFactory.getLogger(WithUUIDDetailsServiceImpl.class);
 
     private final WithUUIDDetailsRepository withUUIDDetailsRepository;
@@ -44,8 +45,8 @@ public class WithUUIDDetailsServiceImpl implements WithUUIDDetailsService {
     public WithUUIDDetailsDTO save(WithUUIDDetailsDTO withUUIDDetailsDTO) {
         log.debug("Request to save WithUUIDDetails : {}", withUUIDDetailsDTO);
         WithUUIDDetails withUUIDDetails = withUUIDDetailsMapper.toEntity(withUUIDDetailsDTO);
-        UUID withUUIDId = withUUIDDetailsDTO.getWithUUID().getUuid();
-        withUUIDRepository.findById(withUUIDId).ifPresent(withUUIDDetails::withUUID);
+        UUID uuid = withUUIDDetails.getWithUUID().getUuid();
+        withUUIDRepository.findById(uuid).ifPresent(withUUIDDetails::withUUID);
         withUUIDDetails = withUUIDDetailsRepository.save(withUUIDDetails);
         return withUUIDDetailsMapper.toDto(withUUIDDetails);
     }
@@ -55,13 +56,10 @@ public class WithUUIDDetailsServiceImpl implements WithUUIDDetailsService {
         log.debug("Request to partially update WithUUIDDetails : {}", withUUIDDetailsDTO);
 
         return withUUIDDetailsRepository
-            .findById(withUUIDDetailsDTO.getUuid())
+            .findById(withUUIDDetailsMapper.toEntity(withUUIDDetailsDTO).getUuid())
             .map(
                 existingWithUUIDDetails -> {
-                    if (withUUIDDetailsDTO.getDetails() != null) {
-                        existingWithUUIDDetails.setDetails(withUUIDDetailsDTO.getDetails());
-                    }
-
+                    withUUIDDetailsMapper.partialUpdate(existingWithUUIDDetails, withUUIDDetailsDTO);
                     return existingWithUUIDDetails;
                 }
             )

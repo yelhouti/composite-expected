@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @IntegrationTest
 class DomainUserDetailsServiceIT {
+
     private static final String USER_ONE_LOGIN = "test-user-one";
     private static final String USER_ONE_EMAIL = "test-user-one@localhost";
     private static final String USER_TWO_LOGIN = "test-user-two";

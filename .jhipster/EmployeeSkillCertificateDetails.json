@@ -1,0 +1,32 @@
+{
+  "name": "EmployeeSkillCertificateDetails",
+  "fields": [
+    {
+      "fieldName": "detail",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "employeeSkillCertificate",
+      "otherEntityRelationshipName": "employeeSkillCertificateDetails",
+      "relationshipName": "employeeSkillCertificate",
+      "ownerSide": true,
+      "options": {
+        "id": true
+      }
+    }
+  ],
+  "entityTableName": "escd",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": ["compositekey"],
+  "changelogDate": "20210331102929"
+}

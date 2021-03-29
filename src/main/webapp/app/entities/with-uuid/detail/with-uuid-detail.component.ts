@@ -5,7 +5,7 @@ import { IWithUUID } from '../with-uuid.model';
 
 @Component({
   selector: 'jhi-with-uuid-detail',
-  templateUrl: './with-uuid-detail.component.html'
+  templateUrl: './with-uuid-detail.component.html',
 })
 export class WithUUIDDetailComponent implements OnInit {
   withUUID: IWithUUID | null = null;

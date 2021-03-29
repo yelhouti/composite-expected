@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser(value = TEST_USER_LOGIN)
 @IntegrationTest
 class AccountResourceIT {
+
     static final String TEST_USER_LOGIN = "test";
 
     @Autowired

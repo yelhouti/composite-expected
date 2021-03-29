@@ -6,5 +6,5 @@ package com.mycompany.myapp.domain.enumeration;
 public enum TaskType {
     TYPE1,
     TYPE2,
-    TYPE3
+    TYPE3,
 }

@@ -8,46 +8,33 @@ import { UserManagementService } from '../service/user-management.service';
 
 @Component({
   selector: 'jhi-user-mgmt-update',
-  templateUrl: './user-management-update.component.html'
+  templateUrl: './user-management-update.component.html',
 })
 export class UserManagementUpdateComponent implements OnInit {
-  user!: User;
   languages = LANGUAGES;
   authorities: string[] = [];
   isSaving = false;
 
   editForm = this.fb.group({
     id: [],
-    login: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(1),
-        Validators.maxLength(50),
-        Validators.pattern('^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$')
-      ]
-    ],
+    login: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50), Validators.pattern('^[_.@A-Za-z0-9-]*')]],
     firstName: ['', [Validators.maxLength(50)]],
     lastName: ['', [Validators.maxLength(50)]],
     email: ['', [Validators.minLength(5), Validators.maxLength(254), Validators.email]],
     activated: [],
     langKey: [],
-    authorities: []
+    authorities: [],
   });
 
   constructor(private userService: UserManagementService, private route: ActivatedRoute, private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.route.data.subscribe(({ user }) => {
-      if (user) {
-        this.user = user;
-        if (this.user.id === undefined) {
-          this.user.activated = true;
-        }
-        this.updateForm(user);
-      }
+      this.updateForm(user);
     });
-    this.userService.authorities().subscribe(authorities => (this.authorities = authorities));
+    this.userService.authorities().subscribe(authorities => {
+      this.authorities = authorities;
+    });
   }
 
   previousState(): void {
@@ -56,41 +43,28 @@ export class UserManagementUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    this.updateUser(this.user);
-    if (this.user.id !== undefined) {
-      this.userService.update(this.user).subscribe(
+    const user = this.editForm.value;
+    if (user.id !== null) {
+      this.userService.update(user).subscribe(
         () => this.onSaveSuccess(),
         () => this.onSaveError()
       );
     } else {
-      this.userService.create(this.user).subscribe(
+      this.userService.create(user).subscribe(
         () => this.onSaveSuccess(),
         () => this.onSaveError()
       );
     }
   }
 
-  private updateForm(user: User): void {
-    this.editForm.patchValue({
-      id: user.id,
-      login: user.login,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      activated: user.activated,
-      langKey: user.langKey,
-      authorities: user.authorities
-    });
-  }
-
-  private updateUser(user: User): void {
-    user.login = this.editForm.get(['login'])!.value;
-    user.firstName = this.editForm.get(['firstName'])!.value;
-    user.lastName = this.editForm.get(['lastName'])!.value;
-    user.email = this.editForm.get(['email'])!.value;
-    user.activated = this.editForm.get(['activated'])!.value;
-    user.langKey = this.editForm.get(['langKey'])!.value;
-    user.authorities = this.editForm.get(['authorities'])!.value;
+  private updateForm(user: User | null): void {
+    if (user) {
+      this.editForm.reset({ ...user });
+    } else {
+      this.editForm.reset({
+        activated: true,
+      });
+    }
   }
 
   private onSaveSuccess(): void {

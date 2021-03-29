@@ -1,6 +1,8 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateDTO;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,12 @@ public interface EmployeeSkillCertificateService {
      * @return the list of entities.
      */
     Page<EmployeeSkillCertificateDTO> findAll(Pageable pageable);
+    /**
+     * Get all the EmployeeSkillCertificateDTO where EmployeeSkillCertificateDetails is {@code null}.
+     *
+     * @return the {@link List} of entities.
+     */
+    List<EmployeeSkillCertificateDTO> findAllWhereEmployeeSkillCertificateDetailsIsNull();
 
     /**
      * Get the "id" employeeSkillCertificate.
@@ -39,12 +47,12 @@ public interface EmployeeSkillCertificateService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<EmployeeSkillCertificateDTO> findOne(Long id);
+    Optional<EmployeeSkillCertificateDTO> findOne(EmployeeSkillCertificateId id);
 
     /**
      * Delete the "id" employeeSkillCertificate.
      *
      * @param id the id of the entity.
      */
-    void delete(Long id);
+    void delete(EmployeeSkillCertificateId id);
 }

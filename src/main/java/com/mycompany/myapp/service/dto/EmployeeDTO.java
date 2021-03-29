@@ -8,6 +8,7 @@ import javax.validation.constraints.*;
  * A DTO for the {@link com.mycompany.myapp.domain.Employee} entity.
  */
 public class EmployeeDTO implements Serializable {
+
     @NotNull
     private String username;
 

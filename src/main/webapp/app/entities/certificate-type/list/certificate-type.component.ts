@@ -1,51 +1,77 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { FilterMetadata, MessageService } from 'primeng/api';
 import { ICertificateType } from '../certificate-type.model';
 import { CertificateTypeService } from '../service/certificate-type.service';
-import { CertificateTypeDeleteDialogComponent } from '../delete/certificate-type-delete-dialog.component';
+import { ConfirmationService } from 'primeng/api';
+import { TranslateService } from '@ngx-translate/core';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'jhi-certificate-type',
-  templateUrl: './certificate-type.component.html'
+  templateUrl: './certificate-type.component.html',
 })
 export class CertificateTypeComponent implements OnInit {
   certificateTypes?: ICertificateType[];
-  isLoading = false;
+  eventSubscriber?: Subscription;
 
-  constructor(protected certificateTypeService: CertificateTypeService, protected modalService: NgbModal) {}
+  @ViewChild('certificateTypeTable', { static: true })
+  certificateTypeTable!: Table;
 
-  loadAll(): void {
-    this.isLoading = true;
+  private filtersDetails: { [_: string]: { type: string } } = {
+    id: { type: 'number' },
+    name: { type: 'string' },
+  };
 
-    this.certificateTypeService.query().subscribe(
-      (res: HttpResponse<ICertificateType[]>) => {
-        this.isLoading = false;
-        this.certificateTypes = res.body ?? [];
-      },
-      () => {
-        this.isLoading = false;
-      }
-    );
-  }
+  constructor(
+    protected certificateTypeService: CertificateTypeService,
+    protected messageService: MessageService,
+    protected confirmationService: ConfirmationService,
+    protected translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.loadAll();
+  }
+
+  get filters(): { [s: string]: FilterMetadata } {
+    return this.certificateTypeTable.filters as { [s: string]: FilterMetadata };
+  }
+
+  loadAll(): void {
+    this.certificateTypeService
+      .query()
+      .pipe(
+        filter((res: HttpResponse<ICertificateType[]>) => res.ok),
+        map((res: HttpResponse<ICertificateType[]>) => res.body!)
+      )
+      .subscribe(
+        (certificateTypes: ICertificateType[]) => {
+          this.certificateTypes = certificateTypes;
+        },
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
+  }
+
+  delete(id: number): void {
+    this.confirmationService.confirm({
+      header: this.translateService.instant('entity.delete.title'),
+      message: this.translateService.instant('compositekeyApp.certificateType.delete.question', { id }),
+      accept: () => {
+        this.certificateTypeService.delete(id).subscribe(() => {
+          this.loadAll();
+        });
+      },
+    });
   }
 
   trackId(index: number, item: ICertificateType): number {
     return item.id!;
   }
 
-  delete(certificateType: ICertificateType): void {
-    const modalRef = this.modalService.open(CertificateTypeDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.certificateType = certificateType;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed.subscribe(reason => {
-      if (reason === 'deleted') {
-        this.loadAll();
-      }
-    });
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

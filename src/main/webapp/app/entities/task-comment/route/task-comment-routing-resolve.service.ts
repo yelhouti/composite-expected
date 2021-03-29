@@ -4,18 +4,18 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { ITaskComment, TaskComment } from '../task-comment.model';
+import { ITaskComment } from '../task-comment.model';
 import { TaskCommentService } from '../service/task-comment.service';
 
 @Injectable({ providedIn: 'root' })
-export class TaskCommentRoutingResolveService implements Resolve<ITaskComment> {
-  constructor(protected service: TaskCommentService, protected router: Router) {}
+export class TaskCommentRoutingResolveService implements Resolve<ITaskComment | null> {
+  constructor(private service: TaskCommentService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<ITaskComment> | Observable<never> {
-    const id = route.params['id'];
+  resolve(route: ActivatedRouteSnapshot): Observable<ITaskComment | null> | Observable<never> {
+    const id = route.params['id'] ? route.params['id'] : null;
     if (id) {
       return this.service.find(id).pipe(
-        mergeMap((taskComment: HttpResponse<TaskComment>) => {
+        mergeMap((taskComment: HttpResponse<ITaskComment>) => {
           if (taskComment.body) {
             return of(taskComment.body);
           } else {
@@ -25,6 +25,6 @@ export class TaskCommentRoutingResolveService implements Resolve<ITaskComment> {
         })
       );
     }
-    return of(new TaskComment());
+    return of(null);
   }
 }

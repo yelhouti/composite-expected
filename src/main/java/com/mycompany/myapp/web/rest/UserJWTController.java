@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class UserJWTController {
+
     private final TokenProvider tokenProvider;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -48,6 +49,7 @@ public class UserJWTController {
      * Object to return as body in JWT Authentication.
      */
     static class JWTToken {
+
         private String idToken;
 
         JWTToken(String idToken) {

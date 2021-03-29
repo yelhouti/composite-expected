@@ -11,7 +11,7 @@ describe('Auth JWT', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgxWebstorageModule.forRoot()]
+      imports: [HttpClientTestingModule, NgxWebstorageModule.forRoot()],
     });
 
     httpMock = TestBed.inject(HttpTestingController);

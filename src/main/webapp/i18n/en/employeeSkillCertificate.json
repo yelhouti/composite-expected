@@ -17,9 +17,9 @@
       "detail": {
         "title": "Employee Skill Certificate"
       },
-      "id": "ID",
       "grade": "Grade",
       "date": "Date",
+      "employeeSkillCertificateDetails": "Employee Skill Certificate Details",
       "type": "Type",
       "skill": "Skill"
     }

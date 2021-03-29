@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { TaskCommentComponent } from '../list/task-comment.component';
 import { TaskCommentDetailComponent } from '../detail/task-comment-detail.component';
@@ -12,38 +13,52 @@ const taskCommentRoute: Routes = [
     path: '',
     component: TaskCommentComponent,
     data: {
-      defaultSort: 'id,asc'
+      authorities: [Authority.USER],
+      defaultSort: 'id,asc',
+      pageTitle: 'compositekeyApp.taskComment.home.title',
     },
-    canActivate: [UserRouteAccessService]
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/view',
     component: TaskCommentDetailComponent,
     resolve: {
-      taskComment: TaskCommentRoutingResolveService
+      taskComment: TaskCommentRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.taskComment.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
     path: 'new',
     component: TaskCommentUpdateComponent,
     resolve: {
-      taskComment: TaskCommentRoutingResolveService
+      taskComment: TaskCommentRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.taskComment.home.title',
+    },
+    canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/edit',
     component: TaskCommentUpdateComponent,
     resolve: {
-      taskComment: TaskCommentRoutingResolveService
+      taskComment: TaskCommentRoutingResolveService,
     },
-    canActivate: [UserRouteAccessService]
-  }
+    data: {
+      authorities: [Authority.USER],
+      pageTitle: 'compositekeyApp.taskComment.home.title',
+    },
+    canActivate: [UserRouteAccessService],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(taskCommentRoute)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class TaskCommentRoutingModule {}

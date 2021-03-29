@@ -8,7 +8,7 @@ import { HealthModalComponent } from './modal/health-modal.component';
 
 @Component({
   selector: 'jhi-health',
-  templateUrl: './health.component.html'
+  templateUrl: './health.component.html',
 })
 export class HealthComponent implements OnInit {
   health?: Health;

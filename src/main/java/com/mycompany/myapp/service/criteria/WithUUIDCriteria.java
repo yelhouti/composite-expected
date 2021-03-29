@@ -22,20 +22,21 @@ import tech.jhipster.service.filter.UUIDFilter;
  * fix type specific filters.
  */
 public class WithUUIDCriteria implements Serializable, Criteria {
+
     private static final long serialVersionUID = 1L;
 
     private UUIDFilter uuid;
 
     private StringFilter name;
 
-    private UUIDFilter withUUIDDetailsId;
+    private WithUUIDDetailsCriteria withUUIDDetails;
 
     public WithUUIDCriteria() {}
 
     public WithUUIDCriteria(WithUUIDCriteria other) {
         this.uuid = other.uuid == null ? null : other.uuid.copy();
         this.name = other.name == null ? null : other.name.copy();
-        this.withUUIDDetailsId = other.withUUIDDetailsId == null ? null : other.withUUIDDetailsId.copy();
+        this.withUUIDDetails = other.withUUIDDetails == null ? null : other.withUUIDDetails.copy();
     }
 
     @Override
@@ -73,19 +74,19 @@ public class WithUUIDCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public UUIDFilter getWithUUIDDetailsId() {
-        return withUUIDDetailsId;
+    public WithUUIDDetailsCriteria getWithUUIDDetails() {
+        return withUUIDDetails;
     }
 
-    public UUIDFilter withUUIDDetailsId() {
-        if (withUUIDDetailsId == null) {
-            withUUIDDetailsId = new UUIDFilter();
+    public WithUUIDDetailsCriteria withUUIDDetails() {
+        if (withUUIDDetails == null) {
+            withUUIDDetails = new WithUUIDDetailsCriteria();
         }
-        return withUUIDDetailsId;
+        return withUUIDDetails;
     }
 
-    public void setWithUUIDDetailsId(UUIDFilter withUUIDDetailsId) {
-        this.withUUIDDetailsId = withUUIDDetailsId;
+    public void setWithUUIDDetails(WithUUIDDetailsCriteria withUUIDDetails) {
+        this.withUUIDDetails = withUUIDDetails;
     }
 
     @Override
@@ -97,14 +98,12 @@ public class WithUUIDCriteria implements Serializable, Criteria {
             return false;
         }
         final WithUUIDCriteria that = (WithUUIDCriteria) o;
-        return (
-            Objects.equals(uuid, that.uuid) && Objects.equals(name, that.name) && Objects.equals(withUUIDDetailsId, that.withUUIDDetailsId)
-        );
+        return Objects.equals(uuid, that.uuid) && Objects.equals(name, that.name) && Objects.equals(withUUIDDetails, that.withUUIDDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name, withUUIDDetailsId);
+        return Objects.hash(uuid, name, withUUIDDetails);
     }
 
     // prettier-ignore
@@ -113,7 +112,7 @@ public class WithUUIDCriteria implements Serializable, Criteria {
         return "WithUUIDCriteria{" +
             (uuid != null ? "uuid=" + uuid + ", " : "") +
             (name != null ? "name=" + name + ", " : "") +
-            (withUUIDDetailsId != null ? "withUUIDDetailsId=" + withUUIDDetailsId + ", " : "") +
+            (withUUIDDetails != null ? "withUUIDDetails=" + withUUIDDetails + ", " : "") +
             "}";
     }
 }

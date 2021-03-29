@@ -2,15 +2,10 @@
   <div class="col-8">
     <div *ngIf="withUUIDDetails">
       <h2 data-cy="withUUIDDetailsDetailsHeading">
-        <span jhiTranslate="compositekeyApp.withUUIDDetails.detail.title">With UUID Details</span>
+        <span jhiTranslate="compositekeyApp.withUUIDDetails.detail.title">With UUID Details</span> {{ withUUIDDetails.withUUID!.uuid! }}
       </h2>
 
       <hr />
-
-      <jhi-alert-error></jhi-alert-error>
-
-      <jhi-alert></jhi-alert>
-
       <dl class="row-md jh-entity-details">
         <dt><span jhiTranslate="compositekeyApp.withUUID.uuid">Uuid</span></dt>
         <dd>
@@ -23,18 +18,27 @@
         <dt><span jhiTranslate="compositekeyApp.withUUIDDetails.withUUID">With UUID</span></dt>
         <dd>
           <div *ngIf="withUUIDDetails.withUUID">
-            <a [routerLink]="['/with-uuid', withUUIDDetails.withUUID?.uuid, 'view']">{{ withUUIDDetails.withUUID?.uuid }}</a>
+            <a [routerLink]="['/with-uuid', withUUIDDetails!.withUUID!.uuid!, 'view']">{{ withUUIDDetails!.withUUID!.uuid }}</a>
           </div>
         </dd>
       </dl>
 
-      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
-      </button>
-
-      <button type="button" [routerLink]="['/with-uuid-details', withUUIDDetails.uuid, 'edit']" class="btn btn-primary">
-        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
-      </button>
+      <button
+        pButton
+        type="submit"
+        (click)="previousState()"
+        class="p-button-info"
+        icon="pi pi-arrow-left"
+        [label]="'entity.action.back' | translate"
+        data-cy="entityDetailsBackButton"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        [label]="'entity.action.edit' | translate"
+        [routerLink]="['/with-uuid-details', withUUIDDetails!.uuid, 'edit']"
+      ></button>
     </div>
   </div>
 </div>

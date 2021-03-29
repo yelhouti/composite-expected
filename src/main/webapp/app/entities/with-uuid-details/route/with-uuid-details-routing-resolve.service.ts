@@ -4,18 +4,18 @@ import { Resolve, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of, EMPTY } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
-import { IWithUUIDDetails, WithUUIDDetails } from '../with-uuid-details.model';
+import { IWithUUIDDetails } from '../with-uuid-details.model';
 import { WithUUIDDetailsService } from '../service/with-uuid-details.service';
 
 @Injectable({ providedIn: 'root' })
-export class WithUUIDDetailsRoutingResolveService implements Resolve<IWithUUIDDetails> {
-  constructor(protected service: WithUUIDDetailsService, protected router: Router) {}
+export class WithUUIDDetailsRoutingResolveService implements Resolve<IWithUUIDDetails | null> {
+  constructor(private service: WithUUIDDetailsService, private router: Router) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<IWithUUIDDetails> | Observable<never> {
-    const id = route.params['uuid'];
-    if (id) {
-      return this.service.find(id).pipe(
-        mergeMap((withUUIDDetails: HttpResponse<WithUUIDDetails>) => {
+  resolve(route: ActivatedRouteSnapshot): Observable<IWithUUIDDetails | null> | Observable<never> {
+    const uuid = route.params['uuid'] ? route.params['uuid'] : null;
+    if (uuid) {
+      return this.service.find(uuid).pipe(
+        mergeMap((withUUIDDetails: HttpResponse<IWithUUIDDetails>) => {
           if (withUUIDDetails.body) {
             return of(withUUIDDetails.body);
           } else {
@@ -25,6 +25,6 @@ export class WithUUIDDetailsRoutingResolveService implements Resolve<IWithUUIDDe
         })
       );
     }
-    return of(new WithUUIDDetails());
+    return of(null);
   }
 }

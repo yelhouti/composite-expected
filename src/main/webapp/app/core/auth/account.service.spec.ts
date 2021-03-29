@@ -23,7 +23,7 @@ function accountWithAuthorities(authorities: string[]): Account {
     langKey: '',
     lastName: '',
     login: '',
-    imageUrl: ''
+    imageUrl: '',
   };
 }
 
@@ -37,7 +37,7 @@ describe('Service Tests', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule, NgxWebstorageModule.forRoot()],
-        providers: [TranslateService, StateStorageService, Router]
+        providers: [TranslateService, StateStorageService, Router],
       });
 
       service = TestBed.inject(AccountService);

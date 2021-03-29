@@ -6,6 +6,7 @@ export const HOME_ROUTE: Route = {
   path: '',
   component: HomeComponent,
   data: {
-    pageTitle: 'home.title'
-  }
+    authorities: [],
+    pageTitle: 'home.title',
+  },
 };

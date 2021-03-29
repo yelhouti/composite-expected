@@ -85,7 +85,7 @@ export enum HttpMethod {
   Get = 'GET',
   Put = 'PUT',
   Patch = 'PATCH',
-  Delete = 'DELETE'
+  Delete = 'DELETE',
 }
 
 export interface ProcessMetrics {
@@ -155,5 +155,5 @@ export enum ThreadState {
   Waiting = 'WAITING',
   Blocked = 'BLOCKED',
   New = 'NEW',
-  Terminated = 'TERMINATED'
+  Terminated = 'TERMINATED',
 }

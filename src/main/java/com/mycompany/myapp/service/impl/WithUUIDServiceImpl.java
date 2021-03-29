@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WithUUIDServiceImpl implements WithUUIDService {
+
     private final Logger log = LoggerFactory.getLogger(WithUUIDServiceImpl.class);
 
     private final WithUUIDRepository withUUIDRepository;
@@ -46,13 +47,10 @@ public class WithUUIDServiceImpl implements WithUUIDService {
         log.debug("Request to partially update WithUUID : {}", withUUIDDTO);
 
         return withUUIDRepository
-            .findById(withUUIDDTO.getUuid())
+            .findById(withUUIDMapper.toEntity(withUUIDDTO).getUuid())
             .map(
                 existingWithUUID -> {
-                    if (withUUIDDTO.getName() != null) {
-                        existingWithUUID.setName(withUUIDDTO.getName());
-                    }
-
+                    withUUIDMapper.partialUpdate(existingWithUUID, withUUIDDTO);
                     return existingWithUUID;
                 }
             )

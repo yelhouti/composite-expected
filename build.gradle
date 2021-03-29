@@ -181,7 +181,7 @@ configurations {
         resolutionStrategy {
             // Inherited version from Spring Boot can't be used because of regressions:
             // To be removed as soon as spring-boot use the same version
-            force 'org.liquibase:liquibase-core:4.3.1'
+            force 'org.liquibase:liquibase-core:4.3.2'
         }
     }
 }
@@ -189,12 +189,6 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots/"
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
     //jhipster-needle-gradle-repositories - JHipster will add additional repositories
 }
 
@@ -298,8 +292,8 @@ wrapper {
 
 if (project.hasProperty("nodeInstall")) {
     node {
-        version = "14.15.0"
-        npmVersion = "7.6.3"
+        version = "14.16.0"
+        npmVersion = "7.8.0"
         download = true
     }
 }

@@ -33,6 +33,7 @@ import tech.jhipster.web.util.ResponseUtil;
 @RestController
 @RequestMapping("/api")
 public class TaskCommentResource {
+
     private final Logger log = LoggerFactory.getLogger(TaskCommentResource.class);
 
     private static final String ENTITY_NAME = "taskComment";
@@ -87,12 +88,42 @@ public class TaskCommentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/task-comments/{id}")
-    public ResponseEntity<TaskCommentDTO> updateTaskComment(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody TaskCommentDTO taskCommentDTO
-    )
+    public ResponseEntity<TaskCommentDTO> updateTaskComment(@PathVariable Long id, @Valid @RequestBody TaskCommentDTO taskCommentDTO)
         throws URISyntaxException {
         log.debug("REST request to update TaskComment : {}, {}", id, taskCommentDTO);
+        if (taskCommentDTO.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        if (!Objects.equals(id, taskCommentDTO.getId())) {
+            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+        }
+        if (!taskCommentRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        TaskCommentDTO result = taskCommentService.save(taskCommentDTO);
+        return ResponseEntity
+            .ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, taskCommentDTO.getId().toString()))
+            .body(result);
+    }
+
+    /**
+     * {@code PATCH  /task-comments/:id} : Partial updates given fields of an existing taskComment, field will ignore if it is null
+     *
+     * @param id the id of the taskCommentDTO to save.
+     * @param taskCommentDTO the taskCommentDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated taskCommentDTO,
+     * or with status {@code 400 (Bad Request)} if the taskCommentDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the taskCommentDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the taskCommentDTO couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PatchMapping(value = "/task-comments/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<TaskCommentDTO> partialUpdateTaskComment(
+        @PathVariable Long id,
+        @NotNull @RequestBody TaskCommentDTO taskCommentDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to partial update TaskComment partially : {}, {}", id, taskCommentDTO);
         if (taskCommentDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -102,31 +133,6 @@ public class TaskCommentResource {
 
         if (!taskCommentRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        TaskCommentDTO result = taskCommentService.save(taskCommentDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, taskCommentDTO.getId().toString()))
-            .body(result);
-    }
-
-    /**
-     * {@code PATCH  /task-comments} : Updates given fields of an existing taskComment.
-     *
-     * @param taskCommentDTO the taskCommentDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated taskCommentDTO,
-     * or with status {@code 400 (Bad Request)} if the taskCommentDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the taskCommentDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the taskCommentDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/task-comments", consumes = "application/merge-patch+json")
-    public ResponseEntity<TaskCommentDTO> partialUpdateTaskComment(@NotNull @RequestBody TaskCommentDTO taskCommentDTO)
-        throws URISyntaxException {
-        log.debug("REST request to update TaskComment partially : {}", taskCommentDTO);
-        if (taskCommentDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
 
         Optional<TaskCommentDTO> result = taskCommentService.partialUpdate(taskCommentDTO);

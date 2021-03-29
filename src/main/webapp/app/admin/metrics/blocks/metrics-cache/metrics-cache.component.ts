@@ -5,7 +5,7 @@ import { CacheMetrics } from 'app/admin/metrics/metrics.model';
 @Component({
   selector: 'jhi-metrics-cache',
   templateUrl: './metrics-cache.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsCacheComponent {
   /**

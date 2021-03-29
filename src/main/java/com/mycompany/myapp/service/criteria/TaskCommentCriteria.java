@@ -21,20 +21,21 @@ import tech.jhipster.service.filter.StringFilter;
  * fix type specific filters.
  */
 public class TaskCommentCriteria implements Serializable, Criteria {
+
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
 
     private StringFilter value;
 
-    private LongFilter taskId;
+    private TaskCriteria task;
 
     public TaskCommentCriteria() {}
 
     public TaskCommentCriteria(TaskCommentCriteria other) {
         this.id = other.id == null ? null : other.id.copy();
         this.value = other.value == null ? null : other.value.copy();
-        this.taskId = other.taskId == null ? null : other.taskId.copy();
+        this.task = other.task == null ? null : other.task.copy();
     }
 
     @Override
@@ -72,19 +73,19 @@ public class TaskCommentCriteria implements Serializable, Criteria {
         this.value = value;
     }
 
-    public LongFilter getTaskId() {
-        return taskId;
+    public TaskCriteria getTask() {
+        return task;
     }
 
-    public LongFilter taskId() {
-        if (taskId == null) {
-            taskId = new LongFilter();
+    public TaskCriteria task() {
+        if (task == null) {
+            task = new TaskCriteria();
         }
-        return taskId;
+        return task;
     }
 
-    public void setTaskId(LongFilter taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskCriteria task) {
+        this.task = task;
     }
 
     @Override
@@ -96,12 +97,12 @@ public class TaskCommentCriteria implements Serializable, Criteria {
             return false;
         }
         final TaskCommentCriteria that = (TaskCommentCriteria) o;
-        return Objects.equals(id, that.id) && Objects.equals(value, that.value) && Objects.equals(taskId, that.taskId);
+        return Objects.equals(id, that.id) && Objects.equals(value, that.value) && Objects.equals(task, that.task);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, value, taskId);
+        return Objects.hash(id, value, task);
     }
 
     // prettier-ignore
@@ -110,7 +111,7 @@ public class TaskCommentCriteria implements Serializable, Criteria {
         return "TaskCommentCriteria{" +
             (id != null ? "id=" + id + ", " : "") +
             (value != null ? "value=" + value + ", " : "") +
-            (taskId != null ? "taskId=" + taskId + ", " : "") +
+            (task != null ? "task=" + task + ", " : "") +
             "}";
     }
 }

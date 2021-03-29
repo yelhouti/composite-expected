@@ -3,6 +3,7 @@ package com.mycompany.myapp.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -27,11 +28,13 @@ import org.springframework.format.support.FormattingConversionService;
  * Utility class for testing REST controllers.
  */
 public final class TestUtil {
+
     private static final ObjectMapper mapper = createObjectMapper();
 
     private static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, false);
+        mapper.configure(MapperFeature.USE_ANNOTATIONS, false); // ignores JsonIgnoreProperties for nested composite keys
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         mapper.registerModule(new JavaTimeModule());
         return mapper;
@@ -67,6 +70,7 @@ public final class TestUtil {
      * A matcher that tests that the examined string represents the same instant as the reference datetime.
      */
     public static class ZonedDateTimeMatcher extends TypeSafeDiagnosingMatcher<String> {
+
         private final ZonedDateTime date;
 
         public ZonedDateTimeMatcher(ZonedDateTime date) {
@@ -106,6 +110,7 @@ public final class TestUtil {
      * A matcher that tests that the examined number represents the same value - it can be Long, Double, etc - as the reference BigDecimal.
      */
     public static class NumberMatcher extends TypeSafeMatcher<Number> {
+
         final BigDecimal value;
 
         public NumberMatcher(BigDecimal value) {

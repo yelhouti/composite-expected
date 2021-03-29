@@ -1,43 +1,65 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { FormBuilder } from '@angular/forms';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
 
-import { IWithUUIDDetails, WithUUIDDetails } from '../with-uuid-details.model';
+import { IWithUUIDDetails } from '../with-uuid-details.model';
 import { WithUUIDDetailsService } from '../service/with-uuid-details.service';
+import { MessageService } from 'primeng/api';
 import { IWithUUID } from 'app/entities/with-uuid/with-uuid.model';
 import { WithUUIDService } from 'app/entities/with-uuid/service/with-uuid.service';
 
 @Component({
   selector: 'jhi-with-uuid-details-update',
-  templateUrl: './with-uuid-details-update.component.html'
+  templateUrl: './with-uuid-details-update.component.html',
 })
 export class WithUUIDDetailsUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
-
-  withUUIDSCollection: IWithUUID[] = [];
+  withUUIDOptions: IWithUUID[] | null = null;
+  withUUIDFilterValue?: any;
 
   editForm = this.fb.group({
     uuid: [],
     details: [],
-    withUUID: []
+    withUUID: [null, [Validators.required]],
   });
 
   constructor(
+    protected messageService: MessageService,
     protected withUUIDDetailsService: WithUUIDDetailsService,
     protected withUUIDService: WithUUIDService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ withUUIDDetails }) => {
       this.updateForm(withUUIDDetails);
-
-      this.loadRelationshipsOptions();
     });
+    this.loadAllWithUUIDS();
+  }
+
+  loadAllWithUUIDS(): void {
+    // TODO change this to load only unspecified + add selected to options if on edit (not create)
+    this.withUUIDService.query().subscribe(
+      (res: HttpResponse<IWithUUID[]>) => (this.withUUIDOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  updateForm(withUUIDDetails: IWithUUIDDetails | null): void {
+    if (withUUIDDetails) {
+      this.edit = true;
+      this.editForm.reset({ ...withUUIDDetails }, { emitEvent: false, onlySelf: true });
+      this.withUUIDFilterValue = withUUIDDetails.withUUID?.uuid;
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -46,65 +68,31 @@ export class WithUUIDDetailsUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const withUUIDDetails = this.createFromForm();
-    if (withUUIDDetails.uuid !== undefined) {
+    const withUUIDDetails = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.withUUIDDetailsService.update(withUUIDDetails));
     } else {
       this.subscribeToSaveResponse(this.withUUIDDetailsService.create(withUUIDDetails));
     }
   }
 
-  trackWithUUIDByUuid(index: number, item: IWithUUID): string {
-    return item.uuid!;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IWithUUIDDetails>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(withUUIDDetails: IWithUUIDDetails): void {
-    this.editForm.patchValue({
-      uuid: withUUIDDetails.uuid,
-      details: withUUIDDetails.details,
-      withUUID: withUUIDDetails.withUUID
-    });
-
-    this.withUUIDSCollection = this.withUUIDService.addWithUUIDToCollectionIfMissing(this.withUUIDSCollection, withUUIDDetails.withUUID);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.withUUIDService
-      .query({ 'withUUIDDetailsId.specified': 'false' })
-      .pipe(map((res: HttpResponse<IWithUUID[]>) => res.body ?? []))
-      .pipe(
-        map((withUUIDS: IWithUUID[]) =>
-          this.withUUIDService.addWithUUIDToCollectionIfMissing(withUUIDS, this.editForm.get('withUUID')!.value)
-        )
-      )
-      .subscribe((withUUIDS: IWithUUID[]) => (this.withUUIDSCollection = withUUIDS));
-  }
-
-  protected createFromForm(): IWithUUIDDetails {
-    return {
-      ...new WithUUIDDetails(),
-      uuid: this.editForm.get(['uuid'])!.value,
-      details: this.editForm.get(['details'])!.value,
-      withUUID: this.editForm.get(['withUUID'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }

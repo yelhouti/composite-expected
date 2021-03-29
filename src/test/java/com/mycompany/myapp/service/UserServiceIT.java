@@ -31,6 +31,7 @@ import tech.jhipster.security.RandomUtil;
 @IntegrationTest
 @Transactional
 class UserServiceIT {
+
     private static final String DEFAULT_LOGIN = "johndoe";
 
     private static final String DEFAULT_EMAIL = "johndoe@localhost";

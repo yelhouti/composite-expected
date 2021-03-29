@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.criteria.CertificateTypeCriteria;
 import com.mycompany.myapp.service.dto.CertificateTypeDTO;
 import com.mycompany.myapp.service.mapper.CertificateTypeMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,15 +27,23 @@ import tech.jhipster.service.QueryService;
 @Service
 @Transactional(readOnly = true)
 public class CertificateTypeQueryService extends QueryService<CertificateType> {
+
     private final Logger log = LoggerFactory.getLogger(CertificateTypeQueryService.class);
 
     private final CertificateTypeRepository certificateTypeRepository;
 
     private final CertificateTypeMapper certificateTypeMapper;
 
-    public CertificateTypeQueryService(CertificateTypeRepository certificateTypeRepository, CertificateTypeMapper certificateTypeMapper) {
+    private final EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService;
+
+    public CertificateTypeQueryService(
+        CertificateTypeRepository certificateTypeRepository,
+        CertificateTypeMapper certificateTypeMapper,
+        @Lazy EmployeeSkillCertificateQueryService employeeSkillCertificateQueryService
+    ) {
         this.certificateTypeRepository = certificateTypeRepository;
         this.certificateTypeMapper = certificateTypeMapper;
+        this.employeeSkillCertificateQueryService = employeeSkillCertificateQueryService;
     }
 
     /**
@@ -79,7 +88,7 @@ public class CertificateTypeQueryService extends QueryService<CertificateType> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<CertificateType> createSpecification(CertificateTypeCriteria criteria) {
+    public Specification<CertificateType> createSpecification(CertificateTypeCriteria criteria) {
         Specification<CertificateType> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getId() != null) {
@@ -88,13 +97,22 @@ public class CertificateTypeQueryService extends QueryService<CertificateType> {
             if (criteria.getName() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getName(), CertificateType_.name));
             }
-            if (criteria.getEmployeeSkillCertificateId() != null) {
+
+            if (criteria.getEmployeeSkillCertificate() != null) {
+                Specification<EmployeeSkillCertificate> employeeSkillCertificateSpecification =
+                    this.employeeSkillCertificateQueryService.createSpecification(criteria.getEmployeeSkillCertificate());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getEmployeeSkillCertificateId(),
-                            root -> root.join(CertificateType_.employeeSkillCertificates, JoinType.LEFT).get(EmployeeSkillCertificate_.id)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<EmployeeSkillCertificate> employeeSkillCertificateRoot = query.from(EmployeeSkillCertificate.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.isMember(
+                                    employeeSkillCertificateRoot,
+                                    root.get(CertificateType_.employeeSkillCertificates)
+                                ),
+                                employeeSkillCertificateSpecification.toPredicate(employeeSkillCertificateRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

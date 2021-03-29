@@ -9,6 +9,9 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring", uses = {})
 public interface WithIdStringMapper extends EntityMapper<WithIdStringDTO, WithIdString> {
+    @Mapping(target = "withIdStringDetails", ignore = true)
+    WithIdString toEntity(WithIdStringDTO withIdStringDTO);
+
     @Named("id")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

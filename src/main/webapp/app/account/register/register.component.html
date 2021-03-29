@@ -44,7 +44,7 @@
           <div *ngIf="registerForm.get('login')!.invalid && (registerForm.get('login')!.dirty || registerForm.get('login')!.touched)">
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('login')?.errors?.required"
+              *ngIf="registerForm.get('login')!.errors!.required"
               jhiTranslate="register.messages.validate.login.required"
             >
               Your username is required.
@@ -52,7 +52,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('login')?.errors?.minlength"
+              *ngIf="registerForm.get('login')!.errors!.minlength"
               jhiTranslate="register.messages.validate.login.minlength"
             >
               Your username is required to be at least 1 character.
@@ -60,7 +60,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('login')?.errors?.maxlength"
+              *ngIf="registerForm.get('login')!.errors!.maxlength"
               jhiTranslate="register.messages.validate.login.maxlength"
             >
               Your username cannot be longer than 50 characters.
@@ -68,7 +68,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('login')?.errors?.pattern"
+              *ngIf="registerForm.get('login')!.errors!.pattern"
               jhiTranslate="register.messages.validate.login.pattern"
             >
               Your username can only contain letters and digits.
@@ -91,7 +91,7 @@
           <div *ngIf="registerForm.get('email')!.invalid && (registerForm.get('email')!.dirty || registerForm.get('email')!.touched)">
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('email')?.errors?.required"
+              *ngIf="registerForm.get('email')!.errors!.required"
               jhiTranslate="global.messages.validate.email.required"
             >
               Your email is required.
@@ -99,7 +99,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('email')?.errors?.invalid"
+              *ngIf="registerForm.get('email')!.errors!.invalid"
               jhiTranslate="global.messages.validate.email.invalid"
             >
               Your email is invalid.
@@ -107,7 +107,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('email')?.errors?.minlength"
+              *ngIf="registerForm.get('email')!.errors!.minlength"
               jhiTranslate="global.messages.validate.email.minlength"
             >
               Your email is required to be at least 5 characters.
@@ -115,7 +115,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('email')?.errors?.maxlength"
+              *ngIf="registerForm.get('email')!.errors!.maxlength"
               jhiTranslate="global.messages.validate.email.maxlength"
             >
               Your email cannot be longer than 100 characters.
@@ -140,7 +140,7 @@
           >
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('password')?.errors?.required"
+              *ngIf="registerForm.get('password')!.errors!.required"
               jhiTranslate="global.messages.validate.newpassword.required"
             >
               Your password is required.
@@ -148,7 +148,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('password')?.errors?.minlength"
+              *ngIf="registerForm.get('password')!.errors!.minlength"
               jhiTranslate="global.messages.validate.newpassword.minlength"
             >
               Your password is required to be at least 4 characters.
@@ -156,7 +156,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('password')?.errors?.maxlength"
+              *ngIf="registerForm.get('password')!.errors!.maxlength"
               jhiTranslate="global.messages.validate.newpassword.maxlength"
             >
               Your password cannot be longer than 50 characters.
@@ -188,7 +188,7 @@
           >
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('confirmPassword')?.errors?.required"
+              *ngIf="registerForm.get('confirmPassword')!.errors!.required"
               jhiTranslate="global.messages.validate.confirmpassword.required"
             >
               Your confirmation password is required.
@@ -196,7 +196,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('confirmPassword')?.errors?.minlength"
+              *ngIf="registerForm.get('confirmPassword')!.errors!.minlength"
               jhiTranslate="global.messages.validate.confirmpassword.minlength"
             >
               Your confirmation password is required to be at least 4 characters.
@@ -204,7 +204,7 @@
 
             <small
               class="form-text text-danger"
-              *ngIf="registerForm.get('confirmPassword')?.errors?.maxlength"
+              *ngIf="registerForm.get('confirmPassword')!.errors!.maxlength"
               jhiTranslate="global.messages.validate.confirmpassword.maxlength"
             >
               Your confirmation password cannot be longer than 50 characters.

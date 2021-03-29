@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-
 import { ITaskComment, TaskComment } from '../task-comment.model';
 
 import { TaskCommentService } from './task-comment.service';
@@ -14,7 +13,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(TaskCommentService);
@@ -22,7 +21,7 @@ describe('Service Tests', () => {
 
       elemDefault = {
         id: 0,
-        value: 'AAAAAAA'
+        value: 'AAAAAAA',
       };
     });
 
@@ -40,7 +39,7 @@ describe('Service Tests', () => {
       it('should create a TaskComment', () => {
         const returnedFromService = Object.assign(
           {
-            id: 0
+            id: 0,
           },
           elemDefault
         );
@@ -58,7 +57,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 1,
-            value: 'BBBBBB'
+            value: 'BBBBBB',
           },
           elemDefault
         );
@@ -76,7 +75,7 @@ describe('Service Tests', () => {
         const returnedFromService = Object.assign(
           {
             id: 1,
-            value: 'BBBBBB'
+            value: 'BBBBBB',
           },
           elemDefault
         );
@@ -97,58 +96,6 @@ describe('Service Tests', () => {
         const req = httpMock.expectOne({ method: 'DELETE' });
         req.flush({ status: 200 });
         expect(expectedResult);
-      });
-
-      describe('addTaskCommentToCollectionIfMissing', () => {
-        it('should add a TaskComment to an empty array', () => {
-          const taskComment: ITaskComment = { id: 123 };
-          expectedResult = service.addTaskCommentToCollectionIfMissing([], taskComment);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(taskComment);
-        });
-
-        it('should not add a TaskComment to an array that contains it', () => {
-          const taskComment: ITaskComment = { id: 123 };
-          const taskCommentCollection: ITaskComment[] = [
-            {
-              ...taskComment
-            },
-            { id: 456 }
-          ];
-          expectedResult = service.addTaskCommentToCollectionIfMissing(taskCommentCollection, taskComment);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a TaskComment to an array that doesn't contain it", () => {
-          const taskComment: ITaskComment = { id: 123 };
-          const taskCommentCollection: ITaskComment[] = [{ id: 456 }];
-          expectedResult = service.addTaskCommentToCollectionIfMissing(taskCommentCollection, taskComment);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(taskComment);
-        });
-
-        it('should add only unique TaskComment to an array', () => {
-          const taskCommentArray: ITaskComment[] = [{ id: 123 }, { id: 456 }, { id: 63603 }];
-          const taskCommentCollection: ITaskComment[] = [{ id: 123 }];
-          expectedResult = service.addTaskCommentToCollectionIfMissing(taskCommentCollection, ...taskCommentArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const taskComment: ITaskComment = { id: 123 };
-          const taskComment2: ITaskComment = { id: 456 };
-          expectedResult = service.addTaskCommentToCollectionIfMissing([], taskComment, taskComment2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(taskComment);
-          expect(expectedResult).toContain(taskComment2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const taskComment: ITaskComment = { id: 123 };
-          expectedResult = service.addTaskCommentToCollectionIfMissing([], null, taskComment, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(taskComment);
-        });
       });
     });
 

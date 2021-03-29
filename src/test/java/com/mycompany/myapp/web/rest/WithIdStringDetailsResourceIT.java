@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @WithMockUser
 class WithIdStringDetailsResourceIT {
+
     private static final String DEFAULT_DETAILS = "AAAAAAAAAA";
     private static final String UPDATED_DETAILS = "BBBBBBBBBB";
 
@@ -195,7 +196,7 @@ class WithIdStringDetailsResourceIT {
 
         // Get all the withIdStringDetailsList
         restWithIdStringDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(withIdStringDetails.getId())))
@@ -313,13 +314,12 @@ class WithIdStringDetailsResourceIT {
         // Get already existing entity
         WithIdString withIdString = withIdStringDetails.getWithIdString();
         withIdStringDetailsRepository.saveAndFlush(withIdStringDetails);
-        String withIdStringId = withIdString.getId();
 
-        // Get all the withIdStringDetailsList where withIdString equals to withIdStringId
-        defaultWithIdStringDetailsShouldBeFound("withIdStringId.equals=" + withIdStringId);
+        // Get all the withIdStringDetailsList where withIdString.id equals to withIdString.getId()
+        defaultWithIdStringDetailsShouldBeFound("withIdString.id.equals=" + withIdString.getId());
 
-        // Get all the withIdStringDetailsList where withIdString equals to "invalid-id"
-        defaultWithIdStringDetailsShouldNotBeFound("withIdStringId.equals=" + "invalid-id");
+        // Get all the withIdStringDetailsList where withIdString.id equals to "invalid-id"
+        defaultWithIdStringDetailsShouldNotBeFound("withIdString.id.equals=" + "invalid-id");
     }
 
     /**
@@ -327,7 +327,7 @@ class WithIdStringDetailsResourceIT {
      */
     private void defaultWithIdStringDetailsShouldBeFound(String filter) throws Exception {
         restWithIdStringDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(withIdStringDetails.getId())))
@@ -335,7 +335,7 @@ class WithIdStringDetailsResourceIT {
 
         // Check, that the count call also returns 1
         restWithIdStringDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -346,7 +346,7 @@ class WithIdStringDetailsResourceIT {
      */
     private void defaultWithIdStringDetailsShouldNotBeFound(String filter) throws Exception {
         restWithIdStringDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -354,7 +354,7 @@ class WithIdStringDetailsResourceIT {
 
         // Check, that the count call also returns 0
         restWithIdStringDetailsMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -384,7 +384,7 @@ class WithIdStringDetailsResourceIT {
 
         restWithIdStringDetailsMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, withIdStringDetailsDTO.getId())
+                put(ENTITY_API_URL_ID, withIdStringDetails.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
             )
@@ -409,7 +409,7 @@ class WithIdStringDetailsResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restWithIdStringDetailsMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, withIdStringDetailsDTO.getId())
+                put(ENTITY_API_URL_ID, withIdStringDetails.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
             )
@@ -477,10 +477,11 @@ class WithIdStringDetailsResourceIT {
         // Update the withIdStringDetails using partial update
         WithIdStringDetails partialUpdatedWithIdStringDetails = new WithIdStringDetails();
         partialUpdatedWithIdStringDetails.setId(withIdStringDetails.getId());
+        partialUpdatedWithIdStringDetails.setWithIdString(withIdStringDetails.getWithIdString());
 
         restWithIdStringDetailsMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedWithIdStringDetails.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdStringDetails))
             )
@@ -504,12 +505,13 @@ class WithIdStringDetailsResourceIT {
         // Update the withIdStringDetails using partial update
         WithIdStringDetails partialUpdatedWithIdStringDetails = new WithIdStringDetails();
         partialUpdatedWithIdStringDetails.setId(withIdStringDetails.getId());
+        partialUpdatedWithIdStringDetails.setWithIdString(withIdStringDetails.getWithIdString());
 
         partialUpdatedWithIdStringDetails.details(UPDATED_DETAILS);
 
         restWithIdStringDetailsMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedWithIdStringDetails.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdStringDetails))
             )
@@ -524,17 +526,71 @@ class WithIdStringDetailsResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateWithIdStringDetailsShouldThrown() throws Exception {
-        // Update the withIdStringDetails without id should throw
-        WithIdStringDetails partialUpdatedWithIdStringDetails = new WithIdStringDetails();
+    void patchNonExistingWithIdStringDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withIdStringDetailsRepository.findAll().size();
+        withIdStringDetails.setId(UUID.randomUUID().toString());
 
+        // Create the WithIdStringDetails
+        WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(withIdStringDetails);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restWithIdStringDetailsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, UUID.randomUUID().toString())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the WithIdStringDetails in the database
+        List<WithIdStringDetails> withIdStringDetailsList = withIdStringDetailsRepository.findAll();
+        assertThat(withIdStringDetailsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchWithIdStringDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withIdStringDetailsRepository.findAll().size();
+        withIdStringDetails.setId(UUID.randomUUID().toString());
+
+        // Create the WithIdStringDetails
+        WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(withIdStringDetails);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restWithIdStringDetailsMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, UUID.randomUUID().toString())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the WithIdStringDetails in the database
+        List<WithIdStringDetails> withIdStringDetailsList = withIdStringDetailsRepository.findAll();
+        assertThat(withIdStringDetailsList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamWithIdStringDetails() throws Exception {
+        int databaseSizeBeforeUpdate = withIdStringDetailsRepository.findAll().size();
+        withIdStringDetails.setId(UUID.randomUUID().toString());
+
+        // Create the WithIdStringDetails
+        WithIdStringDetailsDTO withIdStringDetailsDTO = withIdStringDetailsMapper.toDto(withIdStringDetails);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restWithIdStringDetailsMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedWithIdStringDetails))
+                    .content(TestUtil.convertObjectToJsonBytes(withIdStringDetailsDTO))
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the WithIdStringDetails in the database
+        List<WithIdStringDetails> withIdStringDetailsList = withIdStringDetailsRepository.findAll();
+        assertThat(withIdStringDetailsList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test

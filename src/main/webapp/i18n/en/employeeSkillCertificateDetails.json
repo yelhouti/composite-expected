@@ -1,0 +1,24 @@
+{
+  "compositekeyApp": {
+    "employeeSkillCertificateDetails": {
+      "home": {
+        "title": "Employee Skill Certificate Details",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Employee Skill Certificate Details",
+        "createOrEditLabel": "Create or edit a Employee Skill Certificate Details",
+        "notFound": "No Employee Skill Certificate Details found"
+      },
+      "created": "A new Employee Skill Certificate Details is created with identifier {{ param }}",
+      "updated": "A Employee Skill Certificate Details is updated with identifier {{ param }}",
+      "deleted": "A Employee Skill Certificate Details is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Employee Skill Certificate Details {{ id }}?"
+      },
+      "detail": {
+        "title": "Employee Skill Certificate Details"
+      },
+      "detail": "Detail",
+      "employeeSkillCertificate": "Employee Skill Certificate"
+    }
+  }
+}

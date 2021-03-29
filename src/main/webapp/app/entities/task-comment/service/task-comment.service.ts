@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
 import { ITaskComment, getTaskCommentIdentifier } from '../task-comment.model';
@@ -21,8 +19,14 @@ export class TaskCommentService {
   }
 
   update(taskComment: ITaskComment): Observable<EntityResponseType> {
-    return this.http.put<ITaskComment>(`${this.resourceUrl}/${getTaskCommentIdentifier(taskComment) as number}`, taskComment, {
-      observe: 'response'
+    return this.http.put<ITaskComment>(`${this.resourceUrl}/${getTaskCommentIdentifier(taskComment)!}`, taskComment, {
+      observe: 'response',
+    });
+  }
+
+  partialUpdate(taskComment: ITaskComment): Observable<EntityResponseType> {
+    return this.http.patch<ITaskComment>(`${this.resourceUrl}/${getTaskCommentIdentifier(taskComment)!}`, taskComment, {
+      observe: 'response',
     });
   }
 
@@ -37,25 +41,5 @@ export class TaskCommentService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  addTaskCommentToCollectionIfMissing(
-    taskCommentCollection: ITaskComment[],
-    ...taskCommentsToCheck: (ITaskComment | null | undefined)[]
-  ): ITaskComment[] {
-    const taskComments: ITaskComment[] = taskCommentsToCheck.filter(isPresent);
-    if (taskComments.length > 0) {
-      const taskCommentCollectionIdentifiers = taskCommentCollection.map(taskCommentItem => getTaskCommentIdentifier(taskCommentItem)!);
-      const taskCommentsToAdd = taskComments.filter(taskCommentItem => {
-        const taskCommentIdentifier = getTaskCommentIdentifier(taskCommentItem);
-        if (taskCommentIdentifier == null || taskCommentCollectionIdentifiers.includes(taskCommentIdentifier)) {
-          return false;
-        }
-        taskCommentCollectionIdentifiers.push(taskCommentIdentifier);
-        return true;
-      });
-      return [...taskCommentsToAdd, ...taskCommentCollection];
-    }
-    return taskCommentCollection;
   }
 }

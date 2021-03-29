@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IEmployeeSkill, EmployeeSkill } from '../employee-skill.model';
+import { IEmployeeSkill } from '../employee-skill.model';
 import { EmployeeSkillService } from '../service/employee-skill.service';
 
 import { EmployeeSkillRoutingResolveService } from './employee-skill-routing-resolve.service';
@@ -17,25 +17,25 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: EmployeeSkillRoutingResolveService;
     let service: EmployeeSkillService;
-    let resultEmployeeSkill: IEmployeeSkill | undefined;
+    let resultEmployeeSkill: IEmployeeSkill | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(EmployeeSkillRoutingResolveService);
       service = TestBed.inject(EmployeeSkillService);
-      resultEmployeeSkill = undefined;
+      resultEmployeeSkill = null;
     });
 
     describe('resolve', () => {
       it('should return IEmployeeSkill returned by find', () => {
         // GIVEN
-        service.find = jest.fn(name => of(new HttpResponse({ body: { name } })));
-        mockActivatedRouteSnapshot.params = { name: 'ABC' };
+        service.find = jest.fn(() => of(new HttpResponse({ body: { name: 'ABC', employee: { username: 'ABC' } } })));
+        mockActivatedRouteSnapshot.params = { name: 'ABC', employeeUsername: 'ABC' };
 
         // WHEN
         routingResolveService.resolve(mockActivatedRouteSnapshot).subscribe(result => {
@@ -43,11 +43,11 @@ describe('Service Tests', () => {
         });
 
         // THEN
-        expect(service.find).toBeCalledWith('ABC');
-        expect(resultEmployeeSkill).toEqual({ name: 'ABC' });
+        expect(service.find).toBeCalledWith('ABC', 'ABC');
+        expect(resultEmployeeSkill).toEqual({ name: 'ABC', employee: { username: 'ABC' } });
       });
 
-      it('should return new IEmployeeSkill if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,13 +59,13 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultEmployeeSkill).toEqual(new EmployeeSkill());
+        expect(resultEmployeeSkill).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
         // GIVEN
         spyOn(service, 'find').and.returnValue(of(new HttpResponse({ body: null })));
-        mockActivatedRouteSnapshot.params = { name: 'ABC' };
+        mockActivatedRouteSnapshot.params = { name: 'ABC', employeeUsername: 'ABC' };
 
         // WHEN
         routingResolveService.resolve(mockActivatedRouteSnapshot).subscribe(result => {
@@ -73,8 +73,8 @@ describe('Service Tests', () => {
         });
 
         // THEN
-        expect(service.find).toBeCalledWith('ABC');
-        expect(resultEmployeeSkill).toEqual(undefined);
+        expect(service.find).toBeCalledWith('ABC', 'ABC');
+        expect(resultEmployeeSkill).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

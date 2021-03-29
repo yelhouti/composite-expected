@@ -7,9 +7,10 @@ import com.mycompany.myapp.service.criteria.WithUUIDDetailsCriteria;
 import com.mycompany.myapp.service.dto.WithUUIDDetailsDTO;
 import com.mycompany.myapp.service.mapper.WithUUIDDetailsMapper;
 import java.util.List;
-import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,15 +27,23 @@ import tech.jhipster.service.QueryService;
 @Service
 @Transactional(readOnly = true)
 public class WithUUIDDetailsQueryService extends QueryService<WithUUIDDetails> {
+
     private final Logger log = LoggerFactory.getLogger(WithUUIDDetailsQueryService.class);
 
     private final WithUUIDDetailsRepository withUUIDDetailsRepository;
 
     private final WithUUIDDetailsMapper withUUIDDetailsMapper;
 
-    public WithUUIDDetailsQueryService(WithUUIDDetailsRepository withUUIDDetailsRepository, WithUUIDDetailsMapper withUUIDDetailsMapper) {
+    private final WithUUIDQueryService withUUIDQueryService;
+
+    public WithUUIDDetailsQueryService(
+        WithUUIDDetailsRepository withUUIDDetailsRepository,
+        WithUUIDDetailsMapper withUUIDDetailsMapper,
+        @Lazy WithUUIDQueryService withUUIDQueryService
+    ) {
         this.withUUIDDetailsRepository = withUUIDDetailsRepository;
         this.withUUIDDetailsMapper = withUUIDDetailsMapper;
+        this.withUUIDQueryService = withUUIDQueryService;
     }
 
     /**
@@ -79,7 +88,7 @@ public class WithUUIDDetailsQueryService extends QueryService<WithUUIDDetails> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
-    protected Specification<WithUUIDDetails> createSpecification(WithUUIDDetailsCriteria criteria) {
+    public Specification<WithUUIDDetails> createSpecification(WithUUIDDetailsCriteria criteria) {
         Specification<WithUUIDDetails> specification = Specification.where(null);
         if (criteria != null) {
             if (criteria.getUuid() != null) {
@@ -88,13 +97,21 @@ public class WithUUIDDetailsQueryService extends QueryService<WithUUIDDetails> {
             if (criteria.getDetails() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDetails(), WithUUIDDetails_.details));
             }
-            if (criteria.getWithUUIDId() != null) {
+
+            if (criteria.getWithUUID() != null) {
+                Specification<WithUUID> withUUIDSpecification = this.withUUIDQueryService.createSpecification(criteria.getWithUUID());
                 specification =
                     specification.and(
-                        buildSpecification(
-                            criteria.getWithUUIDId(),
-                            root -> root.join(WithUUIDDetails_.withUUID, JoinType.LEFT).get(WithUUID_.uuid)
-                        )
+                        (root, query, criteriaBuilder) -> {
+                            Root<WithUUID> withUUIDRoot = query.from(WithUUID.class);
+                            return criteriaBuilder.and(
+                                criteriaBuilder.equal(
+                                    withUUIDRoot.get(WithUUID_.uuid),
+                                    root.get(WithUUIDDetails_.withUUID).get(WithUUID_.uuid)
+                                ),
+                                withUUIDSpecification.toPredicate(withUUIDRoot, query, criteriaBuilder)
+                            );
+                        }
                     );
             }
         }

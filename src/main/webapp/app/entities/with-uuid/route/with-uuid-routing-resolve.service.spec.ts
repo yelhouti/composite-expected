@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IWithUUID, WithUUID } from '../with-uuid.model';
+import { IWithUUID } from '../with-uuid.model';
 import { WithUUIDService } from '../service/with-uuid.service';
 
 import { WithUUIDRoutingResolveService } from './with-uuid-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: WithUUIDRoutingResolveService;
     let service: WithUUIDService;
-    let resultWithUUID: IWithUUID | undefined;
+    let resultWithUUID: IWithUUID | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(WithUUIDRoutingResolveService);
       service = TestBed.inject(WithUUIDService);
-      resultWithUUID = undefined;
+      resultWithUUID = null;
     });
 
     describe('resolve', () => {
       it('should return IWithUUID returned by find', () => {
         // GIVEN
-        service.find = jest.fn(uuid => of(new HttpResponse({ body: { uuid } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } })));
         mockActivatedRouteSnapshot.params = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
 
         // WHEN
@@ -47,7 +47,7 @@ describe('Service Tests', () => {
         expect(resultWithUUID).toEqual({ uuid: '9fec3727-3421-4967-b213-ba36557ca194' });
       });
 
-      it('should return new IWithUUID if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultWithUUID).toEqual(new WithUUID());
+        expect(resultWithUUID).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('9fec3727-3421-4967-b213-ba36557ca194');
-        expect(resultWithUUID).toEqual(undefined);
+        expect(resultWithUUID).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

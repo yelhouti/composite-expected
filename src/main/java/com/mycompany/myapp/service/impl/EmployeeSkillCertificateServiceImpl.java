@@ -1,11 +1,16 @@
 package com.mycompany.myapp.service.impl;
 
 import com.mycompany.myapp.domain.EmployeeSkillCertificate;
+import com.mycompany.myapp.domain.EmployeeSkillCertificateId;
 import com.mycompany.myapp.repository.EmployeeSkillCertificateRepository;
 import com.mycompany.myapp.service.EmployeeSkillCertificateService;
 import com.mycompany.myapp.service.dto.EmployeeSkillCertificateDTO;
 import com.mycompany.myapp.service.mapper.EmployeeSkillCertificateMapper;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -19,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class EmployeeSkillCertificateServiceImpl implements EmployeeSkillCertificateService {
+
     private final Logger log = LoggerFactory.getLogger(EmployeeSkillCertificateServiceImpl.class);
 
     private final EmployeeSkillCertificateRepository employeeSkillCertificateRepository;
@@ -46,17 +52,10 @@ public class EmployeeSkillCertificateServiceImpl implements EmployeeSkillCertifi
         log.debug("Request to partially update EmployeeSkillCertificate : {}", employeeSkillCertificateDTO);
 
         return employeeSkillCertificateRepository
-            .findById(employeeSkillCertificateDTO.getId())
+            .findById(employeeSkillCertificateMapper.toEntity(employeeSkillCertificateDTO).getId())
             .map(
                 existingEmployeeSkillCertificate -> {
-                    if (employeeSkillCertificateDTO.getGrade() != null) {
-                        existingEmployeeSkillCertificate.setGrade(employeeSkillCertificateDTO.getGrade());
-                    }
-
-                    if (employeeSkillCertificateDTO.getDate() != null) {
-                        existingEmployeeSkillCertificate.setDate(employeeSkillCertificateDTO.getDate());
-                    }
-
+                    employeeSkillCertificateMapper.partialUpdate(existingEmployeeSkillCertificate, employeeSkillCertificateDTO);
                     return existingEmployeeSkillCertificate;
                 }
             )
@@ -71,15 +70,29 @@ public class EmployeeSkillCertificateServiceImpl implements EmployeeSkillCertifi
         return employeeSkillCertificateRepository.findAll(pageable).map(employeeSkillCertificateMapper::toDto);
     }
 
+    /**
+     *  Get all the employeeSkillCertificates where EmployeeSkillCertificateDetails is {@code null}.
+     *  @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public List<EmployeeSkillCertificateDTO> findAllWhereEmployeeSkillCertificateDetailsIsNull() {
+        log.debug("Request to get all employeeSkillCertificates where EmployeeSkillCertificateDetails is null");
+        return StreamSupport
+            .stream(employeeSkillCertificateRepository.findAll().spliterator(), false)
+            .filter(employeeSkillCertificate -> employeeSkillCertificate.getEmployeeSkillCertificateDetails() == null)
+            .map(employeeSkillCertificateMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public Optional<EmployeeSkillCertificateDTO> findOne(Long id) {
+    public Optional<EmployeeSkillCertificateDTO> findOne(EmployeeSkillCertificateId id) {
         log.debug("Request to get EmployeeSkillCertificate : {}", id);
         return employeeSkillCertificateRepository.findById(id).map(employeeSkillCertificateMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(EmployeeSkillCertificateId id) {
         log.debug("Request to delete EmployeeSkillCertificate : {}", id);
         employeeSkillCertificateRepository.deleteById(id);
     }

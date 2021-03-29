@@ -18,9 +18,9 @@ describe('Component Tests', () => {
         providers: [
           {
             provide: ActivatedRoute,
-            useValue: { data: of({ task: { id: 123 } }) }
-          }
-        ]
+            useValue: { data: of({ task: { id: 123 } }) },
+          },
+        ],
       })
         .overrideTemplate(TaskDetailComponent, '')
         .compileComponents();

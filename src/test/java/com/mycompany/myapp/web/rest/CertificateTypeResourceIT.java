@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @WithMockUser
 class CertificateTypeResourceIT {
+
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
@@ -150,7 +151,7 @@ class CertificateTypeResourceIT {
 
         // Get all the certificateTypeList
         restCertificateTypeMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
+            .perform(get(ENTITY_API_URL))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(certificateType.getId().intValue())))
@@ -278,13 +279,14 @@ class CertificateTypeResourceIT {
         em.flush();
         certificateType.addEmployeeSkillCertificate(employeeSkillCertificate);
         certificateTypeRepository.saveAndFlush(certificateType);
-        Long employeeSkillCertificateId = employeeSkillCertificate.getId();
 
-        // Get all the certificateTypeList where employeeSkillCertificate equals to employeeSkillCertificateId
-        defaultCertificateTypeShouldBeFound("employeeSkillCertificateId.equals=" + employeeSkillCertificateId);
+        // Get all the certificateTypeList where employeeSkillCertificate.type.id equals to employeeSkillCertificate.getId().getTypeId()
+        defaultCertificateTypeShouldBeFound("employeeSkillCertificate.type.id.equals=" + employeeSkillCertificate.getId().getTypeId());
 
-        // Get all the certificateTypeList where employeeSkillCertificate equals to (employeeSkillCertificateId + 1)
-        defaultCertificateTypeShouldNotBeFound("employeeSkillCertificateId.equals=" + (employeeSkillCertificateId + 1));
+        // Get all the certificateTypeList where employeeSkillCertificate.type.id equals to (employeeSkillCertificate.getId().getTypeId() + 1)
+        defaultCertificateTypeShouldNotBeFound(
+            "employeeSkillCertificate.type.id.equals=" + (employeeSkillCertificate.getId().getTypeId() + 1)
+        );
     }
 
     /**
@@ -292,7 +294,7 @@ class CertificateTypeResourceIT {
      */
     private void defaultCertificateTypeShouldBeFound(String filter) throws Exception {
         restCertificateTypeMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(certificateType.getId().intValue())))
@@ -300,7 +302,7 @@ class CertificateTypeResourceIT {
 
         // Check, that the count call also returns 1
         restCertificateTypeMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("1"));
@@ -311,7 +313,7 @@ class CertificateTypeResourceIT {
      */
     private void defaultCertificateTypeShouldNotBeFound(String filter) throws Exception {
         restCertificateTypeMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
@@ -319,7 +321,7 @@ class CertificateTypeResourceIT {
 
         // Check, that the count call also returns 0
         restCertificateTypeMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
+            .perform(get(ENTITY_API_URL + "/count?" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string("0"));
@@ -349,7 +351,7 @@ class CertificateTypeResourceIT {
 
         restCertificateTypeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, certificateTypeDTO.getId())
+                put(ENTITY_API_URL_ID, certificateType.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(certificateTypeDTO))
             )
@@ -374,7 +376,7 @@ class CertificateTypeResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restCertificateTypeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, certificateTypeDTO.getId())
+                put(ENTITY_API_URL_ID, certificateType.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(certificateTypeDTO))
             )
@@ -443,7 +445,7 @@ class CertificateTypeResourceIT {
 
         restCertificateTypeMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedCertificateType.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCertificateType))
             )
@@ -472,7 +474,7 @@ class CertificateTypeResourceIT {
 
         restCertificateTypeMockMvc
             .perform(
-                patch(ENTITY_API_URL)
+                patch(ENTITY_API_URL_ID, partialUpdatedCertificateType.getId())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCertificateType))
             )
@@ -487,17 +489,71 @@ class CertificateTypeResourceIT {
 
     @Test
     @Transactional
-    void partialUpdateCertificateTypeShouldThrown() throws Exception {
-        // Update the certificateType without id should throw
-        CertificateType partialUpdatedCertificateType = new CertificateType();
+    void patchNonExistingCertificateType() throws Exception {
+        int databaseSizeBeforeUpdate = certificateTypeRepository.findAll().size();
+        certificateType.setId(count.incrementAndGet());
 
+        // Create the CertificateType
+        CertificateTypeDTO certificateTypeDTO = certificateTypeMapper.toDto(certificateType);
+
+        // If the entity doesn't have an ID, it will throw BadRequestAlertException
+        restCertificateTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(certificateTypeDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the CertificateType in the database
+        List<CertificateType> certificateTypeList = certificateTypeRepository.findAll();
+        assertThat(certificateTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithIdMismatchCertificateType() throws Exception {
+        int databaseSizeBeforeUpdate = certificateTypeRepository.findAll().size();
+        certificateType.setId(count.incrementAndGet());
+
+        // Create the CertificateType
+        CertificateTypeDTO certificateTypeDTO = certificateTypeMapper.toDto(certificateType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
+        restCertificateTypeMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                    .contentType("application/merge-patch+json")
+                    .content(TestUtil.convertObjectToJsonBytes(certificateTypeDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        // Validate the CertificateType in the database
+        List<CertificateType> certificateTypeList = certificateTypeRepository.findAll();
+        assertThat(certificateTypeList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    void patchWithMissingIdPathParamCertificateType() throws Exception {
+        int databaseSizeBeforeUpdate = certificateTypeRepository.findAll().size();
+        certificateType.setId(count.incrementAndGet());
+
+        // Create the CertificateType
+        CertificateTypeDTO certificateTypeDTO = certificateTypeMapper.toDto(certificateType);
+
+        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restCertificateTypeMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedCertificateType))
+                    .content(TestUtil.convertObjectToJsonBytes(certificateTypeDTO))
             )
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isMethodNotAllowed());
+
+        // Validate the CertificateType in the database
+        List<CertificateType> certificateTypeList = certificateTypeRepository.findAll();
+        assertThat(certificateTypeList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test

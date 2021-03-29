@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { IWithUUIDDetails, WithUUIDDetails } from '../with-uuid-details.model';
+import { IWithUUIDDetails } from '../with-uuid-details.model';
 import { WithUUIDDetailsService } from '../service/with-uuid-details.service';
 
 import { WithUUIDDetailsRoutingResolveService } from './with-uuid-details-routing-resolve.service';
@@ -17,24 +17,24 @@ describe('Service Tests', () => {
     let mockActivatedRouteSnapshot: ActivatedRouteSnapshot;
     let routingResolveService: WithUUIDDetailsRoutingResolveService;
     let service: WithUUIDDetailsService;
-    let resultWithUUIDDetails: IWithUUIDDetails | undefined;
+    let resultWithUUIDDetails: IWithUUIDDetails | null;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [Router, ActivatedRouteSnapshot]
+        providers: [Router, ActivatedRouteSnapshot],
       });
       mockRouter = TestBed.inject(Router);
       mockActivatedRouteSnapshot = TestBed.inject(ActivatedRouteSnapshot);
       routingResolveService = TestBed.inject(WithUUIDDetailsRoutingResolveService);
       service = TestBed.inject(WithUUIDDetailsService);
-      resultWithUUIDDetails = undefined;
+      resultWithUUIDDetails = null;
     });
 
     describe('resolve', () => {
       it('should return IWithUUIDDetails returned by find', () => {
         // GIVEN
-        service.find = jest.fn(uuid => of(new HttpResponse({ body: { uuid } })));
+        service.find = jest.fn(() => of(new HttpResponse({ body: { withUUID: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } } })));
         mockActivatedRouteSnapshot.params = { uuid: '9fec3727-3421-4967-b213-ba36557ca194' };
 
         // WHEN
@@ -44,10 +44,10 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('9fec3727-3421-4967-b213-ba36557ca194');
-        expect(resultWithUUIDDetails).toEqual({ uuid: '9fec3727-3421-4967-b213-ba36557ca194' });
+        expect(resultWithUUIDDetails).toEqual({ withUUID: { uuid: '9fec3727-3421-4967-b213-ba36557ca194' } });
       });
 
-      it('should return new IWithUUIDDetails if id is not provided', () => {
+      it('should return null if id is not provided', () => {
         // GIVEN
         service.find = jest.fn();
         mockActivatedRouteSnapshot.params = {};
@@ -59,7 +59,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).not.toBeCalled();
-        expect(resultWithUUIDDetails).toEqual(new WithUUIDDetails());
+        expect(resultWithUUIDDetails).toEqual(null);
       });
 
       it('should route to 404 page if data not found in server', () => {
@@ -74,7 +74,7 @@ describe('Service Tests', () => {
 
         // THEN
         expect(service.find).toBeCalledWith('9fec3727-3421-4967-b213-ba36557ca194');
-        expect(resultWithUUIDDetails).toEqual(undefined);
+        expect(resultWithUUIDDetails).toEqual(null);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['404']);
       });
     });

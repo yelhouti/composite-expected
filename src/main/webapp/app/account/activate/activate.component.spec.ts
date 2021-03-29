@@ -18,9 +18,9 @@ describe('Component Tests', () => {
           providers: [
             {
               provide: ActivatedRoute,
-              useValue: { queryParams: of({ key: 'ABC123' }) }
-            }
-          ]
+              useValue: { queryParams: of({ key: 'ABC123' }) },
+            },
+          ],
         })
           .overrideTemplate(ActivateComponent, '')
           .compileComponents();

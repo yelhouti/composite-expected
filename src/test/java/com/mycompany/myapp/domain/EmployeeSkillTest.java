@@ -11,13 +11,13 @@ class EmployeeSkillTest {
     void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(EmployeeSkill.class);
         EmployeeSkill employeeSkill1 = new EmployeeSkill();
-        employeeSkill1.setName("id1");
+        employeeSkill1.setId(new EmployeeSkillId("id1", "id1"));
         EmployeeSkill employeeSkill2 = new EmployeeSkill();
-        employeeSkill2.setName(employeeSkill1.getName());
+        employeeSkill2.setId(employeeSkill1.getId());
         assertThat(employeeSkill1).isEqualTo(employeeSkill2);
-        employeeSkill2.setName("id2");
+        employeeSkill2.setId(new EmployeeSkillId("id2", "id2"));
         assertThat(employeeSkill1).isNotEqualTo(employeeSkill2);
-        employeeSkill1.setName(null);
+        employeeSkill1.setId(null);
         assertThat(employeeSkill1).isNotEqualTo(employeeSkill2);
     }
 }

@@ -8,40 +8,51 @@
       >
         Create or edit a Certificate Type
       </h2>
-
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+      <div class="form-grid p-fluid">
+        <div class="p-field p-grid">
+          <ng-container *ngIf="editForm.get('id')!.value">
+            <label jhiTranslate="global.field.id" for="field_id" class="p-col-12 p-md-2">ID</label>
+            <div class="p-col-12 p-md-10">
+              <input pInputText type="number" name="id" id="field_id" formControlName="id" readonly />
+            </div>
+          </ng-container>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.certificateType.name" for="field_name">Name</label>
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.certificateType.name" for="field_name" class="p-col-12 p-md-2">Name</label>
+          <div class="p-col-12 p-md-10">
+            <input pInputText type="text" name="name" id="field_name" formControlName="name" />
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('name')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>
 
       <div>
-        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
         <button
+          pButton
+          type="button"
+          id="cancel-save"
+          icon="pi pi-ban"
+          class="p-button-secondary"
+          (click)="previousState()"
+          [label]="'entity.action.cancel' | translate"
+        ></button>
+        <button
+          pButton
           type="submit"
           id="save-entity"
-          data-cy="entityCreateSaveButton"
+          icon="pi pi-save"
           [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          [label]="'entity.action.save' | translate"
+        ></button>
       </div>
     </form>
   </div>

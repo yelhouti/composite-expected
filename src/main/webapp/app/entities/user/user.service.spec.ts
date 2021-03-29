@@ -14,7 +14,7 @@ describe('Service Tests', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
+        imports: [HttpClientTestingModule],
       });
       expectedResult = null;
       service = TestBed.inject(UserService);
@@ -38,67 +38,15 @@ describe('Service Tests', () => {
 
       it('should propagate not found response', () => {
         service.query().subscribe({
-          error: (error: HttpErrorResponse) => (expectedResult = error.status)
+          error: (error: HttpErrorResponse) => (expectedResult = error.status),
         });
 
         const req = httpMock.expectOne({ method: 'GET' });
         req.flush('Internal Server Error', {
           status: 500,
-          statusText: 'Inernal Server Error'
+          statusText: 'Inernal Server Error',
         });
         expect(expectedResult).toEqual(500);
-      });
-
-      describe('addUserToCollectionIfMissing', () => {
-        it('should add a User to an empty array', () => {
-          const user: IUser = { id: 123 };
-          expectedResult = service.addUserToCollectionIfMissing([], user);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(user);
-        });
-
-        it('should not add a User to an array that contains it', () => {
-          const user: IUser = { id: 123 };
-          const userCollection: IUser[] = [
-            {
-              ...user
-            },
-            { id: 456 }
-          ];
-          expectedResult = service.addUserToCollectionIfMissing(userCollection, user);
-          expect(expectedResult).toHaveLength(2);
-        });
-
-        it("should add a User to an array that doesn't contain it", () => {
-          const user: IUser = { id: 123 };
-          const userCollection: IUser[] = [{ id: 456 }];
-          expectedResult = service.addUserToCollectionIfMissing(userCollection, user);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(user);
-        });
-
-        it('should add only unique User to an array', () => {
-          const userArray: IUser[] = [{ id: 123 }, { id: 456 }, { id: 86013 }];
-          const userCollection: IUser[] = [{ id: 456 }];
-          expectedResult = service.addUserToCollectionIfMissing(userCollection, ...userArray);
-          expect(expectedResult).toHaveLength(3);
-        });
-
-        it('should accept varargs', () => {
-          const user: IUser = { id: 123 };
-          const user2: IUser = { id: 456 };
-          expectedResult = service.addUserToCollectionIfMissing([], user, user2);
-          expect(expectedResult).toHaveLength(2);
-          expect(expectedResult).toContain(user);
-          expect(expectedResult).toContain(user2);
-        });
-
-        it('should accept null and undefined values', () => {
-          const user: IUser = { id: 123 };
-          expectedResult = service.addUserToCollectionIfMissing([], null, user, undefined);
-          expect(expectedResult).toHaveLength(1);
-          expect(expectedResult).toContain(user);
-        });
       });
     });
   });

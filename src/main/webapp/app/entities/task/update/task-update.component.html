@@ -4,286 +4,233 @@
       <h2 id="jhi-task-heading" data-cy="TaskCreateUpdateHeading" jhiTranslate="compositekeyApp.task.home.createOrEditLabel">
         Create or edit a Task
       </h2>
-
-      <div>
-        <jhi-alert-error></jhi-alert-error>
-
-        <div class="form-group" [hidden]="editForm.get('id')!.value == null">
-          <label class="form-control-label" jhiTranslate="global.field.id" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.name" for="field_name">Name</label>
-          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
-          <div *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('name')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.type" for="field_type">Type</label>
-          <select class="form-control" name="type" formControlName="type" id="field_type" data-cy="type">
-            <option [ngValue]="null">{{ 'compositekeyApp.TaskType.null' | translate }}</option>
-            <option value="TYPE1">{{ 'compositekeyApp.TaskType.TYPE1' | translate }}</option>
-            <option value="TYPE2">{{ 'compositekeyApp.TaskType.TYPE2' | translate }}</option>
-            <option value="TYPE3">{{ 'compositekeyApp.TaskType.TYPE3' | translate }}</option>
-          </select>
-          <div *ngIf="editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('type')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.endDate" for="field_endDate">End Date</label>
-          <div class="input-group">
-            <input
-              id="field_endDate"
-              data-cy="endDate"
-              type="text"
-              class="form-control"
-              name="endDate"
-              ngbDatepicker
-              #endDateDp="ngbDatepicker"
-              formControlName="endDate"
-            />
-            <span class="input-group-append">
-              <button type="button" class="btn btn-secondary" (click)="endDateDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
-            </span>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.createdAt" for="field_createdAt">Created At</label>
-          <div class="d-flex">
-            <input
-              id="field_createdAt"
-              data-cy="createdAt"
-              type="datetime-local"
-              class="form-control"
-              name="createdAt"
-              formControlName="createdAt"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          <div *ngIf="editForm.get('createdAt')!.invalid && (editForm.get('createdAt')!.dirty || editForm.get('createdAt')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('createdAt')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-            <small
-              class="form-text text-danger"
-              [hidden]="!editForm.get('createdAt')?.errors?.ZonedDateTimelocal"
-              jhiTranslate="entity.validation.ZonedDateTimelocal"
-            >
-              This field should be a date and time.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.modifiedAt" for="field_modifiedAt">Modified At</label>
-          <div class="d-flex">
-            <input
-              id="field_modifiedAt"
-              data-cy="modifiedAt"
-              type="datetime-local"
-              class="form-control"
-              name="modifiedAt"
-              formControlName="modifiedAt"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-          <div *ngIf="editForm.get('modifiedAt')!.invalid && (editForm.get('modifiedAt')!.dirty || editForm.get('modifiedAt')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('modifiedAt')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-            <small
-              class="form-text text-danger"
-              [hidden]="!editForm.get('modifiedAt')?.errors?.ZonedDateTimelocal"
-              jhiTranslate="entity.validation.ZonedDateTimelocal"
-            >
-              This field should be a date and time.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.done" for="field_done">Done</label>
-          <input type="checkbox" class="form-check" name="done" id="field_done" data-cy="done" formControlName="done" />
-          <div *ngIf="editForm.get('done')!.invalid && (editForm.get('done')!.dirty || editForm.get('done')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('done')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.description" for="field_description">Description</label>
-          <textarea
-            class="form-control"
-            name="description"
-            id="field_description"
-            data-cy="description"
-            formControlName="description"
-          ></textarea>
-          <div *ngIf="editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('description')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.attachment" for="field_attachment">Attachment</label>
-          <div>
-            <div *ngIf="editForm.get('attachment')!.value" class="form-text text-danger clearfix">
-              <a
-                class="pull-left"
-                (click)="openFile(editForm.get('attachment')!.value, editForm.get('attachmentContentType')!.value)"
-                jhiTranslate="entity.action.open"
-                >open</a
-              ><br />
-              <span class="pull-left"
-                >{{ editForm.get('attachmentContentType')!.value }}, {{ byteSize(editForm.get('attachment')!.value) }}</span
-              >
-              <button
-                type="button"
-                (click)="editForm.patchValue({ attachment: null }); editForm.patchValue({ attachmentContentType: null })"
-                class="btn btn-secondary btn-xs pull-right"
-              >
-                <fa-icon icon="times"></fa-icon>
-              </button>
+      <div class="form-grid p-fluid">
+        <div class="p-field p-grid">
+          <ng-container *ngIf="editForm.get('id')!.value">
+            <label jhiTranslate="global.field.id" for="field_id" class="p-col-12 p-md-2">ID</label>
+            <div class="p-col-12 p-md-10">
+              <input pInputText type="number" name="id" id="field_id" formControlName="id" readonly />
             </div>
-            <input
-              type="file"
-              id="file_attachment"
-              data-cy="attachment"
-              (change)="setFileData($event, 'attachment', false)"
-              jhiTranslate="entity.action.addblob"
-            />
-          </div>
-          <input
-            type="hidden"
-            class="form-control"
-            name="attachment"
-            id="field_attachment"
-            data-cy="attachment"
-            formControlName="attachment"
-          />
-          <input
-            type="hidden"
-            class="form-control"
-            name="attachmentContentType"
-            id="field_attachmentContentType"
-            formControlName="attachmentContentType"
-          />
-          <div *ngIf="editForm.get('attachment')!.invalid && (editForm.get('attachment')!.dirty || editForm.get('attachment')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('attachment')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
+          </ng-container>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.name" for="field_name" class="p-col-12 p-md-2">Name</label>
+          <div class="p-col-12 p-md-10">
+            <input pInputText type="text" name="name" id="field_name" formControlName="name" />
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('name')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.picture" for="field_picture">Picture</label>
-          <div>
-            <img
-              [src]="'data:' + editForm.get('pictureContentType')!.value + ';base64,' + editForm.get('picture')!.value"
-              style="max-height: 100px"
-              *ngIf="editForm.get('picture')!.value"
-              alt="task image"
-            />
-            <div *ngIf="editForm.get('picture')!.value" class="form-text text-danger clearfix">
-              <span class="pull-left">{{ editForm.get('pictureContentType')!.value }}, {{ byteSize(editForm.get('picture')!.value) }}</span>
-              <button
-                type="button"
-                (click)="clearInputImage('picture', 'pictureContentType', 'file_picture')"
-                class="btn btn-secondary btn-xs pull-right"
-              >
-                <fa-icon icon="times"></fa-icon>
-              </button>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.type" for="field_type" class="p-col-12 p-md-2">Type</label>
+          <div class="p-col-12 p-md-10">
+            <p-dropdown [options]="typeOptions!" name="type" formControlName="type" id="field_type" placeholder="Choose">
+              <ng-template let-type pTemplate="item">{{ 'compositekeyApp.task.TaskType.' + type.label | translate }}</ng-template>
+            </p-dropdown>
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('type')!.invalid && (editForm.get('type')!.dirty || editForm.get('type')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('type')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
             </div>
-            <input
-              type="file"
-              id="file_picture"
-              data-cy="picture"
-              (change)="setFileData($event, 'picture', true)"
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.endDate" for="field_endDate" class="p-col-12 p-md-2">End Date</label>
+          <div class="p-col-12 p-md-10">
+            <p-calendar id="field_endDate" formControlName="endDate" [showIcon]="true"></p-calendar>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.createdAt" for="field_createdAt" class="p-col-12 p-md-2">Created At</label>
+          <div class="p-col-12 p-md-10">
+            <p-calendar id="field_createdAt" formControlName="createdAt" [showIcon]="true" [showTime]="true"></p-calendar>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('createdAt')!.invalid && (editForm.get('createdAt')!.dirty || editForm.get('createdAt')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('createdAt')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+                <p-message
+                  severity="error"
+                  [hidden]="!editForm.get('createdAt')!.errors!.ZonedDateTimelocal"
+                  [text]="'entity.validation.ZonedDateTimelocal' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.modifiedAt" for="field_modifiedAt" class="p-col-12 p-md-2">Modified At</label>
+          <div class="p-col-12 p-md-10">
+            <p-calendar id="field_modifiedAt" formControlName="modifiedAt" [showIcon]="true" [showTime]="true"></p-calendar>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('modifiedAt')!.invalid && (editForm.get('modifiedAt')!.dirty || editForm.get('modifiedAt')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('modifiedAt')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+                <p-message
+                  severity="error"
+                  [hidden]="!editForm.get('modifiedAt')!.errors!.ZonedDateTimelocal"
+                  [text]="'entity.validation.ZonedDateTimelocal' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.done" for="field_done" class="p-col-12 p-md-2">Done</label>
+          <div class="p-col-12 p-md-10">
+            <p-inputSwitch name="done" id="field_done" formControlName="done"></p-inputSwitch>
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('done')!.invalid && (editForm.get('done')!.dirty || editForm.get('done')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('done')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.description" for="field_description" class="p-col-12 p-md-2">Description</label>
+          <div class="p-col-12 p-md-10">
+            <textarea pInputTextarea name="description" id="field_description" formControlName="description"></textarea>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('description')!.invalid && (editForm.get('description')!.dirty || editForm.get('description')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('description')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.attachment" for="field_attachment" class="p-col-12 p-md-2">Attachment</label>
+          <div class="p-col-12 p-md-10">
+            <p-fileUpload
+              name="attachment"
+              id="field_attachment"
+              [showUploadButton]="false"
+              (onSelect)="onFileSelect($event, 'attachment')"
+              (onClear)="onFileRemove($event, 'attachment')"
+              (onRemove)="onFileRemove($event, 'attachment')"
+              [files]="attachmentFile ? [attachmentFile] : []"
+            ></p-fileUpload>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('attachment')!.invalid && (editForm.get('attachment')!.dirty || editForm.get('attachment')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('attachment')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.picture" for="field_picture" class="p-col-12 p-md-2">Picture</label>
+          <div class="p-col-12 p-md-10">
+            <p-fileUpload
+              name="picture"
+              id="field_picture"
+              [showUploadButton]="false"
+              (onSelect)="onFileSelect($event, 'picture')"
               accept="image/*"
-              jhiTranslate="entity.action.addimage"
-            />
-          </div>
-          <input type="hidden" class="form-control" name="picture" id="field_picture" data-cy="picture" formControlName="picture" />
-          <input
-            type="hidden"
-            class="form-control"
-            name="pictureContentType"
-            id="field_pictureContentType"
-            formControlName="pictureContentType"
-          />
-          <div *ngIf="editForm.get('picture')!.invalid && (editForm.get('picture')!.dirty || editForm.get('picture')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('picture')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
+              (onClear)="onFileRemove($event, 'picture')"
+              (onRemove)="onFileRemove($event, 'picture')"
+              [files]="pictureFile ? [pictureFile] : []"
+            ></p-fileUpload>
+            <div class="validation-messages">
+              <ng-container
+                *ngIf="editForm.get('picture')!.invalid && (editForm.get('picture')!.dirty || editForm.get('picture')!.touched)"
+              >
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('picture')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-control-label" jhiTranslate="compositekeyApp.task.user" for="field_user">User</label>
-          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user">
-            <option *ngIf="!editForm.get('user')!.value" [ngValue]="null" selected></option>
-            <option
-              [ngValue]="userOption.id === editForm.get('user')!.value?.id ? editForm.get('user')!.value : userOption"
-              *ngFor="let userOption of usersSharedCollection; trackBy: trackUserById"
-            >
-              {{ userOption.login }}
-            </option>
-          </select>
-        </div>
-        <div *ngIf="editForm.get(['user'])!.invalid && (editForm.get(['user'])!.dirty || editForm.get(['user'])!.touched)">
-          <small class="form-text text-danger" *ngIf="editForm.get(['user'])?.errors?.required" jhiTranslate="entity.validation.required">
-            This field is required.
-          </small>
+        <div class="p-field p-grid">
+          <label jhiTranslate="compositekeyApp.task.user" for="field_user" class="p-col-12 p-md-2">User</label>
+          <div class="p-col-12 p-md-10">
+            <p-dropdown
+              id="field_user"
+              [options]="userOptions!"
+              formControlName="user"
+              placeholder="Choose"
+              optionLabel="login"
+              dataKey="id"
+            ></p-dropdown>
+            <div class="validation-messages">
+              <ng-container *ngIf="editForm.get('user')!.invalid && (editForm.get('user')!.dirty || editForm.get('user')!.touched)">
+                <p-message
+                  severity="error"
+                  *ngIf="editForm.get('user')!.errors!.required"
+                  [text]="'entity.validation.required' | translate"
+                >
+                </p-message>
+              </ng-container>
+            </div>
+          </div>
         </div>
       </div>
 
       <div>
-        <button type="button" id="cancel-save" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
-        </button>
-
         <button
+          pButton
+          type="button"
+          id="cancel-save"
+          icon="pi pi-ban"
+          class="p-button-secondary"
+          (click)="previousState()"
+          [label]="'entity.action.cancel' | translate"
+        ></button>
+        <button
+          pButton
           type="submit"
           id="save-entity"
-          data-cy="entityCreateSaveButton"
+          icon="pi pi-save"
           [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
-        </button>
+          [label]="'entity.action.save' | translate"
+        ></button>
       </div>
     </form>
   </div>

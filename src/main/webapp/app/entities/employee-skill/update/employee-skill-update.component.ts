@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { lazyLoadEventToServerQueryParams } from 'app/core/request/request-util';
+import { LazyLoadEvent } from 'primeng/api';
 
-import { IEmployeeSkill, EmployeeSkill } from '../employee-skill.model';
+import { IEmployeeSkill } from '../employee-skill.model';
 import { EmployeeSkillService } from '../service/employee-skill.service';
+import { MessageService } from 'primeng/api';
 import { ITask } from 'app/entities/task/task.model';
 import { TaskService } from 'app/entities/task/service/task.service';
 import { IEmployee } from 'app/entities/employee/employee.model';
@@ -14,36 +16,81 @@ import { EmployeeService } from 'app/entities/employee/service/employee.service'
 
 @Component({
   selector: 'jhi-employee-skill-update',
-  templateUrl: './employee-skill-update.component.html'
+  templateUrl: './employee-skill-update.component.html',
 })
 export class EmployeeSkillUpdateComponent implements OnInit {
+  edit = false;
   isSaving = false;
-
-  tasksSharedCollection: ITask[] = [];
-  employeesSharedCollection: IEmployee[] = [];
+  taskOptions: ITask[] | null = null;
+  taskSelectedOptions: ITask[] | null = null;
+  employeeOptions: IEmployee[] | null = null;
+  employeeFilterValue?: any;
+  teacherOptions: IEmployee[] | null = null;
+  teacherFilterValue?: any;
 
   editForm = this.fb.group({
     name: [null, [Validators.required]],
     level: [null, [Validators.required]],
     tasks: [],
-    employee: [null, Validators.required],
-    teacher: [null, Validators.required]
+    employee: [null, [Validators.required]],
+    teacher: [null, [Validators.required]],
   });
 
   constructor(
+    protected messageService: MessageService,
     protected employeeSkillService: EmployeeSkillService,
     protected taskService: TaskService,
     protected employeeService: EmployeeService,
     protected activatedRoute: ActivatedRoute,
-    protected fb: FormBuilder
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.isSaving = false;
+
     this.activatedRoute.data.subscribe(({ employeeSkill }) => {
       this.updateForm(employeeSkill);
-
-      this.loadRelationshipsOptions();
     });
+  }
+
+  onTaskLazyLoadEvent(event: LazyLoadEvent): void {
+    this.taskService.query(lazyLoadEventToServerQueryParams(event, 'name.contains')).subscribe(
+      (res: HttpResponse<ITask[]>) => (this.taskOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  onEmployeeLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService.query(lazyLoadEventToServerQueryParams(event, 'fullname.contains')).subscribe(
+      (res: HttpResponse<IEmployee[]>) => (this.employeeOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  onTeacherLazyLoadEvent(event: LazyLoadEvent): void {
+    this.employeeService.query(lazyLoadEventToServerQueryParams(event, 'fullname.contains')).subscribe(
+      (res: HttpResponse<IEmployee[]>) => (this.teacherOptions = res.body),
+      (res: HttpErrorResponse) => this.onError(res.message)
+    );
+  }
+
+  updateForm(employeeSkill: IEmployeeSkill | null): void {
+    if (employeeSkill) {
+      this.edit = true;
+      this.editForm.reset({ ...employeeSkill }, { emitEvent: false, onlySelf: true });
+      this.taskSelectedOptions = employeeSkill.tasks ?? [];
+      if (employeeSkill.employee) {
+        this.employeeOptions = [employeeSkill.employee];
+        this.employeeFilterValue = employeeSkill.employee.fullname;
+      }
+      if (employeeSkill.teacher) {
+        this.teacherOptions = [employeeSkill.teacher];
+        this.teacherFilterValue = employeeSkill.teacher.fullname;
+      }
+    } else {
+      this.edit = false;
+      this.editForm.reset({});
+    }
   }
 
   previousState(): void {
@@ -52,99 +99,31 @@ export class EmployeeSkillUpdateComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const employeeSkill = this.createFromForm();
-    if (employeeSkill.name !== undefined) {
+    const employeeSkill = this.editForm.value;
+    if (this.edit) {
       this.subscribeToSaveResponse(this.employeeSkillService.update(employeeSkill));
     } else {
       this.subscribeToSaveResponse(this.employeeSkillService.create(employeeSkill));
     }
   }
 
-  trackTaskById(index: number, item: ITask): number {
-    return item.id!;
-  }
-
-  trackEmployeeByUsername(index: number, item: IEmployee): string {
-    return item.username!;
-  }
-
-  getSelectedTask(option: ITask, selectedVals?: ITask[]): ITask {
-    if (selectedVals) {
-      for (let i = 0; i < selectedVals.length; i++) {
-        if (option.id === selectedVals[i].id) {
-          return selectedVals[i];
-        }
-      }
-    }
-    return option;
-  }
-
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IEmployeeSkill>>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
+    result.subscribe(
       () => this.onSaveSuccess(),
       () => this.onSaveError()
     );
   }
 
   protected onSaveSuccess(): void {
+    this.isSaving = false;
     this.previousState();
   }
 
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
     this.isSaving = false;
   }
 
-  protected updateForm(employeeSkill: IEmployeeSkill): void {
-    this.editForm.patchValue({
-      name: employeeSkill.name,
-      level: employeeSkill.level,
-      tasks: employeeSkill.tasks,
-      employee: employeeSkill.employee,
-      teacher: employeeSkill.teacher
-    });
-
-    this.tasksSharedCollection = this.taskService.addTaskToCollectionIfMissing(this.tasksSharedCollection, ...(employeeSkill.tasks ?? []));
-    this.employeesSharedCollection = this.employeeService.addEmployeeToCollectionIfMissing(
-      this.employeesSharedCollection,
-      employeeSkill.employee,
-      employeeSkill.teacher
-    );
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.taskService
-      .query()
-      .pipe(map((res: HttpResponse<ITask[]>) => res.body ?? []))
-      .pipe(map((tasks: ITask[]) => this.taskService.addTaskToCollectionIfMissing(tasks, ...(this.editForm.get('tasks')!.value ?? []))))
-      .subscribe((tasks: ITask[]) => (this.tasksSharedCollection = tasks));
-
-    this.employeeService
-      .query()
-      .pipe(map((res: HttpResponse<IEmployee[]>) => res.body ?? []))
-      .pipe(
-        map((employees: IEmployee[]) =>
-          this.employeeService.addEmployeeToCollectionIfMissing(
-            employees,
-            this.editForm.get('employee')!.value,
-            this.editForm.get('teacher')!.value
-          )
-        )
-      )
-      .subscribe((employees: IEmployee[]) => (this.employeesSharedCollection = employees));
-  }
-
-  protected createFromForm(): IEmployeeSkill {
-    return {
-      ...new EmployeeSkill(),
-      name: this.editForm.get(['name'])!.value,
-      level: this.editForm.get(['level'])!.value,
-      tasks: this.editForm.get(['tasks'])!.value,
-      employee: this.editForm.get(['employee'])!.value,
-      teacher: this.editForm.get(['teacher'])!.value
-    };
+  protected onError(errorMessage: string): void {
+    this.messageService.add({ severity: 'error', summary: errorMessage });
   }
 }
